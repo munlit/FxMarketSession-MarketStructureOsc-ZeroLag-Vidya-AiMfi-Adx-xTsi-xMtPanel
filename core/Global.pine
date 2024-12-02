@@ -1,0 +1,445 @@
+/// ╔═══════════════════════════════════╗
+/// ║	Globals							║
+/// ╚═══════════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+strGlobalExtendTooltip					= "Indicador TSI basado en tendencia"
+strGlobalOptionalTooltip				= "Configuración de temporalidad adicional"
+
+/// ───────────────────────
+/// ─── Variables
+/// ───────────────────────
+
+globalTSIGroupTimeframe					= "Tsi & Divergences"
+// globalTSIGroupTimeframe					= "Temporalidad Global"
+showTsiMuDiTSIDivergs					= input.bool	(defval = true,			title = 'TSI & Divergences',			group = globalGroupTimeframe)
+showTsiMuDiTSIMultitimeframe			= input.bool	(defval = false,		title = "Multitimeframe",				group = globalGroupTimeframe,		tooltip = strGlobalOptionalTooltip)
+strGlobalMultiTimeFrame					= input.string 	(defval = "Grafico",	title = "Multi Timeframe",				group = globalGroupTimeframe,
+			  options					=				["Grafico", "15 min", "30 min", "1 Hora", "2 Horas", "3 Horas", "4 Horas", "1 Dia", "1 Semana", "1 Mes"])
+strGlobalColorSelector					= input.string 	(defval = "Allen",		title = "Color Selector",				group = globalGroupTimeframe,
+			  options					=				["Allen", "Ultr", "Mono"])
+			//   options					=				["Allen", "Ultr", "Inverse", "Classic", "Light", "Mono"])
+float insGlobalTFCoefficient			= 				2.3
+
+/// ───────────────────────
+/// ─── Types
+/// ───────────────────────
+
+type globalTypeOHL
+	float O								= open
+	float H								= high
+	float L								= low
+	float C								= close
+	float V								= volume
+	int   I								= bar_index
+
+/// ───────────────────────
+/// ─── Switch
+/// ───────────────────────
+
+[_co_gbl_buy, _co_gbl_sell, _co_gbl_long, _co_gbl_short, _co_gbl_neutral, _co_gbl_extra, _co_gbl_white, _co_gbl_black, _co_gbl_txt_light, _co_gbl_txt_dark]	= switch	strGlobalColorSelector
+	"Allen"								=> [#33FFAC,		#CCF8FF,		#ADEB42,		#EA1889,		#CCF8FF,		#FDF43C,		#E6F7FF,		#121F3D,		#FBFD73,		#121F3D]
+	"Ultr"								=> [#00E7FD,		#FE0CB6,		#00E7FD,		#FE0CB6,		#121F3D,		#FDF43C,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Light"								=> [#2962FF,		#F23645,		#2962FF,		#F23645,		#FCFF8F,		#5C818A,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Inverse"							=> [#ADEB42,		#EA1889,		#33FFAC,		#CCF8FF,		#CCF8FF,		#FDF43C,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Classic"							=> [#B1FF05,		#D11C36,		#B1FF05,		#D11C36,		#5C818A,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+	"Mono"								=> [#CCF8FF,		#0C1633,		#CCF8FF,		#0C1633,		#676B79,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
+
+/// ───────────────────────
+/// ─── Switch
+/// ───────────────────────
+
+/// ─── switch line style
+string	_line_style					= switch _option_line_style
+	"───"								=> line.style_solid
+	"---"								=> line.style_dashed
+	"···"								=> line.style_dotted
+
+/// ─── switch position vertical
+string	_position_vertical			= switch _option_position_y
+	"Arriba"							=> "top"
+	"Medio"								=> "middle"
+	"Abajo"								=> "bottom"
+
+/// ─── switch position horizontal
+string	_position_horizontal		= switch _option_position_x
+
+	"Izquierda"							=> "left"
+	"Centro"							=> "center"
+	"Derecha"							=> "right"
+
+/// ─── switch position in/out
+string	_position_in				= switch _option_position_in
+	"Externo"							=> "outside"
+	"Interno"							=> "inside"
+
+/// ─── switch label size
+string	_label_size					= switch _option_label_size
+	"Auto"								=> size.auto
+	"Mini"								=> size.tiny
+	"Pequeño"							=> size.small
+	"Normal"							=> size.normal
+	"Grande"							=> size.large
+	"Enorme"							=> size.huge
+
+/// ─── switch session timezone
+string	_session					= switch _option_timezone
+	"NYSE"								=> "UTC-5"
+	"New York"							=> "America/New_York"
+	"Chicago"							=> "America/Chicago"
+	"Londres"							=> "Europe/London"
+	"Tokyo"								=> "Asia/Tokyo"
+	"Shanghai"							=> "Asia/Shanghai"
+	"Sydney"							=> "Australia/Sydney"
+	"Argentina"							=> "America/Argentina/Buenos_Aires"
+
+/// ───────────────────────
+/// ─── Functions
+/// ───────────────────────
+
+/// ─── function timeframe
+FunGlobalTimeFrame(_timeframe) =>
+	switch _timeframe
+		"Grafico"						=> "Chart"
+		"1 seg"							=> "S"	
+		"5 seg"							=> "5S"
+		"10 seg"						=> "10S"
+		"15 seg"						=> "15S"
+		"30 seg"						=> "30S"
+		"1 min"							=> "1"	
+		"3 min"							=> "3"	
+		"5 min"							=> "5"
+		"15 min"						=> "15"
+		"30 min"						=> "30"
+		"1 Hora"						=> "60"
+		"2 Horas"						=> "120"
+		"3 Horas"						=> "180"
+		"4 Horas"						=> "240"
+		"8 horas"						=> "480"
+		"Dia"							=> "D"
+		"1 Dia"							=> "1D"
+		"Semana"						=> "W"
+		"1 Semana"						=> "1W"
+		"Mes"							=> "M"
+		"1 Mes"							=> "1M"
+
+/// ─── function location vertical
+FunGlobalVertical(_vertical) =>
+	switch _vertical
+		"arriba"						=> "top"
+		"medio"							=> "middle"
+		"abajo"							=> "bottom"
+
+/// ─── function location horizontal
+FunGlobalHorizontal(_horizontal) =>
+	switch _horizontal
+
+		"izquierda"						=> "left"
+		"centro"						=> "center"
+		"derecha"						=> "right"
+
+/// ─── function position
+FunGlobalPositionIn(_position) =>
+	switch _position
+		"Externo"						=> "outside"
+		"Interno"						=> "inside"
+
+/// ─── function text size
+FunGlobalTextSize(_textsize) =>
+	switch _textsize
+		"Mini"							=> size.tiny
+		"Pequeño"						=> size.small
+		"Normal"						=> size.normal
+		"Grande"						=> size.large
+		"Enorme"						=> size.huge
+		"Auto"							=> size.auto
+
+/// ─── function line style
+FunGlobalLineStyle(_linestyle) =>
+	switch _linestyle
+		'⎯⎯⎯⎯'							=> line.style_solid
+		'----'							=> line.style_dashed
+		'····'							=> line.style_dotted
+
+/// ─── function Days of Week
+FunGlobalDayofWeek(_days) =>
+	switch _days
+		1								=> 'Domingo'
+		2								=> 'Lunes'
+		3								=> 'Martes'
+		4								=> 'Miercoles'
+		5								=> 'Jueves'
+		6								=> 'Viernes'
+		7								=> 'Sabado'
+
+/// ─── function Months of Year
+FunGlobalDayofMonth(_months) =>
+	switch _months
+		1								=> 'Enero'
+		2								=> 'Febrero'
+		3								=> 'Marzo'
+		4								=> 'Abril'
+		5								=> 'Mayo'
+		6								=> 'Junio'
+		7								=> 'Julio'
+		8								=> 'Abosto'
+		9								=> 'Septiembre'
+		10								=> 'Octubre'
+		11								=> 'Noviembre'
+		12								=> 'Diciembre'
+
+/// ─── function Quarters
+FunGlobalQuarters(_quarters) =>
+	switch _quarters
+		1								=> 'Q1'
+		2								=> 'Q2'
+		3								=> 'Q3'
+		4								=> 'Q4'
+
+/// ─── function Timezone
+FunGlobalTimeZone(_timezone) =>
+	switch _timezone
+		"NYSE"							=> "UTC-5"
+		"New York"						=> "America/New_York"
+		"Chicago"						=> "America/Chicago"
+		"Londres"						=> "Europe/London"
+		"Tokyo"							=> "Asia/Tokyo"
+		"Shanghai"						=> "Asia/Shanghai"
+		"Sydney"						=> "Australia/Sydney"
+		"Argentina"						=> "America/Argentina/Buenos_Aires"
+
+/// ─── function tsi
+FunGlobalCalculateTSI(bool _fast, _source) =>
+// FunGlobalCalculateTSI(bool _speed, _source, _fast_long, _fast_short, _fast_signal, _slow_long, _slow_short, _slow_signal) =>
+	if _fast
+		_long				= 25
+		_short				= 5
+		_signal				= 14
+
+	else
+		_long				= 25
+		_short				= 13
+		_signal				= 13
+
+	_tsi					= ta.tsi(_source, _short, _long) * 100
+	_tsi_ema				= ta.ema(_tsi, _signal)
+
+	[_tsi, _tsi_ema]
+
+/// ─── function hvar
+FunGlobalCalcHLVar(_source, _length) =>
+	_alpha								= 2 / (_length + 1)
+	_vud								= _source	> _source[1]	? _source		- _source[1]	: 0
+	_vdd								= _source	< _source[1]	? _source[1]	- _source		: 0
+	_v_upD								= math.sum(_vud, 9)
+	_v_downD							= math.sum(_vdd, 9)
+	_v_CMO								= nz((_v_upD - _v_downD) / (_v_upD + _v_downD))
+	_HLVAR								= 0.0
+	_HLVAR								:= nz(_alpha * math.abs(_v_CMO) * _source) + (1 - _alpha * math.abs(_v_CMO)) * nz(HLVAR[1])
+	_HLVAR
+
+/// ─── function kama
+FunGlobalCalcKama(_source, _length) =>
+
+	_KAMA								= 0.0
+	_xvnoise							= math.abs(_source - _source[1])
+	_fastend							= 0.666
+	_slowend							= 0.0645
+	_signal								= math.abs(_source - _source[_length])
+	_noise								= math.sum(_xvnoise, _length)
+	_nefratio							= _noise != 0 ? _signal / _noise : 0
+	_smooth								= math.pow(_nefratio * (_fastend - _slowend) + _slowend, 2)
+	_KAMA								:= nz(_KAMA[1])		+ _smooth * (_source - nz(_KAMA[1]))
+	_KAMA
+
+/// ─── function trama
+FunGlobalCalcTRAMA(_source, _length) =>
+	_ama								= 0.
+	_hhA								= math.max(math.sign(ta.change(ta.highest(_length))), 0)
+	_llA								= bool(math.max(math.sign(ta.change(ta.lowest(_length)) * -1), 0))
+	_tc									= math.pow(ta.sma(bool(_hhA) or bool(_llA) ? 1 : 0, _length), 2)
+	_ama								:= nz(_ama[1] + _tc * (_source - _ama[1]), _source)
+	_ama
+
+/// ─── function dema
+FunGlobalCalcDEMA(_source, _length) =>
+	_hldema								= 0.0
+	_hldema								:= 2 * ta.ema(_source, _length) - ta.ema(ta.ema(_source, _length), _length)
+	_hldema
+
+/// ─── function zlema
+FunGlobalCalcHLZlema(_source, _length) =>
+	_zxLag								= _length / 2 == math.round(_length / 2) ? _length / 2 : (_length - 1) / 2
+	_zxEMAData							= _source + _source - _source[_zxLag]
+	_hlzlema							= ta.ema(_zxEMAData, _length)
+	_hlzlema
+
+/// ─── function tsf
+FunGlobalCalcHLTsf(_source, _length) =>
+	_linreg								= ta.linreg(_source, _length, 0)
+	_linregV							= ta.linreg(_source, _length, 1)
+	_lrs_minus							= _linreg - _linregV
+	_hltsf								= ta.linreg(_source, _length, 0) + _lrs_minus
+	_hltsf
+
+/// ─── function wwma
+FunGlobalCalcHLWwma(_source, _length) =>
+	_wwalpha							= 1 / _length
+	_hlwwma								= 0.0
+	_hlwwma								:= _wwalpha * _source + (1 - _wwalpha) * nz(_hlwwma[1])
+	_hlwwma
+
+/// ─── function calculate MA
+FunGlobalCalculateMA(_source, _length, _type) =>
+	switch _type
+		"SMA"							=> ta.sma	(_source, _length)
+		"HMA"							=> ta.hma	(_source, _length)
+		"EMA"							=> ta.ema	(_source, _length)
+		"SMMA"							=> ta.rma	(_source, _length)
+		"WMA"							=> ta.wma	(_source, _length)
+		"VWMA"							=> ta.vwma	(_source, _length)
+		"MFI"							=> ta.mfi	(_source, _length)
+
+		// "TSI"							=> = ta.tsi(_source, _short, _long) * 100
+		"LSMA"							=> ta.linreg(_source, _length, offset = 0)
+
+		"KAMA"							=> FunGlobalCalcKama		(_source, _length)
+		"TRAMA"							=> FunGlobalCalcTRAMA		(_source, _length)
+		"VAR"							=> FunGlobalCalcHLVar		(_source, _length)
+		"DEMA"							=> FunGlobalCalcDEMA		(_source, _length)
+		"ZLEMA"							=> FunGlobalCalcHLZlema		(_source, _length)
+		"TSF"							=> FunGlobalCalcHLTsf		(_source, _length)
+		"WWMA"							=> FunGlobalCalcHLWwma		(_source, _length)
+
+/// ─── function calculate ATR
+FusGlobalCalculateATR(_source, _atr_length) =>
+	_highest_high				= ta.highest(_source, _atr_length)
+	_lowest_low					= ta.lowest(_source, _atr_length)
+	_true_range					= na(_highest_high[1]) ? _highest_high - _lowest_low : math.max(_highest_high - _lowest_low, math.abs(_highest_high - _source[1]), math.abs(_lowest_low - _source[1]))
+	ta.rma(_true_range, _atr_length)
+
+/// ─── Function calculate timeframe range
+FunGlobalCalculateTimeframeRange(_coefficient, _timeframe) =>
+	_x									= 3
+	_mayor								= 480
+	_minor								= 15
+	_tonumber							= str.tonumber(_timeframe)
+	_operat_coeff						= _tonumber * _coefficient
+	_operat_minor						= _tonumber * _x
+	_toresult							= str.tonumber(_timeframe)
+	// _toresult							= str.tostring(_timeframe)
+
+	_conditional						= _tonumber >= _mayor ? _toresult : _tonumber <= _minor ? _operat_minor : _operat_coeff
+	str.tostring(_conditional)
+
+/// ─── Function create new table
+FunGlobalNewTable(_box, _col, _row, _width, _bgcolor, _txt, _txtcolor, _txthalign, _txtsize) =>
+	table.cell(table_id		= _box,
+		  column			= _col,
+		  row				= _row,
+		  width				= _width,
+		  bgcolor			= _bgcolor,
+		  text				= _txt,
+		  text_color		= _txtcolor,
+		  text_halign		= _txthalign,
+		  text_size			= _txtsize
+		  )
+
+/// ─── function Signal buy/sell
+FunGlobalSignal(_buy, _sell) =>
+	_buy ? "🟢⬈" : _sell ? "🔴⬊" : "⚪➞"
+
+/// ─── function Color buy/sell
+FunGlobalIfColor(_buy, _sell) =>
+	_buy ? _co_gbl_buy : _sell ? _co_gbl_sell : _co_gbl_neutral
+
+/// ─── Function signal buy/sell
+FunGlobalSignalBuySell(_buy, _sell, _buy2, _sell2, _buy3, _sell3, _buy4, _sell4) =>
+	_if_buy								= _sell			> _sell3			and _sell2			> _sell4
+	_if_sell							= _buy			< _buy3				and _buy2			< _buy4
+	_if_color							= _if_sell	?	"🔴⬊"	:	_if_buy	?	"🟢⬈"	:	"⚪➞"
+
+	_cond_buy							= _buy >= 80
+	_cond_sell							= _sell <= 20
+
+	_signal_color						= _cond_buy ? colorTsiObsPnl_Buy : _cond_sell ? colorTsiObsPnl_Sell : colorTsiObsPnl_Neutral
+	_signal_opacity						= _buy >= 100 or _sell <= 0 ? 20 : _buy >= 80 or _sell <= 20 ? 40 : 65
+
+/// ─── function RSI calculate
+FunGlobalCalculateRSI(_source, _length) =>
+	_upmove								= math.max		(_source - _source[1], 0)
+	_downmove							= math.max		(_source[1] - _source, 0)
+	_upavg								= ta.rma		(_upmove, _length)
+	_downavg							= ta.rma		(_downmove, _length)
+	_calc_rsi							= _downavg == 0 ? 100 : _upavg == 0 ? 0 : 100 - (100 / (1 + _upavg / _downavg))
+	_calc_rsi
+
+/// ─── function table signal
+FunTsiObsPnlCalculateCellSignal(_col, _row, _title, _var, _var2, _var3, _var4, _ma) =>
+	/// ─── signal buy/sell
+	_if_buy								= _var		> _var3		and _var2		> _var4		and	_var4 < 20
+	_if_sell							= _var		< _var3		and _var2		< _var4		and _var4 > 80
+	_if_condition						= _if_sell	?	"🔴⬊"	:	_if_buy	?	"🟢⬈"	:	"⚪➞"
+
+	// _cond_buy							= _var >= 80
+	// _cond_sell							= _var <= 20
+
+	// _signal_color						= _cond_buy ? colorTsiObsPnl_Buy : _cond_sell ? colorTsiObsPnl_Sell : colorTsiObsPnl_Neutral
+	_signal_opacity						= _var >= 100 or _var <= 0 ? 20 : _var >= 80 or _var <= 20 ? 40 : 65
+
+	/// ─── table
+	_cell_color							= _var >= 80 ? colorTsiObsPnl_Sell : _var <= 20 ? colorTsiObsPnl_Buy : colorTsiObsPnl_Neutral
+	_opacity							= _var >= 100 or _var <= 0 ? 20 : _var >= 85 or _var <= 15 ? 40 : 65
+	_cell_text							= _title + "\n" + str.tostring(_var, "#.00") + "\n" +_if_condition
+	// _cell_text							= _timeframe + "\n" + str.tostring(_var, "#.00")
+
+	table.cell							(vTsiPnlNewTableSignal, _col, _row, _cell_text,
+		  bgcolor						= color.new(_cell_color, _signal_opacity),
+		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= colorTsiObsPnl_Text,
+		  width							= 6)
+
+/// ─── Function calculate plots & fill
+// FunGlobalCalculatePlotsFill(_value_up, _value_dn) =>
+// 	_show								= show_vVidya_shadow
+// 	_color_up							= col_vVidya_uptrend
+// 	_color_dn							= col_vVidya_downtrend
+// 	_opacity							= 60
+// 	_opacity_none						= 100
+// 	_line_width							= 2
+// 	_line_style							= plot.style_linebr
+// 	_color_conditional					= vVidya_trend_up ? _color_up : not vVidya_trend_up ? _color_dn : chart.fg_color
+
+// 	_plot_up							= plot(_value_up,	color = _color_conditional,	linewidth = _line_width, style = _line_style)
+// 	// _plot_dn							= plot(_value_dn,	color = _color_conditional,	linewidth = _line_width, style = _line_style)
+// 	_plot_dn							= plot(_value_dn,	display = display.none)
+// 	fill(_plot_up, _plot_dn, _value_up, _value_dn, color.new(_color_conditional, _show ? _opacity : _opacity_none), na)
+
+/// ─── Function calculate fill
+// FunGlobalCalculateFill(_plot_up, _plot_dn, _value_up, _value_dn) =>
+// 	_show								= show_vVidya_shadow
+// 	_color_up							= col_vVidya_uptrend
+// 	_color_dn							= col_vVidya_downtrend
+// 	_opacity							= 60
+// 	_opacity_none						= 100
+// 	_color_conditional					= vVidya_trend_up ? _color_up : not vVidya_trend_up ? _color_dn : chart.fg_color
+
+// 	fill(_plot_up, _plot_dn, _value_up, _value_dn, color.new(_color_conditional, _show ? _opacity : _opacity_none), na)
+
+/// ─── instance function calculate plots & fill
+// FunGlobalCalculateFill(vVi_trend1, vVi_trend2, vVidya_smoothed_value, hl2)
+
+/// ───────────────────────
+/// ─── Instances
+/// ───────────────────────
+
+globalOHL								= globalTypeOHL.new()
+
+/// Instance function timeframe
+// FunGlobalTimeFrame(strGlobalTimeFrame)
+
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ─── 🔘🔴🟢🟡🛑⚙️🎲🧿🎯🎱🤖💀☠️👻👽👾😈🥶😰😶‍🌫️🩻💰⏱️⏰⏲️🧭☃️⚪⚫🔘
+/// ───  ■ × ◙

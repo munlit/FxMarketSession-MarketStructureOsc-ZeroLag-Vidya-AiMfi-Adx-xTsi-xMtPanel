@@ -1,0 +1,131 @@
+// @function 	    Determines if a given background color corresponds to a light theme based on its brightness level.
+// @param bgColor   (color) The background color to check. Optional. Default value is the chart's background color.
+// @returns 	    (bool) True if the background color is "light" (has a brightness greater than 0.5), otherwise false.
+
+//@version=5
+indicator(title						= "TSI two [Allen ]",
+		  shorttitle				= "TSI two",
+		  precision					= 3,
+		  timeframe					= "",
+		  timeframe_gaps			= true,
+		  format					= format.price,
+		  explicit_plot_zorder		= true)
+
+//#region ———————————————————— Constants and inputs
+
+///	Colors ───────────────────────
+
+string	GRP3						= "TSI Line"
+color	co_tsiOsObBBuyLine			= input.color(color.new(#17ff00, 0),	title = "",							group = GRP3,		inline = "1")
+color	co_tsiOsObBMiddleLine		= input.color(color.new(#f3ff00, 0),	title = "",							group = GRP3,		inline = "1")
+color	co_tsiOsObBSellLine			= input.color(color.new(#d32f2f, 0),	title = "",							group = GRP3,		inline = "1") 
+
+string	GRP4						= "TSI Signal"
+color	co_tsiOsObBBuySignal		= input.color(color.new(#17ff00, 0),	title = "",							group = GRP4,		inline = "2")
+color	co_tsiOsObBSellSignal		= input.color(color.new(#d32f2f, 0),	title = "",							group = GRP4,		inline = "2")
+
+///	Vars ─────────────────────────
+
+string	optSI1						= "Fast"
+string	optSI2						= "Slow"
+string	optTI1						= "Classic Bj"
+string	optTI2						= "Nightlife"
+string	optTI3						= "Beach Day"
+
+string	GRP1						= "TSI Control"
+string	tsiOsObBSpeed				= input.string(optSI1,					title = "Rango velocidad",			group = GRP1,		options = [optSI1, optSI2])
+string	tsiOsObBTheme				= input.string(optTI1,					title = "Rango color",				group = GRP1)
+// string	tsiOsObBTheme				= input.string(optTI1,					title = "Rango color",				group = GRP1,		options = [optTI1, optTI2, optTI3])
+
+string	GRP2						= "Lineas de SobreCompra/SobreVenta"
+int		tsiOsObBoBotInput			= 30
+int		tsiOsObBoSoldInput			= -30
+bool	showTsiOsObBLines			= input.bool(false,						title = "Mostrar Ob/Os",			group = GRP2)
+bool	showtsiOsObBHiLo			= input.bool(false,						title = "Mostrar Ob/Os Cruce",		group = GRP2)
+bool	showtsiOsObBMiddle			= input.bool(false,						title = "Mostrar linea media",		group = GRP2)
+
+string	GRP8						= "TSI Rapido"
+int    tsiOsObBBuyLengthFa			= input.int(25,							title = "Longitud Compra",			group = GRP8)
+int    tsiOsObBSellLengthFa			= input.int(5 ,							title = "Longitud Venta",			group = GRP8)
+int    tsiOsObBsignalLengthFa		= input.int(14,							title = "Señal",					group = GRP8)
+
+string	GRP9						= "TSI Lento"
+int		tsiOsObBBuyLengthSl			= input.int(25,							title = "Longitud Compra",			group = GRP9)
+int		tsiOsObBSellLengthSl		= input.int(13,							title = "Longitud Venta",			group = GRP9)
+int		tsiOsObBsignalLengthSl		= input.int(13,							title = "Señal",					group = GRP9)
+
+///	Function ─────────────────────
+
+isLightTheme(color bgColor = chart.bg_color) =>
+	float	_r						= color.r(bgColor)
+	float	_g						= color.g(bgColor)
+	float	_b						= color.b(bgColor)
+	float	_brightness				= (_r + _g + _b) / (3 * 255)
+	bool	_isLight				= _brightness > 0.5
+
+
+///	Calc ─────────────────────────
+
+
+bool	tsisbBTSIsp					= tsiOsObBSpeed == optSI1
+int		tsisbBshort					= tsisbBTSIsp				? tsiOsObBSellLengthFa		: tsiOsObBSellLengthSl
+int		tsisbBlong					= tsisbBTSIsp				? tsiOsObBBuyLengthFa		: tsiOsObBBuyLengthSl
+int		tsisbBsign					= tsisbBTSIsp				? tsiOsObBsignalLengthFa	: tsiOsObBsignalLengthSl
+
+float	tsisbBTSI					= ta.tsi(close, tsisbBshort, tsisbBlong) * 100
+float	tsisbBTSL					= ta.ema(tsisbBTSI, tsisbBsign)
+
+
+///	If ───────────────────────────
+
+
+// bool	tsisbBtsiIsBull				= tsisbBTSI	>= tsisbBTSI[1]
+// bool	tsisbBtslIsBull				= tsisbBTSL	>= tsisbBTSL[1]
+// bool	tsisbBtrendIsBull			= tsisbBTSI	>= tsisbBTSL
+// float	tsisbBDIFF					= tsisbBTSI	- tsisbBTSL
+// float	tsisbBbarHi					= math.max(0, 0 + tsisbBDIFF)
+// float	tsisbBbarLo					= math.min(0, 0 + tsisbBDIFF)
+
+// bool	tsisbBcurlUp				= tsisbBTSI	> tsisbBTSI[1]			and tsisbBTSI		< tsisbBTSL
+// bool	tsisbBcurlDn				= tsisbBTSI	< tsisbBTSI[1]			and tsisbBTSI		> tsisbBTSL
+// bool	tsisbBoverBought			= tsisbBTSI	> tsiOsObBoBotInput		and tsisbBTSI		< tsisbBTSI[1]	and tsisbBTSI[1]	> tsisbBTSL[1]
+// bool	tsisbBoverSold				= tsisbBTSI	< tsiOsObBoSoldInput	and tsisbBTSI		> tsisbBTSI[1]	and tsisbBTSI[1]	< tsisbBTSL[1]
+
+// bool	tsisbBCROSSUP				= ta.crossover(tsisbBTSI,			tsisbBTSL)
+// bool	tsisbBCROSSDN				= ta.crossunder(tsisbBTSI,			tsisbBTSL)
+// bool	tsisbBCROSS					= ta.cross(tsisbBTSI,				tsisbBTSL)
+// bool	tsisbBtsiXUp				= ta.crossover(tsisbBTSI,			tsiOsObBoBotInput)
+// bool	tsisbBtsiXDn				= ta.crossunder(tsisbBTSI,			tsiOsObBoSoldInput)
+
+// bool	tsisbBisLight				= isLightTheme()
+// bool	tsisbBisClassic				= tsiOsObBTheme == optTI1
+// bool	tsisbBisBeachy				= tsiOsObBTheme == optTI3
+
+
+///	Colors ───────────────────────
+
+
+// int		co_tsisbBbarOpac			= tsisbBisLight						? 50				: 80
+// int		co_tsisbBbarBgTransp		= tsisbBisLight						? 90				: 0
+
+// color	co_tsisbBtsiColor			= tsisbBisClassic					? tsisbBcurlUp		? co_tsiOsObBBuyLine		: tsisbBcurlDn			? co_tsiOsObBSellLine		: co_tsiOsObBMiddleLine	: co_tsisbBtsiTheme
+// color	co_tsisbBtslColor			= tsisbBisClassic					? tsisbBtslIsBull	? co_tsiOsObBBuySignal		: co_tsiOsObBSellSignal	: co_tsisbBtslTheme
+// color	co_tsisbBfillColor1			= tsisbBisClassic					? tsisbBtrendIsBull	? co_tsiOsObBBuyFill		: co_tsiOsObBSellFill	: na
+
+// color	co_tsisbBfillColor2			= not tsisbBisClassic				? tsisbBtrendIsBull ? 
+
+///	Display ──────────────────────
+
+tsisbBPlotTSI						= plot(tsisbBTSI,
+		  title						= "TSI Linea",
+		  color						= co_tsiOsObBBuyLine)
+
+tsisbBPlotEMA						= plot(tsisbBTSL,
+		  title						= "TSI Señal",
+		  color						= co_tsiOsObBSellLine)
+
+// co_tsisbBdisplayFill				= tsisbBisClassic					? display.none			: display.all
+
+// fill(tsisbBPlotTSI, tsisbBPlotEMA, co_tsisbBfillColor1, fillgaps = true)
+// fill(tsisbBPlotTSI, tsisbBPlotEMA, tsisbBTSI, tsisbBTSL, co_tsisbBfillColor2, color.new(co_tsisbBfillColor2, 70), fillgaps = true, display = co_tsisbBdisplayFill)
+

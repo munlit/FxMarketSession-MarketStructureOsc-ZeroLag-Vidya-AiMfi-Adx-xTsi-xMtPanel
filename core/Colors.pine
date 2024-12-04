@@ -366,6 +366,84 @@
 	// CitiMonoDarkGray							= #5C5F66
 	// CitiMonoSlateGray						= #292C33
 
+/// ─── Dribble ───
+
+	// SisenseLime								= #EDFF8C
+	// SisenseLile								= #E9EEEA
+	// SisenseGray								= #CFDFCA
+	// SisenseLile								= #D8DFE9
+	// EverybotYellow							= #F8E164
+	// EverybotGreen							= #2BE1A9
+	// EverybotGray								= #9B9E9A
+	// SalesforceMint							= #7AFFA1
+	// SalesforceYellow							= #FFF87C
+	// SalesforceLile							= #D5BEF2
+	// SalesforceOrange							= #FF8C7D
+	// SalesforceLime							= #CCF657
+	// SalesforceBlue							= #3F73F7
+	// SalesforceRed							= #FF4B4B
+	// SalesforceMustard						= #EDD803
+	// SalesforcePink							= #EEC5EF
+	// SalesforceLile300						= #D8CFEE
+	// Ex1Teal									= #1CD8E1
+	// Ex1Blue									= #00B8E6
+	// Ex1Lime									= #E3FF53
+	// Ex1Yellow								= #FCFE53
+	// Ex1Blue									= #00315e
+	// Ex1Orange500								= #E65A00
+	// Ex1Orange600								= #D93D04
+	// Ex1Red									= #A60303
+	// Ex1Wine									= #730202
+	// NetsuiteYellow							= #F5ED31
+	// NetsuiteOrange							= #FF934F
+	// NetsuiteCocoa							= #E0D8CA
+	// WiskAeroYellow							= #F9F940
+	// WiskAeroRed								= #F13939
+	// WiskAeroCocoa							= #E2E2E2
+	// NexusBlue								= #3189FF
+	// NexusSky									= #98F1F4
+	// NexusSky200								= #CFFCFB
+	// NexusLile								= #C3D3F5
+	// MyntMint									= #A9D4BC
+	// MyntPink									= #E9C2F1
+	// MyntLile300								= #D9D4FD
+	// MyntLile500								= #A6A3FE
+	// MyntSky									= #A3D6FF
+	// KyberTeal								= #00C694
+	// PlayexGreen								= #04BE4E
+	// PlayexLime								= #B1E393
+	// FenomenonYellow							= #E7F870
+	// FenomenonOrange							= #F2751A
+	// OrixBlue									= #1B76FF
+	// OrixTeal									= #0DCDB7
+	// KonyYellow								= #FEF201
+	// KonyYellow300							= #FFF984
+
+/// ─── Behance ───
+
+	// OsomeBlue								= #0061FE
+	// OsomeRed									= #FF4054
+	// OsomeOrange								= #FF6447
+	// OsomeGreen								= #00BA77
+	// OsomeYellow								= #F2DD50
+	// SellerCapitalMint						= #3CE5BB
+	// SellerCapitalPurple						= #000B52
+	// SellerCapitalBlue						= #0012A3
+	// CasperRed								= #D92D07
+	// CasperRed400								= #EC4C04
+	// CasperRed300								= #FF5C5C
+	// CasperSky								= #07C7F2
+	// CasperSky300								= #95E7FC
+	// CasperMustard							= #FEE08C
+	// CasperGray								= #ADCBE3
+	// CasperGreen300							= #73F093
+	// 404Blue400								= #109FFB
+	// 404Sky600								= #20E4FD
+	// TaxusRed									= #F20505
+	// TaxusRed400								= #F2133C
+	// DefiMint									= #41F2A0
+	// DefiGreen700								= #10734F
+
 /// ─── Arbe Robotics ───
 	// ARoPrimary								= #0035FF								// ArbePrimary
 	// ARoPrimaryLight							= #0640FF								// ArbePrimaryLight

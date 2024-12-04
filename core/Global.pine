@@ -2,14 +2,18 @@
 /// ║	Globals							║
 /// ╚═══════════════════════════════════╝
 
+
 //// ─────────────────────────────────────────────────────────────────────
+
 
 strGlobalExtendTooltip					= "Indicador TSI basado en tendencia"
 strGlobalOptionalTooltip				= "Configuración de temporalidad adicional"
 
+
 /// ───────────────────────
 /// ─── Variables
 /// ───────────────────────
+
 
 globalTSIGroupTimeframe					= "Tsi & Divergences"
 // globalTSIGroupTimeframe					= "Temporalidad Global"
@@ -22,9 +26,31 @@ strGlobalColorSelector					= input.string 	(defval = "Allen",		title = "Color Se
 			//   options					=				["Allen", "Ultr", "Inverse", "Classic", "Light", "Mono"])
 float insGlobalTFCoefficient			= 				2.3
 
+
+/// ───────────────────────
+/// ─── Heikin Ashi
+/// ───────────────────────
+
+
+showGlobal_HknAshi						= input.bool	(defval = true,		title = 'Activar Heikin Ashi',			group = 'Heikin Ashi mode',				tooltip = strGlobalKeikinAshiTooltip)
+
+vGlobalHeiAsTicker						= ticker.heikinashi(syminfo.tickerid)
+[heAsGblO, heAsGblH, heAsGblL, heAsGblC]= request.security(vGlobalHeiAsTicker, timeframe.period, [open, high, low, close])
+
+gbl_Source_O							= showGlobal_HknAshi ? heAsGblO : open
+gbl_Source_H							= showGlobal_HknAshi ? heAsGblH : high
+gbl_Source_L							= showGlobal_HknAshi ? heAsGblL : low
+gbl_Source_C							= showGlobal_HknAshi ? heAsGblC : close
+
+// gbl_Source_2							= showGlobal_HknAshi ? (heAsGblH + heAsGblL) / 2 : hl2
+gbl_Source_3							= showGlobal_HknAshi ? (heAsGblH + heAsGblL + heAsGblC) / 3 : hlc3
+// gbl_Source_4							= showGlobal_HknAshi ? (heAsGblO + heAsGblH + heAsGblL + heAsGblC) / 4 : ohlc4
+
+
 /// ───────────────────────
 /// ─── Types
 /// ───────────────────────
+
 
 type globalTypeOHL
 	float O								= open
@@ -34,9 +60,11 @@ type globalTypeOHL
 	float V								= volume
 	int   I								= bar_index
 
+
 /// ───────────────────────
 /// ─── Switch
 /// ───────────────────────
+
 
 [_co_gbl_buy, _co_gbl_sell, _co_gbl_long, _co_gbl_short, _co_gbl_neutral, _co_gbl_extra, _co_gbl_white, _co_gbl_black, _co_gbl_txt_light, _co_gbl_txt_dark]	= switch	strGlobalColorSelector
 	"Allen"								=> [#33FFAC,		#CCF8FF,		#ADEB42,		#EA1889,		#CCF8FF,		#FDF43C,		#E6F7FF,		#121F3D,		#FBFD73,		#121F3D]
@@ -45,10 +73,6 @@ type globalTypeOHL
 	"Inverse"							=> [#ADEB42,		#EA1889,		#33FFAC,		#CCF8FF,		#CCF8FF,		#FDF43C,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
 	"Classic"							=> [#B1FF05,		#D11C36,		#B1FF05,		#D11C36,		#5C818A,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
 	"Mono"								=> [#CCF8FF,		#0C1633,		#CCF8FF,		#0C1633,		#676B79,		#FCFF8F,		#E6F7FF,		#0C1633,		#E6F7FF,		#121F3D]
-
-/// ───────────────────────
-/// ─── Switch
-/// ───────────────────────
 
 /// ─── switch line style
 string	_line_style					= switch _option_line_style
@@ -94,9 +118,11 @@ string	_session					= switch _option_timezone
 	"Sydney"							=> "Australia/Sydney"
 	"Argentina"							=> "America/Argentina/Buenos_Aires"
 
+
 /// ───────────────────────
 /// ─── Functions
 /// ───────────────────────
+
 
 /// ─── function timeframe
 FunGlobalTimeFrame(_timeframe) =>
@@ -226,6 +252,44 @@ FunGlobalCalculateTSI(bool _fast, _source) =>
 	_tsi_ema				= ta.ema(_tsi, _signal)
 
 	[_tsi, _tsi_ema]
+
+
+FunGlobalCalculateTSI(bool _fast, _x) =>
+	_plus					= 0
+	_source					= gbl_Source_C
+
+	if _fast
+		_long				= 25
+		_short				= 5
+		_signal				= 14
+
+	else
+		_long				= 25
+		_short				= 13
+		_signal				= 13
+
+	_tsi					= _x * ta.tsi(_source, _short, _long) + _plus
+	_tsi_ema				= ta.ema(_tsi, _signal)
+
+	[_tsi, _tsi_ema]
+
+
+/// ─── function tsi min
+FunGlobalCalculateTSIMin(_source, _long, _short, _signal) =>
+	_x						= 100
+	_plus					= 0
+
+	ta.tsi(_source, _short, _long) * _x
+
+// ta.ema(FunGlobalCalculateTSIMin(_source, _long, _short, _signal), _signal)
+
+// /// instance function Tsi fast
+// iGlobalCalcTSIFast						= FunGlobalCalculateTSIMin(gblSource.C, 25, 5, 14)
+// iGlobalCalcEMAFast						= ta.ema(iTsiMuDiCalcTSIFast, 14)
+
+// /// instance function Tsi slow
+// iGlobalCalcTSISlow						= FunGlobalCalculateTSIMin(gblSource.C, 25, 13, 13)
+// iGlobalCalcEMASlow						= ta.ema(iGlobalCalcTSISlow, 13)
 
 /// ─── function hvar
 FunGlobalCalcHLVar(_source, _length) =>
@@ -442,4 +506,4 @@ globalOHL								= globalTypeOHL.new()
 //// ─────────────────────────────────────────────────────────────────────
 
 /// ─── 🔘🔴🟢🟡🛑⚙️🎲🧿🎯🎱🤖💀☠️👻👽👾😈🥶😰😶‍🌫️🩻💰⏱️⏰⏲️🧭☃️⚪⚫🔘
-/// ───  ■ × ◙
+/// ───  ■ × ◙ △ ▽ ▲ ▼

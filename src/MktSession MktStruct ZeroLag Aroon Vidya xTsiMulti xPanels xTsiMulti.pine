@@ -268,6 +268,113 @@ FunGlobalCalculateTimeframeIf(_timeframe) =>
 gblSource								= globalTypeOHL.new()
 
 
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+/// ╔═══════════════════════════════╗
+/// ║	ZeroLag Trend				║
+/// ╚═══════════════════════════════╝
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+/// ＩＮＰＵＴＳ ―――――――――――――――――――――――
+
+
+co_zeLag_buy							= _co_gbl_up
+co_zeLag_sell							= _co_gbl_dn
+co_zeLag_signal							= _co_gbl_white
+co_zeLag_text							= _co_gbl_light
+co_zeLag_text_dark						= _co_gbl_txt_dark
+
+zeLag_GroupVar							= 'ZeroLag Trend'
+showZeLag_trend							= input.bool	(true,			title = 'Mostrar ZeroLag Trend',	group = zeLag_GroupVar,		inline = 'zerocheck')
+showZeLag_level_box						= input.bool	(true,			title = 'Mostrar box ZeroLag',		group = zeLag_GroupVar,		inline = 'zerocheck')
+zeLag_length							= input.int		(13,			title = 'Longitud',					group = zeLag_GroupVar)
+zeLag_lengthEmax						= input.int		(20,			title = 'Longitud Ema',				group = zeLag_GroupVar)
+
+var bZeLag_BOX							= box(na)
+series float iZeLag_ATR					= ta.atr(200)
+
+
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ―――――――――――――
+
+
+series float iZeLag_EMA					= ta.ema(gblSource.C, zeLag_length)
+series float iZeLag_correction			= gblSource.C + (gblSource.C - iZeLag_EMA)				// factor zerolag
+series float iZeLag_ZLMA				= ta.ema(iZeLag_correction, zeLag_length)
+series float iZeLag_EMAx				= ta.ema(gblSource.C, zeLag_lengthEmax)
+
+bool  zeLag_signal_buy					= ta.crossover(iZeLag_ZLMA, iZeLag_EMA)
+bool  zeLag_signal_sell					= ta.crossunder(iZeLag_ZLMA, iZeLag_EMA)
+
+// Determine the color of ZLMA based on its direction
+co_zeLag_ZLMA							= iZeLag_ZLMA	> iZeLag_ZLMA[3]	? co_zeLag_buy	: iZeLag_ZLMA	< iZeLag_ZLMA[3]	? co_zeLag_sell	: na
+co_zeLag_EMAx							= iZeLag_EMA	> iZeLag_EMA[3]		? co_zeLag_buy	: iZeLag_EMA	< iZeLag_EMA[3]		? co_zeLag_sell	: na
+co_zeLag_EMA							= iZeLag_EMAx	< iZeLag_EMA		? co_zeLag_buy	: co_zeLag_sell			// ema color variant
+
+// Method to draw a box on the chart
+method FUN_zeLag_draw_box(color _color, top, _bottom, price) =>
+	box.new(
+			 bar_index, top, bar_index, _bottom,
+			 border_color				= color.new(_color, 50),
+			 border_width				= 1,
+			 border_style				= line.style_dotted,
+			 bgcolor					= color.new(_color, 90), 
+			 text						= str.tostring(math.round(price, 2)), 
+			 text_size					= size.tiny,
+			 text_color					= chart.fg_color,
+			 text_halign				= text.align_right,
+			 force_overlay				= true
+			 )
+
+// Logic to draw trend levels as boxes on the chart
+if showZeLag_level_box and showZeLag_trend
+	bool _check_signals					= zeLag_signal_buy or zeLag_signal_sell // Check if there is an up or down signal
+
+	switch
+		// Draw a box when a bullish signal is detected
+		zeLag_signal_buy				=> bZeLag_BOX		:= co_zeLag_buy.FUN_zeLag_draw_box(iZeLag_ZLMA, iZeLag_ZLMA - iZeLag_ATR, gblSource.C)
+
+		// Draw a box when a bearish signal is detected
+		zeLag_signal_sell				=> bZeLag_BOX		:= co_zeLag_sell.FUN_zeLag_draw_box(iZeLag_ZLMA + iZeLag_ATR, iZeLag_ZLMA, gblSource.C)
+
+	switch
+		// Extend the right side of the box if no new signal is detected
+		not zeLag_signal_buy or not zeLag_signal_sell => bZeLag_BOX.set_right(bar_index + 4)  
+		=> bZeLag_BOX := box(na) // Otherwise, reset the box
+
+
+/// ＰＬＯＴ――――――――――――――――――――――――――――
+
+
+// Plot the Zero-Lag Moving Average
+plot_zeLag_EMA							= plot(showZeLag_trend ? iZeLag_EMA : na,			color = color.new(co_zeLag_EMA, 25),			linewidth = 1,		force_overlay		= true)
+plot_zeLag_EMAx							= plot(showZeLag_trend ? iZeLag_EMAx : na,			color = color.new(co_zeLag_EMAx, 25),			linewidth = 2,		force_overlay		= true)
+// plot_zeLag_ZLMA							= plot(showZeLag_trend ? iZeLag_ZLMA : na,			color = color.new(co_zeLag_ZLMA, 75),			linewidth = 1,		force_overlay		= true)
+fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,							color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
+// fill(plot_zeLag_ZLMA, plot_zeLag_EMAx, iZeLag_ZLMA, iZeLag_EMAx,							color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
+// fill(plot_zeLag_ZLMA, plot_zeLag_EMA, iZeLag_ZLMA, iZeLag_EMA,							color.new(co_zeLag_ZLMA, 90),					color.new(co_zeLag_EMA, 60))
+
+// // Plot shapes for up and down signals
+// plotshape(showZeLag_trend and zeLag_signal_buy ? iZeLag_ZLMA : na,
+// 		  title							= '',
+// 		  style							= shape.diamond,
+// 		  location						= location.absolute,
+// 		  color							= co_zeLag_buy,
+// 		  size							= size.tiny,
+// 		  force_overlay					= true)
+
+// plotshape(showZeLag_trend and zeLag_signal_sell ? iZeLag_ZLMA : na,
+// 		  title							= '',
+// 		  style							= shape.diamond,
+// 		  location						= location.absolute,
+// 		  color							= co_zeLag_sell,
+// 		  size							= size.tiny,
+// 		  force_overlay					= true)
+
+
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 

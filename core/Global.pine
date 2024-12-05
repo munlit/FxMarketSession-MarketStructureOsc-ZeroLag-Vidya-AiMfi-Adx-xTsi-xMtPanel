@@ -495,6 +495,31 @@ FunTsiObsPnlCalculateCellSignal(_col, _row, _title, _var, _var2, _var3, _var4, _
 // FunGlobalCalculateFill(vVi_trend1, vVi_trend2, vVidya_smoothed_value, hl2)
 
 
+/// ─── function tsi
+FunGlobalCalculateTSI(_speed, _x, _plus) =>
+	// _plus								= 50
+	_source								= gbl_Source_C
+
+	_long								= 25			// 6
+
+	_short								= 0				// 13
+	_signal								= 0				// 5
+
+	switch _speed
+		'fast' =>
+			_short						:= 5
+			_signal						:= 14
+
+		'slow' =>
+			_short						:= 13
+			_signal						:= 13
+
+	_tsi								= _x * ta.tsi(_source, _short, _long) + _plus
+	_tsi_ema							= ta.ema(_tsi, _signal)
+
+	[_tsi, _tsi_ema]
+
+
 /// function tendency (smooth & tsi calculate)
 FunxTsiMuCalculateTendencyTSI() =>
 	_source								= gbl_Source_C

@@ -494,6 +494,30 @@ FunTsiObsPnlCalculateCellSignal(_col, _row, _title, _var, _var2, _var3, _var4, _
 /// ─── instance function calculate plots & fill
 // FunGlobalCalculateFill(vVi_trend1, vVi_trend2, vVidya_smoothed_value, hl2)
 
+
+/// function tendency (smooth & tsi calculate)
+FunxTsiMuCalculateTendencyTSI() =>
+	_source								= gbl_Source_C
+	_long								= 6
+	_short								= 13
+	_signal								= 5
+
+	_change								= ta.change(_source)
+	_smooth_single						= ta.ema(_change, _long)
+	_smooth_double						= ta.ema(_smooth_single, _short)
+
+	_x									= 50
+	_plus								= 50
+
+	_smooth								= _smooth_double
+	_smooth_abs							= math.abs(_smooth_double)
+	
+	_trend_tsi							= _x * (_smooth / _smooth_abs) + _plus
+	_trend_ema							= ta.ema(_trend_tsi, _signal)
+
+	[_trend_tsi, _trend_ema]
+
+
 /// ───────────────────────
 /// ─── Instances
 /// ───────────────────────

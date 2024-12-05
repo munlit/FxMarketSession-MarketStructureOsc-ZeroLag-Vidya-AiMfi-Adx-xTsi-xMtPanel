@@ -1,0 +1,437 @@
+/// ╔═══════════════════════════════╗
+/// ║ 	Fx Market Sessions			║
+/// ║ 	@	Allen 㔬				║
+/// ║ 	©	Boitoki					║
+/// ╚═══════════════════════════════╝
+
+
+//@version=5
+indicator(title						= 'Fx Market Sessions [🎱 Allen 㔬]',
+		  shorttitle				= 'FxM Sessions [🎱Allen 㔬]',
+		  overlay					= true,
+		  max_boxes_count			= 500,
+		  max_labels_count			= 500,
+		  max_lines_count			= 500,
+		  max_bars_back				= 1000)
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+/// ╔═══════════════════════════════╗
+/// ║	Fx Market Sessions			║
+/// ╚═══════════════════════════════╝
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Cont ───
+//// ───────────────────────
+
+fxMrkSsGroupGral						= 'General'
+fxMrkSsGroupSyd							= 'Sesión Sydney'
+fxMrkSsGroupTyo							= 'Sesión Tokyo'
+fxMrkSsGroupLon							= 'Sesión Londres'
+fxMrkSsGroupNewY						= 'Sesión New York'
+fxMrkSsGroupBox							= 'Box'
+fxMrkSsGroupTag							= 'Etiquetas'
+fxMrkSsGroupRng							= 'Rango Abierto'
+fxMrkSsGroupOsc							= 'Oscilador'
+fxMrkSsGroupFibo						= 'Niveles Fibonacci'
+fxMrkSsGroupOpc							= 'Opciones'
+fxMrkSsGroupBar							= 'Vela'
+fxMrkSsGroupAlrt						= 'Alertas Visuales'
+fxMrkSsGroupInf							= 'Información'
+fxMrkSsGroupLine						= 'Box'
+
+vFxMkSs_Show							= true
+vFxMkSs_Yes								= 'Si'
+vFxMkSs_No								= 'No'
+vFxMkSs_Extend							= 'Extendido'
+vfxMkSs_Hide							= 'Hide'
+tooltipFfxMkSs_TimeZ					= "Mas opciones de zonas horarias, por ej: 'GMT-4', 'GMT-3', 'GMT-2', 'GMT-1', \n 'GMT', 'GMT+1', 'GMT+2', 'GMT+3', 'GMT+4'"
+
+vFxMkSs_LondonColor						= _co_gbl_sky
+vFxMkSs_NewYorkColor					= _co_gbl_mint
+vFxMkSs_TokyoColor						= _co_gbl_pink
+vFxMkSs_SydneyColor						= _co_gbl_yellow
+
+vFxMkSs_KillLonColor					= _co_gbl_sky
+vFxMkSs_KillNwYColor					= _co_gbl_mint
+// vFxMkSs_KillTykColor					= _co_gbl_pink
+// vFxMkSs_KillSydColor					= _co_gbl_yellow
+
+vFxMkSs_NoneColor						= _co_gbl_black
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Inputs ───
+//// ───────────────────────
+
+/// ─── Timezone
+// optFxMkSs_TimeZone						= input.string	(defval = 'New York',	title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
+optFxMkSs_TimeZone						= input.string	(defval = 'New York',	title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
+		  options						= 				['New York', 'Chicago', 'NYSE', 'Londres', 'Tokyo', 'Sydney', 'Argentina'])
+showFxMkSs_History						= input.string	(defval = vFxMkSs_Yes,	title = 'Historico',										group = fxMrkSsGroupGral,			options = [vFxMkSs_Yes, vFxMkSs_No]) == vFxMkSs_Yes
+vFxMkSs_Lookback						= 12 * 60
+
+/// ─── Sessions
+
+/// ─── London
+showFxMkSs_SessLon						= input.bool	(true,					title = 'Londres  ',										group = fxMrkSsGroupLon,			inline = 'session1_1') and vFxMkSs_Show
+vFxMkSs_SessLnLabel						= input.string	('Londres',				title = ' ',												group = fxMrkSsGroupLon,			inline = 'session1_1')
+vFxMkSs_SessLnColor						= input.color	(vFxMkSs_LondonColor,	title = ' ',												group = fxMrkSsGroupLon,			inline = 'session1_1')
+vFxMkSs_SessLnTimeZ						= input.session	('0300-1200',			title = 'Periodo',											group = fxMrkSsGroupLon)
+vFxMkSs_SessLnExtend					= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupLon,
+		  options						= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// Killzones London
+showFxMkSs_KillLonOpen					= input.bool	(true,					title = 'KillZone Open',									group = fxMrkSsGroupLon,			inline = 'KillLonOpen')
+vFxMkSs_KillLonTimeOpen					= input.session	('0400-0500',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonOpen')
+showFxMkSs_KillLonRally					= input.bool	(true,					title = 'KillZone Rally',									group = fxMrkSsGroupLon,			inline = 'KillLonRally')
+vFxMkSs_KillLonTimeRally				= input.session	('0600-0645',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonRally')
+showFxMkSs_KillLonClose					= input.bool	(true,					title = 'KillZone Close',									group = fxMrkSsGroupLon,			inline = 'KillLonClose')
+vFxMkSs_KillLonTimeClose				= input.session	('1115-1200',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonClose')
+
+/// ─── New York
+showFxMkSs_SessNy						= input.bool	(true,					title = 'New York  ',										group = fxMrkSsGroupNewY,			inline = 'session2_1') and vFxMkSs_Show
+vFxMkSs_SessNyLabel						= input.string	('New York',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'session2_1')
+vFxMkSs_SessNyColor						= input.color	(vFxMkSs_NewYorkColor,	title = ' ',												group = fxMrkSsGroupNewY,			inline = 'session2_1')
+vFxMkSs_SessNyTimeZ						= input.session	('0800-1700',			title = 'Periodo',											group = fxMrkSsGroupNewY)
+vFxMkSs_SessNyExtend					= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupNewY,
+		  options						= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// Killzones New York
+showFxMkSs_KillNwYOpen					= input.bool	(true,					title = 'KillZone Open',									group = fxMrkSsGroupNewY,			inline = 'KillNwYOpen')
+vFxMkSs_KillNwYTimeOpen					= input.session	('0730-0845',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYOpen')
+showFxMkSs_KillNwYRally					= input.bool	(true,					title = 'KillZone Rally',									group = fxMrkSsGroupNewY,			inline = 'KillNwYRally')
+vFxMkSs_KillNwYTimeRally				= input.session	('1000-1045',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYRally')
+showFxMkSs_KillNwYClose					= input.bool	(true,					title = 'KillZone Close',									group = fxMrkSsGroupNewY,			inline = 'KillNwYClose')
+vFxMkSs_KillNwYTimeClose				= input.session	('1230-1315',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYClose')
+
+/// ─── Tokyo
+showFxMkSs_SessTk						= input.bool	(true,					title = 'Tokyo   ',											group = fxMrkSsGroupTyo,			inline = 'session3_1') and vFxMkSs_Show
+vFxMkSs_SessTkLabel						= input.string	('Tokyo',				title = ' ',												group = fxMrkSsGroupTyo,			inline = 'session3_1')
+vFxMkSs_SessTkColor						= input.color	(vFxMkSs_TokyoColor,	title = ' ',												group = fxMrkSsGroupTyo,			inline = 'session3_1')
+vFxMkSs_SessTkTimeZ						= input.session	('1800-0300',			title = 'Periodo',											group = fxMrkSsGroupTyo)
+vFxMkSs_SessTkExtend					= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupTyo,
+		  options						= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// ─── Sydney
+showFxMkSs_SessSyd						= input.bool	(false,					title = 'Sydney  ',											group = fxMrkSsGroupSyd,			inline = 'session4_1') and vFxMkSs_Show
+vFxMkSs_SessSdLabel						= input.string	('Sydney',				title = ' ',												group = fxMrkSsGroupSyd,			inline = 'session4_1')
+vFxMkSs_SessSdColor						= input.color	(vFxMkSs_SydneyColor,	title = ' ',												group = fxMrkSsGroupSyd,			inline = 'session4_1')
+vFxMkSs_SessSdTimeZ						= input.session	('1600-0100',			title = 'Periodo',											group = fxMrkSsGroupSyd)
+vFxMkSs_SessSdExtend					= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupSyd,
+		  options						= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// ─── Show & Styles
+optFxMkSs_LineStyle						= input.string	('····',				title = 'Box style', 										group = fxMrkSsGroupLine,
+		  options						= 				['⎯⎯⎯⎯', '----', '····'])
+vFxMkSs_BorderWidth						= input.int		(1,						title = 'Ancho de Linea',	minval = 0,						group = fxMrkSsGroupLine)
+vFxMkSs_BgOpacity						= input.int		(90,					title = 'Transp fondo', minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+vFxMkSs_LineOpacity						= input.int		(30,					title = 'Transp contorno',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+
+/// ─── Labels
+showFxMkSs_Labels						= input.bool	(true,					title = 'Información',										group = fxMrkSsGroupTag,			inline = 'label_show') and vFxMkSs_Show
+optFxMkSs_LabelSize						= input.string	('Pequeño',				title = '',													group = fxMrkSsGroupTag,			inline = 'label_show',
+		  options						= 				['Auto', 'Mini', 'Pequeño', 'Normal', 'Grande', 'Enorme'])
+optFxMkSs_LabelPositionY				= input.string	('Arriba',				title = '',													group = fxMrkSsGroupTag,			inline = 'label_loc',
+		  options						= 				['Arriba', 'Abajo'])
+optFxMkSs_LabelPositionIn				= input.string	('Externo',				title = '',													group = fxMrkSsGroupTag,			inline = 'label_loc',
+		  options						= 				['Interno', 'Externo'])
+
+/// ─── Info
+showFxMkSs_LabelName					= input.bool	(true,					title = 'Sesión',											group = fxMrkSsGroupTag,			inline = 'label_format')
+showFxMkSs_LabelDay						= input.bool	(true,					title = 'Dia',												group = fxMrkSsGroupTag,			inline = 'label_format')
+showFxMkSs_LabelPrice					= input.bool	(false,					title = 'Precio',											group = fxMrkSsGroupTag,			inline = 'label_format')
+showFxMkSs_LabelPips					= input.bool	(true,					title = 'Pips',												group = fxMrkSsGroupTag,			inline = 'label_format')
+
+vFxMkSsPips								= syminfo.mintick * 10
+vFxMkSs_MaxBars							= 500
+
+vFxMkSs_FmtPrice						= '{0,number,#.#####}'
+vFxMkSs_FmtPips							= '{0,number,#.#}'
+vFxMkSs_IconSeparator					= ' • '
+vFxMkSs_IsWeekends						= dayofweek == 7 or dayofweek == 1
+
+optFxMkSs_LineKillzone					= '⎯⎯⎯⎯'
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Functions ───
+//// ───────────────────────
+
+FunFxMkSs_GetPeriod(_session, _start, _lookback) =>
+	_result								= math.max(_start, 1)
+	for i 								= _result to _lookback
+		if na(_session[i+1])			and _session[i]
+			_result						:= i+1
+			break
+	_result
+
+FunFxMkSs_GetStarted(_session) => na(_session[1]) and _session
+
+FunFxMkSs_GetEnded(_session) => na(_session) and _session[1]
+
+FunFxMkSs_GetLabelPosition(_y, _side) =>
+	switch _y
+		'top'							=> _side == 'outside' ? label.style_label_lower_left : label.style_label_upper_left
+		'bottom'						=> _side == 'outside' ? label.style_label_upper_left : label.style_label_lower_left
+
+vFxMkSs_LabelPosition					= FunFxMkSs_GetLabelPosition(FunGlobalVertical(optFxMkSs_LabelPositionY), FunGlobalPositionIn(optFxMkSs_LabelPositionIn))
+
+/// ─── Labels
+FunFxMkSs_RenderLabel(_show, _session, _is_started, _color, _top, _bottom, _text, _delete_history) =>
+	var label my_label					= na
+	var int start_time					= na
+
+	v_position_y						= (FunGlobalVertical(optFxMkSs_LabelPositionY) == 'top') ? _top : _bottom
+	v_label								= array.new_string()
+	v_chg								= _top - _bottom
+	
+	if _is_started
+		start_time						:= time
+	
+	if showFxMkSs_LabelName and not na(_text)
+		array.push(v_label, _text)
+
+	/// day
+	if showFxMkSs_LabelDay
+		array.push(v_label, FunGlobalDayofWeek(dayofweek(start_time, FunGlobalTimeZone(optFxMkSs_TimeZone))))
+
+	/// price
+	if showFxMkSs_LabelPrice
+		array.push(v_label, str.format(vFxMkSs_FmtPrice, v_chg))
+
+	/// pip
+	if showFxMkSs_LabelPips
+		array.push(v_label, str.format(vFxMkSs_FmtPips, v_chg / vFxMkSsPips) + ' pips')
+
+	if _show
+		if _is_started
+			my_label					:= label.new(time, v_position_y, array.join(v_label, vFxMkSs_IconSeparator),
+				  textcolor				= color.new(_color, vFxMkSs_LineOpacity),
+				  color					= color.new(vFxMkSs_NoneColor, 100),
+				  size					= FunGlobalTextSize(optFxMkSs_LabelSize),
+				  style					= vFxMkSs_LabelPosition,
+				  xloc					= xloc.bar_time,
+				  force_overlay			= true)
+			
+			if _delete_history
+				label.delete(my_label[1])
+
+		if _session
+			label.set_y(my_label, v_position_y)
+			label.set_text(my_label, array.join(v_label, vFxMkSs_IconSeparator))
+
+/// ─── Markets ───
+FunFxMkSs_RenderSession(_show, _session, _is_started, _is_ended, _color, _top, _bottom, _extend, _is_extend, _delete_history) =>
+	var box my_box						= na
+
+	x0_1								= ta.valuewhen(na(_session[1])	and _session,		bar_index, 1)
+	x0_2								= ta.valuewhen(na(_session)		and _session[1],	bar_index, 0)
+	var x1								= 0
+	var x2								= 0
+	var session_open					= 0.0
+	var session_high					= 0.0
+	var session_low						= 0.0
+
+	if _show
+		if _is_started
+			diff						= math.abs(x0_2 - x0_1)
+			x1							:= bar_index
+			x2							:= bar_index + (math.min(diff, vFxMkSs_MaxBars))
+			my_box						:= box.new(x1, _top, x2, _bottom,
+				  border_color			= color.new(_color, vFxMkSs_LineOpacity),
+				  border_width			= vFxMkSs_BorderWidth,
+				  border_style			= FunGlobalLineStyle(optFxMkSs_LineStyle),
+				  bgcolor				= color.new(_color, vFxMkSs_BgOpacity),
+				  force_overlay			= true)
+
+			session_open				:= open
+			session_high				:= _top
+			session_low					:= _bottom
+
+			if _is_extend
+				box.set_extend(my_box, extend.right)
+
+			if _delete_history
+				box.delete(my_box[1])
+
+		else if _session
+			box.set_top(my_box, _top)
+			box.set_bottom(my_box, _bottom)
+
+			session_high				:= _top
+			session_low					:= _bottom
+		
+		else if _is_ended
+			session_open				:= na
+			box.set_right(my_box, bar_index)
+
+	[x1, x2, session_open, session_high, session_low]
+
+/// ─── Boxes
+FunFxMkSs_DrawBox(_show, _session, _color, _label, _extend, _lookback) =>
+	_max								= FunFxMkSs_GetPeriod(_session, 1, _lookback)
+	_top								= ta.highest(high, _max)
+	_bottom								= ta.lowest(low, _max)
+	
+	_is_started							= FunFxMkSs_GetStarted(_session)
+	_is_ended							= FunFxMkSs_GetEnded(_session)
+	_is_extend							= _extend != vFxMkSs_No
+
+	delete_history						= (not showFxMkSs_History) or _is_extend
+
+	[x1, x2, _open, _high, _low]		= FunFxMkSs_RenderSession(_show, _session, _is_started, _is_ended, _color, _top, _bottom, _extend, _is_extend, delete_history)
+
+	if showFxMkSs_Labels
+		FunFxMkSs_RenderLabel(_show, _session, _is_started, _color, _top, _bottom, _label, delete_history)
+
+	[_session, _open, _high, _low]
+
+/// ─── Killzones
+FunFxMkSs_RenderKillZones(_on, _color) =>
+
+	var int Bar							= 0
+	var float High						= 0.0 
+	var float Low						= 0.0
+	var box BoX							= na
+	var label LabeL						= na 
+
+	if  (_on[1] == 0 and _on == 1)
+		Bar								:= bar_index
+		High							:= high
+		Low								:= low
+
+	else if (_on[1] == 1 and _on == 1)
+		High							:= math.max(high , High) 
+		Low								:= math.min(low , Low)
+
+	else if _on == 0
+		High							:= 0.0 
+		Low								:= 0.0
+		Bar								:= 0
+
+	if _on > _on[1]
+		BoX								:= box.new(bar_index, High, bar_index, Low,
+		  bgcolor						= color.new(_color, 80),
+		  border_color					= color.new(_color, 90),
+		  border_width					= 1,
+		  border_style					= FunGlobalLineStyle(optFxMkSs_LineKillzone),
+		  force_overlay					= true)
+
+	if _on and _on == _on[1]
+		box.set_top(BoX, High)
+		box.set_bottom(BoX, Low)
+		box.set_right(BoX, bar_index)
+		label.set_x(LabeL,math.round(math.avg(Bar,bar_index)))
+		label.set_y(LabeL, High)
+
+	[High , Low ]
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Instances ───
+//// ───────────────────────
+
+/// ─── Timeframe
+string ms_timeZone						= (FunGlobalTimeZone(optFxMkSs_TimeZone) == vFxMkSs_No or FunGlobalTimeZone(optFxMkSs_TimeZone) == '') ? na : FunGlobalTimeZone(optFxMkSs_TimeZone)
+
+/// ─── Timeframe London
+int timeMkSs_SessLon					= time(timeframe.period, vFxMkSs_SessLnTimeZ, ms_timeZone)
+
+timeMkSs_KillLonOpen					= time(timeframe.period,	vFxMkSs_KillLonTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillLonRally					= time(timeframe.period,	vFxMkSs_KillLonTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillLonClose					= time(timeframe.period,	vFxMkSs_KillLonTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+
+/// ─── Timeframe New York
+int timeMkSs_SessNewY					= time(timeframe.period, vFxMkSs_SessNyTimeZ, ms_timeZone)
+
+timeMkSs_KillNwYOpen					= time(timeframe.period,	vFxMkSs_KillNwYTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillNwYRally					= time(timeframe.period,	vFxMkSs_KillNwYTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+timeMkSs_KillNwYClose					= time(timeframe.period,	vFxMkSs_KillNwYTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+
+/// ─── Timeframe Tokyo
+int timeMkSs_SessTyk					= time(timeframe.period, vFxMkSs_SessTkTimeZ, ms_timeZone)
+
+/// ─── Timeframe Sydney
+int timeMkSs_SessSyd					= time(timeframe.period, vFxMkSs_SessSdTimeZ, ms_timeZone)
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Drawing ───
+//// ───────────────────────
+
+/// ─── Session London
+[DRAWMkSsSessLon,		DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
+/// ─── Session New York
+[DRAWMkSsSessNewY,		DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
+/// ─── Session Tokyo
+[DRAWMkSsSessTyk,		DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
+/// ─── Session Sydney
+[DRAWMkSsSessSyd,		DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
+
+/// ─── KillZones London
+if showFxMkSs_KillLonOpen
+	[DwMkSs_KillLon_Open, DwMkSs_KillLon_Op]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonOpen,	vFxMkSs_KillLonColor)
+if showFxMkSs_KillLonRally
+	[DwMkSs_KillLon_Rally, DwMkSs_KillLon_Rl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonRally,	vFxMkSs_KillLonColor)
+if showFxMkSs_KillLonClose
+	[DwMkSs_KillLon_Close, DwMkSs_KillLon_Cl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonClose,	vFxMkSs_KillLonColor)
+
+/// ─── KillZones New York
+if showFxMkSs_KillNwYOpen
+	[DwMkSs_KillNwY_Open, DwMkSs_KillNwY_Op]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYOpen,	vFxMkSs_KillNwYColor)
+if showFxMkSs_KillNwYRally
+	[DwMkSs_KillNwY_Rally, DwMkSs_KillNwY_Rl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYRally,	vFxMkSs_KillNwYColor)
+if showFxMkSs_KillNwYClose
+	[DwMkSs_KillNwY_Close, DwMkSs_KillNwY_Cl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYClose,	vFxMkSs_KillNwYColor)
+
+// /// ─── Drawing Table Sessions
+// if showTsiObsPnlTimeframesPanel
+// 	FunTsiObsPnlCalculateCellName				(0,	0,		'Sessions')
+// 	FunSessionCellTime							(1,	0,		'Status')
+// 	FunSessionCellTime							(2,	0,		'Open ')				//	(2,	0,		'Time')
+// 	FunSessionCellTime							(3,	0,		'Close ')
+// 	FunSessionCellTime							(4,	0,		'Killzones ')
+
+// 	if showSessionPanelLondon
+// 		FunSessionCellName						(0,	1,		'London')
+// 		FunSessionCellTimeActive				(1,	1,		'O/C')
+// 		FunSessionCellTimeOpen					(2,	1,		'03:00')				//	(2,	1,		'03:00 12:00')
+// 		FunSessionCellTimeClose					(3,	1,		'12:00')
+// 		FunSessionCellTimeKillzones				(4,	1,		'Killzones')
+
+// 	if showSessionPanelNewYork
+// 		FunSessionCellName						(0,	2,		'New York')
+// 		FunSessionCellTimeActive				(1,	2,		'O/C')
+// 		FunSessionCellTimeOpen					(2, 2,		'08:00')				//	(2,	2,		'08:00 17:00')
+// 		FunSessionCellTimeClose					(3, 2,		'17:00')
+// 		FunSessionCellTimeKillzones				(4,	2,		'Killzones')
+
+// 	if showSessionPanelSydney
+// 		FunSessionCellName						(0,	3,		'Sydney')
+// 		FunSessionCellTimeActive				(1,	3,		'O/C')
+// 		FunSessionCellTimeOpen					(2,	3,		'16:00')				//	(2,	3,		'16:00 01:00')
+// 		FunSessionCellTimeClose					(3,	3,		'01:00')
+// 		FunSessionCellTimeKillzones				(4,	3,		'Killzones')
+
+// 	if showSessionPanelTokyo
+// 		FunSessionCellName						(0,	4,		'Tokyo')
+// 		FunSessionCellTimeActive				(1,	4,		'O/C')
+// 		FunSessionCellTimeOpen					(2,	4,		'19:00')				//	(2,	4,		'19:00 03:00')
+// 		FunSessionCellTimeClose					(3,	4,		'03:00')
+// 		FunSessionCellTimeKillzones				(4,	4,		'Killzones')
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+

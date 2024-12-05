@@ -1,0 +1,241 @@
+/// ╔═══════════════════════════════════╗
+/// ║	Panel TSI Multi Timeframe		║
+/// ║	@	Allen.						║
+/// ╚═══════════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+/// Vars ──────────────────────────────
+
+
+colorTsiObsPnl_Buy						= _co_gbl_long
+colorTsiObsPnl_Sell						= _co_gbl_short
+colorTsiObsPnl_Neutral					= _co_gbl_neutral
+colorTsiObsPnl_White					= _co_gbl_white
+colorTsiObsPnl_Black					= _co_gbl_black
+colorTsiObsPnl_TextDark					= _co_gbl_txt_dark
+colorTsiObsPnl_TextLight				= _co_gbl_txt_light
+colorTsiObsPnl_TiPnBg					= _co_gbl_yellow
+
+/// ─── Inputs
+tsiObsPnlGroupTimeframes				=				'Timeframe Panel'
+showTsiObsPnlTimeframesPanel			= input.bool	(true,				title = 'Panel TSI',			group = tsiObsPnlGroupTimeframes,		inline = 'show p')
+showTsiObsPnlPanelExt					= input.bool	(true,				title = 'Ampliado',				group = tsiObsPnlGroupTimeframes,		inline = 'show p')
+showTsiObsPnlTF15m						= input.bool	(true,				title = '15m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
+showTsiObsPnlTF30m						= input.bool	(false,				title = '30m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
+showTsiObsPnlTF1h						= input.bool	(true,				title = '1 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
+showTsiObsPnlTF2h						= input.bool	(true,				title = '2 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
+showTsiObsPnlTF3h						= input.bool	(false,				title = '3 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
+showTsiObsPnlTF4h						= input.bool	(false,				title = '4 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
+showTsiObsPnlTF1d						= input.bool	(false,				title = '1 D  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
+showTsiObsPnlTF1w						= input.bool	(false,				title = '1 S  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
+
+tsiObsPnlGroupSignal					=				'Signal Panel'
+showTsiObsPnlSignalPanel				= input.bool	(true,				title = 'Panel TSI Signal',		group = tsiObsPnlGroupSignal)
+showTsiObsPnlSignalTsi					= input.bool	(true,				title = 'Tsi ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+showTsiObsPnlSignalMtf					= input.bool	(true,				title = 'Mtf ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+showTsiObsPnlSignalRsi					= input.bool	(false,				title = 'Rsi ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+showTsiObsPnlSignalMfi					= input.bool	(true,				title = 'Mfi ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+showTsiObsPnlSignalAdx					= input.bool	(true,				title = 'Adx ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+
+tsiObsPnl_PosiVert						= input.string	(defval = 'Abajo',	title = ' Y: ',					group = tsiObsPnlGroupTimeframes,		inline = 'ubic',
+		  options						=				['Arriba', 'Medio','Abajo'])
+tsiObsPnl_PosiHoriz						= input.string	(defval = 'Centro',	title = ' X: ',					group = tsiObsPnlGroupTimeframes,		inline = 'ubic',
+		  options						=				['Izquierda', 'Centro','Derecha'])
+
+stTsiObsPnl_TextSize					= input.string	(defval = 'normal',	title = 'Tamaño de texto',
+		  options						= ['auto','tiny','small','normal','large','huge'])
+
+vTsiObsPnl_RsiLength					= 14
+
+
+/// Instances ─────────────────────────
+
+
+/// ─── constructor
+
+// tsiObsPnl_TSI							= _x * ta.tsi(gbl_Source_C, _short, _long) + _plus
+tsiObsPnlRSI							= ta.rsi(gbl_Source_C, vTsiObsPnl_RsiLength)
+
+tsiObsPnl_TSI							= ixTsiMuCalcTsiSlow
+tsiObsPnlMTFRange						= FunGlobalCalculateTimeframeIf(timeframe.period)
+// tsiObsPnlEma							= iTsiMuDiCalculateMultiTfEMA
+// tsiObsPnlMFI							= adapMonIfVAL
+// tsiObsPnlADX							= xAdxDiHi_Didi
+
+/// ─── TSI invoke multitimeframe
+fTsiObsPnlExtNow						= FunGlobalCalculateTimeframeIf(timeframe.period)
+fTsiObsPnlExt15m						= FunGlobalCalculateTimeframeIf('15')
+fTsiObsPnlExt30m						= FunGlobalCalculateTimeframeIf('30')
+fTsiObsPnlExt1h							= FunGlobalCalculateTimeframeIf('60')
+fTsiObsPnlExt2h							= FunGlobalCalculateTimeframeIf('120')
+fTsiObsPnlExt3h							= FunGlobalCalculateTimeframeIf('180')
+fTsiObsPnlExt4h							= FunGlobalCalculateTimeframeIf('240')
+fTsiObsPnlExt1d							= '1D'
+
+/// instance function global timeframe
+iTsiObsPnlCalcSignal					= timeframe.period
+
+/// ─── TSI timeframes
+vTsiObsPnlTF15m							= request.security(syminfo.tickerid,		'15',		tsiObsPnl_TSI)
+vTsiObsPnlTF30m							= request.security(syminfo.tickerid,		'30',		tsiObsPnl_TSI)
+vTsiObsPnlTF1h							= request.security(syminfo.tickerid,		'60',		tsiObsPnl_TSI)
+vTsiObsPnlTF2h							= request.security(syminfo.tickerid,		'120',		tsiObsPnl_TSI)
+vTsiObsPnlTF3h							= request.security(syminfo.tickerid,		'180',		tsiObsPnl_TSI)
+vTsiObsPnlTF4h							= request.security(syminfo.tickerid,		'240',		tsiObsPnl_TSI)
+vTsiObsPnlTF1d							= request.security(syminfo.tickerid,		'D',		tsiObsPnl_TSI)
+
+/// ─── TSI timeframes extend
+[vTsiObsPnlTFExtMtfW,		vTsiObsPnlTFExtMtfW_2,			vTsiObsPnlTFExtMtfW_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExtNow,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf15m,		vTsiObsPnlTFExtMtf15m_2,		vTsiObsPnlTFExtMtf15m_3]						= request.security(syminfo.tickerid,	fTsiObsPnlExt15m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf30m,		vTsiObsPnlTFExtMtf30m_2,		vTsiObsPnlTFExtMtf30m_3]						= request.security(syminfo.tickerid,	fTsiObsPnlExt30m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf1h,		vTsiObsPnlTFExtMtf1h_2,			vTsiObsPnlTFExtMtf1h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt1h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf2h,		vTsiObsPnlTFExtMtf2h_2,			vTsiObsPnlTFExtMtf2h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt2h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf3h,		vTsiObsPnlTFExtMtf3h_2,			vTsiObsPnlTFExtMtf3h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt3h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf4h,		vTsiObsPnlTFExtMtf4h_2,			vTsiObsPnlTFExtMtf4h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt4h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf1d,		vTsiObsPnlTFExtMtf1d_2,			vTsiObsPnlTFExtMtf1d_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt1d,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+
+
+/// Functions ─────────────────────────
+
+
+/// ─── New table
+var vTsiPnlNewTable						= table.new(
+	  position							= FunGlobalVertical(tsiObsPnl_PosiVert) + '_' + FunGlobalHorizontal(tsiObsPnl_PosiHoriz),
+	  columns							= 11,
+	  rows								= 3,
+	  border_width						= 2,
+	  frame_color						= color.new(colorTsiObsPnl_Black, 15),
+	  force_overlay						= true)
+
+/// ─── Function table name
+FunTsiObsPnlCalculateCellName(_col, _row, _text) =>
+	_cell_text							= _text
+
+	table.cell							(vTsiPnlNewTable, _col, _row, _cell_text,
+		  bgcolor						= color.new(colorTsiObsPnl_TiPnBg, 10),
+  		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= color.new(colorTsiObsPnl_TextDark, 10),
+		  width							= 3)
+
+/// ─── Function table time
+FunTsiObsPnlCalculateCellTime(_col, _row, _time) =>
+	_bgcolor							= _co_gbl_black
+	_opacity							= 40
+	_cell_text							= _time
+	_txtcolor							= colorTsiObsPnl_TextLight
+	_txtsize							= stTsiObsPnl_TextSize
+
+	table.cell							(vTsiPnlNewTable, _col, _row, _cell_text,
+		  bgcolor						= color.new(_bgcolor, _opacity),
+		  text_size						= _txtsize,
+		  text_color					= colorTsiObsPnl_TextLight,
+		  width							= 5)
+
+/// ─── Function table value
+FunTsiObsPnlCalculateCellValue(_col, _row, _value) =>
+	_cell_color							= _value >= 100 ? colorTsiObsPnl_Buy : _value <= 0 ? colorTsiObsPnl_Sell : colorTsiObsPnl_Neutral
+	_opacity							= _value >= 100 or _value <= 0 ? 20 : _value >= 85 or _value <= 15 ? 40 : 65
+	_cell_text							= str.tostring(_value, '#.00')
+	_txtsize							= stTsiObsPnl_TextSize
+
+	table.cell							(vTsiPnlNewTable, _col, _row, _cell_text,
+		  bgcolor						= color.new(_cell_color, _opacity),
+		  text_size						= _txtsize,
+		  text_color					= colorTsiObsPnl_TextDark,
+		  width							= 5)
+
+/// ─── Function table cells
+FunTsiObsPnlCalculateCellExtend(_col, _row, _var, _var2, _var3) =>
+	/// ─── signal buy/sell
+	_max								= 120
+	_min								= -20
+	_if_buy								= _var	> _var2	and _var	> _var3	and	_var < _min
+	_if_sell							= _var	< _var2	and _var	< _var3	and	_var > _max
+	_trend_buy							= _var	> _var2	and _var	> _var3
+	_trend_sell							= _var	< _var2	and _var	< _var3
+
+	_if_condition						= _if_sell		?	'🔴'	:	_if_buy		?	'🟢'	:	' '
+	_trend_condition					= _trend_sell	?	'⬊ '	:	_trend_buy	?	'⬈ '	:	' '
+
+	_div								= 6
+	_fract_max							= math.round(_max - (_max / _div))
+	_fract_min							= math.ceil(_min + (_max / _div))
+
+	_cell_color							= _var >= _max and _trend_sell ? colorTsiObsPnl_Sell : _var <= _min and _trend_buy ? colorTsiObsPnl_Buy : colorTsiObsPnl_Neutral
+	_ext_opacity						= _var >= _max or _var <= _min ? 30 : _var >= _fract_max or _var <= _fract_min ? 40 : 65
+	_cell_text							= _if_condition + _trend_condition
+	// _cell_text							= str.tostring(_var, '#.00') + _if_condition + _trend_condition
+
+	table.cell							(vTsiPnlNewTable, _col, _row, _cell_text,
+		  bgcolor						= color.new(_cell_color, _ext_opacity),
+		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= colorTsiObsPnl_TextDark,
+		  width							= 4)
+
+
+/// Visual ────────────────────────────
+
+
+/// ─── Table TSI
+if showTsiObsPnlTimeframesPanel
+	FunTsiObsPnlCalculateCellName				(0,	0,		'  ')
+	FunTsiObsPnlCalculateCellName				(0,	1,		'Tsi')
+	if showTsiObsPnlPanelExt
+		FunTsiObsPnlCalculateCellName			(0,	2,		'Plus')
+
+	FunTsiObsPnlCalculateCellTime				(1,	0,		'Ahora')
+	FunTsiObsPnlCalculateCellValue				(1,	1,		tsiObsPnl_TSI)
+	if showTsiObsPnlPanelExt
+		FunTsiObsPnlCalculateCellExtend			(1,	2,		vTsiObsPnlTFExtMtfW,	vTsiObsPnlTFExtMtfW_2,		vTsiObsPnlTFExtMtfW_3)
+
+	// if showTsiObsPnlTF05m
+	// 	FunTsiObsPnlCalculateCellTime			(2,	0,		'5 m')
+	// 	FunTsiObsPnlCalculateCellValue			(2,	1,		vTsiObsPnlTF05m)
+	// 	if showTsiObsPnlPanelExt
+	// 		FunTsiObsPnlCalculateCellExtend		(2,	2,		vTsiObsPnlTFExtMtf05m,	vTsiObsPnlTFExtMtf05m_2,	vTsiObsPnlTFExtMtf05m_3)
+
+	if showTsiObsPnlTF15m
+		FunTsiObsPnlCalculateCellTime			(3,	0,		'15 m')
+		FunTsiObsPnlCalculateCellValue			(3,	1,		vTsiObsPnlTF15m)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellExtend		(3,	2,		vTsiObsPnlTFExtMtf15m,	vTsiObsPnlTFExtMtf15m_2,	vTsiObsPnlTFExtMtf15m_3)
+
+	if showTsiObsPnlTF30m
+		FunTsiObsPnlCalculateCellTime			(4,	0,		'30 m')
+		FunTsiObsPnlCalculateCellValue			(4,	1,		vTsiObsPnlTF30m)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellExtend		(4,	2,		vTsiObsPnlTFExtMtf30m,	vTsiObsPnlTFExtMtf30m_2,	vTsiObsPnlTFExtMtf30m_3)
+
+	if showTsiObsPnlTF1h
+		FunTsiObsPnlCalculateCellTime			(5,	0,		'1 H')
+		FunTsiObsPnlCalculateCellValue			(5,	1,		vTsiObsPnlTF1h)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellExtend		(5,	2,		vTsiObsPnlTFExtMtf1h,	vTsiObsPnlTFExtMtf1h_2,		vTsiObsPnlTFExtMtf1h_3)
+
+	if showTsiObsPnlTF2h
+		FunTsiObsPnlCalculateCellTime			(6,	0,		'2 H')
+		FunTsiObsPnlCalculateCellValue			(6,	1,		vTsiObsPnlTF2h)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellExtend		(6,	2,		vTsiObsPnlTFExtMtf2h,	vTsiObsPnlTFExtMtf2h_2,		vTsiObsPnlTFExtMtf2h_3)
+
+	if showTsiObsPnlTF3h
+		FunTsiObsPnlCalculateCellTime			(7,	0,		'3 H')
+		FunTsiObsPnlCalculateCellValue			(7,	1,		vTsiObsPnlTF3h)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellExtend		(7,	2,		vTsiObsPnlTFExtMtf3h,	vTsiObsPnlTFExtMtf3h_2,		vTsiObsPnlTFExtMtf3h_3)
+
+	if showTsiObsPnlTF4h
+		FunTsiObsPnlCalculateCellTime			(8,	0,		'4 H')
+		FunTsiObsPnlCalculateCellValue			(8,	1,		vTsiObsPnlTF4h)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellExtend		(8,	2,		vTsiObsPnlTFExtMtf4h,	vTsiObsPnlTFExtMtf4h_2,		vTsiObsPnlTFExtMtf4h_3)
+
+	if showTsiObsPnlTF1d
+		FunTsiObsPnlCalculateCellTime			(9,	0,		'1 D')
+		FunTsiObsPnlCalculateCellValue			(9,	1,		vTsiObsPnlTF1d)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellExtend		(9,	2,		vTsiObsPnlTFExtMtf1d,	vTsiObsPnlTFExtMtf1d_2,		vTsiObsPnlTFExtMtf1d_3)
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■

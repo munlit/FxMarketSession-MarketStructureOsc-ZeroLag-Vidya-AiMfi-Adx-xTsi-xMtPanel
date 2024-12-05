@@ -2,6 +2,17 @@
 /// ║	Globals						║
 /// ╚═══════════════════════════════╝
 /// ╔═══════════════════════════════╗
+/// ║	Fx Market Sessions			║
+/// ╔═══════════════════════════════╗
+/// ║	Market Structure Oscillador	║
+/// ╔═══════════════════════════════╗
+/// ║	ZeroLag Trend				║
+/// ╔═══════════════════════════════╗
+/// ║	Aroon Oscillator			║
+/// ╔═══════════════════════════════╗
+/// ║	Volumatic VIDYA				║
+/// ╚═══════════════════════════════╝
+/// ╔═══════════════════════════════╗
 /// ║	Tsi & Divergences			║
 /// ╔═══════════════════════════════╗
 /// ║	Tsi two						║
@@ -11,6 +22,7 @@
 /// ║	@	Allen	㔬				║
 /// ╚═══════════════════════════════╝
 
+
 //@version=5
 indicator(title							= 'Tsi two & TsiDiv [🎱 Allen 㔬]',
 		  shorttitle					= 'xTsiMulti xPnl [🎱 Allen 㔬]',
@@ -19,6 +31,7 @@ indicator(title							= 'Tsi two & TsiDiv [🎱 Allen 㔬]',
 		//   timeframe_gaps				= true,
 		  precision						= 1,
 		  explicit_plot_zorder			= true)
+
 
 //// ─────────────────────────────────────────────────────────────────────
 
@@ -250,12 +263,15 @@ FunGlobalCalculateTimeframeIf(_timeframe) =>
 
 gblSource								= globalTypeOHL.new()
 
+
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
 
 /// ╔═══════════════════════════════════╗
 /// ║  Tsi & Divergences				║
 /// ║  @	Allen.						║
 /// ╚═══════════════════════════════════╝
+
 
 //// ─────────────────────────────────────────────────────────────────────
 
@@ -438,10 +454,9 @@ plotshape(showxTsiMuTSIDisplay			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_ba
 
 /// ╔═══════════════════════════════════╗
 /// ║	Panel TSI Multi Timeframe		║
-/// ║	Panel Tsi MultiTrend			║
-/// ║	Panel Multi Indicator			║
 /// ║	@	Allen.						║
 /// ╚═══════════════════════════════════╝
+
 
 //// ─────────────────────────────────────────────────────────────────────
 

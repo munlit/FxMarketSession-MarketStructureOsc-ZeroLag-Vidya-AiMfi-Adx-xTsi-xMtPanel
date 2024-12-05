@@ -378,6 +378,274 @@ fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,							color.new(c
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 
+/// ╔═══════════════════════════════════╗
+/// ║	Volumatic VIDYA					║
+/// ╚═══════════════════════════════════╝
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――――――
+
+
+// Define colors for up and down trends
+col_vVidya_uptrend						= _co_gbl_up
+col_vVidya_downtrend					= _co_gbl_dn
+col_vVidya_txt							= _co_gbl_white
+
+show_vVidya_shadow						= input.bool(true,					title = "Shadow",		group = "Color",		inline = "vidya vars")
+
+vVidya_length							= input.int(defval = 10,			title = "Longitud")
+vVidya_momentum							= input.int(defval = 20,			title = "Momentum")
+vVidya_band_distance					= input.float(defval = 2,			title = "Factor de distancia entre bandas",		step = 0.1)
+
+// Define pivot
+int		vVidya_pivot_leftbars			= 3
+int		vVidya_pivot_rightbars			= vVidya_pivot_leftbars
+
+float	vVidya_source					= gblSource.C
+
+// Initialize variables for line, volume, and trend state
+var		line vVidya_pivotline			= na
+var		float vVidya_volumevalue		= na
+float	vVidya_smoothed_value			= na
+var		bool vVidya_trend_up			= na
+
+// Initialize arrays for storing line and volume information
+var	array<line> vVidya_liquid_lines_low	= array.new<line>(500)
+var	array<line> vVidya_liquid_lines_high= array.new<line>(500)
+var		float vVidya_volume_uptrend		= na
+var		float vVidya_volume_downtrend	= na
+
+
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――――――
+
+
+// Define VIDYA (Variable Index Dynamic Average) function
+Fun_vVidya_calculate(_source, _length, _momentum) =>
+	float	_chg_momentum				= ta.change(_source)
+	float	_sum_posmomentum			= math.sum((_chg_momentum >= 0) ? _chg_momentum : 0.0, _momentum)
+	float	_sum_negmomentum			= math.sum((_chg_momentum >= 0) ? 0.0 : -_chg_momentum, _momentum)
+	float	_abs_cmo					= math.abs(100 * (_sum_posmomentum - _sum_negmomentum) / (_sum_posmomentum + _sum_negmomentum))
+	float	_alpha						= 2 / (_length + 1)
+	var	float	_vidya_value			= 0.0
+	_vidya_value						:= _alpha * _abs_cmo / 100 * _source + (1 - _alpha * _abs_cmo / 100) * nz(_vidya_value[1])
+
+	ta.sma(_vidya_value, 15)
+
+// Method to extend lines and add labels for liquidity levels
+method Fun_vVidya_extend_liquidity_lines(array<line> _line_array, _price_level, _cross, _volume) =>
+	if _line_array.size() > 0 and last_bar_index - bar_index < 5000
+		for i = 0 to _line_array.size() - 1 
+			if i < _line_array.size()
+				line	_liquidity_line	= _line_array.get(i)
+				float	_current_line_level= line.get_y2(_liquidity_line)
+				bool	_price_cross	= _cross 
+								  ? _price_level < _current_line_level and _price_level[1] >= _current_line_level 
+								  : _price_level > _current_line_level and _price_level[1] <= _current_line_level
+
+				bool	_is_short_line	= bar_index - line.get_x1(_liquidity_line) < 50
+
+				if _price_cross and _is_short_line
+					line.set_x2(_liquidity_line, bar_index)
+					_line_array.remove(i)
+
+					// Add volume label to the liquidity zone
+					label.new(bar_index-1, _price_level[1], 
+							 str.tostring(_volume, format.volume), 
+							 color		= color.rgb(0, 0, 0, 99), 
+							 style		= _cross ? label.style_label_lower_left : label.style_label_upper_left,
+							 textcolor	= color.new(col_vVidya_txt, 30), 
+							 size		= size.small,
+							 force_overlay	= true
+							 )
+
+					// Add a circle label to represent liquidity zone
+					label.new(bar_index-1, _price_level[1], 
+							 text		= "◉", 
+							 color		= #00000003, 
+							 textcolor	= _cross ? col_vVidya_downtrend : col_vVidya_uptrend, 
+							 style		= label.style_label_center, 
+							 size		= size.normal,
+							 force_overlay	= true
+							 )
+
+
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ――――――――――――――――
+
+
+// Calculate the Average True Range (ATR)
+float	vVi_ATR_value					= ta.atr(200)
+
+// Calculate the VIDYA (Variable Index Dynamic Average)
+vidya_value = Fun_vVidya_calculate(vVidya_source, vVidya_length, vVidya_momentum)
+
+// Calculate upper and lower bands based on VIDYA and ATR
+float	vVi_upper_band					= vidya_value + vVi_ATR_value * vVidya_band_distance
+float	vVi_lower_band					= vidya_value - vVi_ATR_value * vVidya_band_distance
+
+// Detect trend direction using crossovers of source with bands
+if ta.crossover(vVidya_source, vVi_upper_band)
+	vVidya_trend_up						:= true 
+if ta.crossunder(vVidya_source, vVi_lower_band)
+	vVidya_trend_up						:= false 
+
+// Set trend-based smoothing variable
+if vVidya_trend_up
+	vVidya_smoothed_value				:= vVi_lower_band
+if not vVidya_trend_up
+	vVidya_smoothed_value				:= vVi_upper_band
+if ta.change(vVidya_trend_up)
+	vVidya_smoothed_value				:= na
+
+// Calculate pivot highs and lows for price action
+float	vVi_pivot_high					= ta.pivothigh(vVidya_pivot_leftbars, vVidya_pivot_rightbars)
+float	vVi_pivot_low					= ta.pivotlow(close, vVidya_pivot_leftbars, vVidya_pivot_rightbars)
+
+// Create and store lines for pivot lows (support zones)
+if low[vVidya_pivot_rightbars] > vVidya_smoothed_value and vVi_pivot_low 
+	vVidya_pivotline					:= line.new(
+		  bar_index[vVidya_pivot_rightbars], 
+		  low[vVidya_pivot_rightbars], 
+		  bar_index[vVidya_pivot_rightbars]+5, 
+		  low[vVidya_pivot_rightbars], 
+		  color							= color.new(col_vVidya_uptrend, 50),
+		  force_overlay					= true
+		  )
+
+	vVidya_liquid_lines_low.push(vVidya_pivotline)
+	vVidya_volumevalue					:= math.sum(volume, vVidya_pivot_rightbars + vVidya_pivot_leftbars) / (vVidya_pivot_rightbars + vVidya_pivot_leftbars)
+
+// Create and store lines for pivot highs (resistance zones)
+if high[vVidya_pivot_rightbars] < vVidya_smoothed_value and vVi_pivot_high 
+	vVidya_pivotline					:= line.new(
+		  bar_index[vVidya_pivot_rightbars], 
+		  high[vVidya_pivot_rightbars], 
+		  bar_index[vVidya_pivot_rightbars]+5, 
+		  high[vVidya_pivot_rightbars],
+		  color							= color.new(col_vVidya_downtrend, 50),
+		  force_overlay					= true
+		  )
+
+	vVidya_liquid_lines_high.push(vVidya_pivotline)
+	vVidya_volumevalue					:= math.sum(-volume, vVidya_pivot_rightbars + vVidya_pivot_leftbars) / (vVidya_pivot_rightbars + vVidya_pivot_leftbars)
+
+// Extend lines to track price movements
+vVidya_liquid_lines_high.Fun_vVidya_extend_liquidity_lines(vVidya_smoothed_value, true, vVidya_volumevalue)
+vVidya_liquid_lines_low.Fun_vVidya_extend_liquidity_lines(vVidya_smoothed_value, false, vVidya_volumevalue)
+
+// Detect changes in the trend direction
+bool vVi_trend_cross_up					= not vVidya_trend_up[1] and vVidya_trend_up
+bool vVi_trend_cross_down				= not vVidya_trend_up and vVidya_trend_up[1]
+
+// Reset volume counters when trend changes
+if ta.change(vVi_trend_cross_up) or ta.change(vVi_trend_cross_down)
+	vVidya_volume_uptrend				:= 0
+	vVidya_volume_downtrend				:= 0
+
+// Accumulate volume during trends
+if not(ta.change(vVi_trend_cross_up) or ta.change(vVi_trend_cross_down))
+	vVidya_volume_uptrend				+= (close > open ? volume : 0)
+	vVidya_volume_downtrend				+= (close < open ? volume : 0)
+
+// Calculate average volume
+float vVidya_avg_volume_delta			= (vVidya_volume_uptrend + vVidya_volume_downtrend) / 2
+
+// Calculate delta volume percentage
+string vVidya_delta_volume = 
+		  str.tostring(((vVidya_volume_uptrend - vVidya_volume_downtrend) / vVidya_avg_volume_delta) * 100, format.percent) == "NaN%" 
+		  ? "0%" 
+		  : str.tostring(((vVidya_volume_uptrend - vVidya_volume_downtrend) / vVidya_avg_volume_delta) * 100, format.percent)
+
+
+/// ＰＬＯＴ ――――――――――――――――――――――――――――――
+
+
+_fvVi_show								= show_vVidya_shadow
+_fvVi_opacity							= 70
+_fvVi_opacity_none						= 100
+_fvVi_line_width						= 2
+_fvVi_line_style						= plot.style_linebr
+
+col_vVidya_plotBuy						= color.new(col_vVidya_uptrend, 50)
+col_vVidya_plotSell						= color.new(col_vVidya_downtrend, 50)
+
+// Determine the color of the trend
+_fvVi_color_conditional					= vVidya_trend_up ? col_vVidya_plotBuy : not vVidya_trend_up ? col_vVidya_plotSell : chart.fg_color
+
+_fvVi_value_up							= vVidya_smoothed_value
+_fvVi_value_dn							= hl2
+
+// Plot the VIDYA trend line
+_fvVi_plot_up							= plot(_fvVi_value_up,
+		  color							= _fvVi_color_conditional,
+		  linewidth						= _fvVi_line_width,
+		  style							= _fvVi_line_style,
+		  force_overlay					= true)
+
+_fvVi_plot_dn							= plot(_fvVi_value_dn,
+		  display						= display.none,
+		  force_overlay					= true)
+
+// Fill between the plot and the VIDYA line
+fill(_fvVi_plot_up, _fvVi_plot_dn,
+		  _fvVi_value_up,
+		  _fvVi_value_dn,
+		  color.new(_fvVi_color_conditional, _fvVi_show ? _fvVi_opacity : _fvVi_opacity_none),
+		  na
+		  )
+
+// Display labels for volume and trend statistics on the last bar
+if barstate.islast
+	label.delete(
+		 label.new(bar_index + 10, vVidya_smoothed_value, 
+		 "Compra: " + str.tostring(vVidya_volume_uptrend, format.volume) + "\n" +
+		 "Venta: " + str.tostring(vVidya_volume_downtrend, format.volume) + "\n" +
+		 "Delta: " + vVidya_delta_volume, 
+		 color							= color.new(_fvVi_color_conditional, 90),
+		 style							= label.style_label_left, 
+		 textcolor						= _co_gbl_white,
+		 force_overlay					= true
+		 )[1])
+	
+	label.delete(
+		 label.new(bar_index, vVidya_smoothed_value, 
+				 text					= "✪", 
+				 color					= #00000003,
+				 textcolor				= _fvVi_color_conditional, 
+				 style					= label.style_label_center, 
+				 size					= size.large,
+				 force_overlay			= true
+				 )[1])
+
+// Plot trend change markers (up and down arrows)
+plotshape(
+		 series							= vVi_trend_cross_up[1] ? vVidya_smoothed_value[0] : na, 
+		 title							= "Trend Buy", 
+		 style							= shape.labelup, 
+		 location						= location.absolute, 
+		 color							= color.new(col_vVidya_uptrend, 90), 
+		 text							= " ▲ ", 
+		 textcolor						= col_vVidya_uptrend,
+		 force_overlay					= true
+		 )
+
+plotshape(
+		 series							= vVi_trend_cross_down[1] ? vVidya_smoothed_value[0] : na, 
+		 title							= "Trend Sell", 
+		 style							= shape.labeldown, 
+		 location						= location.absolute, 
+		 color							= color.new(col_vVidya_downtrend, 90), 
+		 text							= " ▼ ", 
+		 textcolor						= col_vVidya_downtrend,
+		 force_overlay					= true
+		 )
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
 /// ╔═══════════════════════════════╗
 /// ║	Fx Market Sessions			║
 /// ╚═══════════════════════════════╝

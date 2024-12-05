@@ -106,6 +106,7 @@ TaxusRed								= #F20505
 OsomeBlue								= #0061FE
 OsomeRed								= #FF4054
 
+
 /// Types ─────────────────────────────
 
 
@@ -276,6 +277,7 @@ co_xTsiMuText							= color.new(_co_gbl_txt_dark,		0)
 
 
 /// Instances ─────────────────────────
+
 
 /// Multitimeframe
 
@@ -460,7 +462,6 @@ colorTsiObsPnl_TiPnBg					= _co_gbl_yellow
 tsiObsPnlGroupTimeframes				=				'Timeframe Panel'
 showTsiObsPnlTimeframesPanel			= input.bool	(true,				title = 'Panel TSI',			group = tsiObsPnlGroupTimeframes,		inline = 'show p')
 showTsiObsPnlPanelExt					= input.bool	(true,				title = 'Ampliado',				group = tsiObsPnlGroupTimeframes,		inline = 'show p')
-// showTsiObsPnlTF05m						= input.bool	(false,				title = '5m   ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
 showTsiObsPnlTF15m						= input.bool	(true,				title = '15m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
 showTsiObsPnlTF30m						= input.bool	(false,				title = '30m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
 showTsiObsPnlTF1h						= input.bool	(true,				title = '1 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
@@ -492,13 +493,11 @@ vTsiObsPnl_RsiLength					= 14
 /// Instances ─────────────────────────
 
 
-/// ─── RSI
+/// ─── constructor
 
 // tsiObsPnl_TSI							= _x * ta.tsi(gbl_Source_C, _short, _long) + _plus
-
 tsiObsPnlRSI							= ta.rsi(gbl_Source_C, vTsiObsPnl_RsiLength)
 
-/// ─── TSI invoke
 tsiObsPnl_TSI							= ixTsiMuCalcTsiSlow
 tsiObsPnlMTFRange						= FunGlobalCalculateTimeframeIf(timeframe.period)
 // tsiObsPnlEma							= iTsiMuDiCalculateMultiTfEMA
@@ -507,7 +506,6 @@ tsiObsPnlMTFRange						= FunGlobalCalculateTimeframeIf(timeframe.period)
 
 /// ─── TSI invoke multitimeframe
 fTsiObsPnlExtNow						= FunGlobalCalculateTimeframeIf(timeframe.period)
-// fTsiObsPnlExt05m						= FunGlobalCalculateTimeframeIf('5')
 fTsiObsPnlExt15m						= FunGlobalCalculateTimeframeIf('15')
 fTsiObsPnlExt30m						= FunGlobalCalculateTimeframeIf('30')
 fTsiObsPnlExt1h							= FunGlobalCalculateTimeframeIf('60')
@@ -515,13 +513,11 @@ fTsiObsPnlExt2h							= FunGlobalCalculateTimeframeIf('120')
 fTsiObsPnlExt3h							= FunGlobalCalculateTimeframeIf('180')
 fTsiObsPnlExt4h							= FunGlobalCalculateTimeframeIf('240')
 fTsiObsPnlExt1d							= '1D'
-// fTsiObsPnlExt1w							= '1W'
 
 /// instance function global timeframe
 iTsiObsPnlCalcSignal					= timeframe.period
 
 /// ─── TSI timeframes
-// vTsiObsPnlTF05m							= request.security(syminfo.tickerid,		'5',		tsiObsPnl_TSI)
 vTsiObsPnlTF15m							= request.security(syminfo.tickerid,		'15',		tsiObsPnl_TSI)
 vTsiObsPnlTF30m							= request.security(syminfo.tickerid,		'30',		tsiObsPnl_TSI)
 vTsiObsPnlTF1h							= request.security(syminfo.tickerid,		'60',		tsiObsPnl_TSI)
@@ -529,11 +525,9 @@ vTsiObsPnlTF2h							= request.security(syminfo.tickerid,		'120',		tsiObsPnl_TSI
 vTsiObsPnlTF3h							= request.security(syminfo.tickerid,		'180',		tsiObsPnl_TSI)
 vTsiObsPnlTF4h							= request.security(syminfo.tickerid,		'240',		tsiObsPnl_TSI)
 vTsiObsPnlTF1d							= request.security(syminfo.tickerid,		'D',		tsiObsPnl_TSI)
-// vTsiObsPnlTF1w							= request.security(syminfo.tickerid,		'W',		tsiObsPnl_TSI)
 
 /// ─── TSI timeframes extend
 [vTsiObsPnlTFExtMtfW,		vTsiObsPnlTFExtMtfW_2,			vTsiObsPnlTFExtMtfW_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExtNow,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-// [vTsiObsPnlTFExtMtf05m,		vTsiObsPnlTFExtMtf05m_2,		vTsiObsPnlTFExtMtf05m_3]						= request.security(syminfo.tickerid,	fTsiObsPnlExt05m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf15m,		vTsiObsPnlTFExtMtf15m_2,		vTsiObsPnlTFExtMtf15m_3]						= request.security(syminfo.tickerid,	fTsiObsPnlExt15m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf30m,		vTsiObsPnlTFExtMtf30m_2,		vTsiObsPnlTFExtMtf30m_3]						= request.security(syminfo.tickerid,	fTsiObsPnlExt30m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf1h,		vTsiObsPnlTFExtMtf1h_2,			vTsiObsPnlTFExtMtf1h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt1h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)

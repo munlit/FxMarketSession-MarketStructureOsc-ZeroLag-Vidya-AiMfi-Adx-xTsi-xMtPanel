@@ -1,0 +1,115 @@
+/// ╔═══════════════════════════════╗
+/// ║	Aroon Oscillator			║
+/// ║	@	Allen	㔬				║
+/// ╚═══════════════════════════════╝
+
+//@version=5
+indicator("Aroon Oscillator",
+		  max_bars_back					= 500,
+		  format						= format.percent,
+		  max_labels_count				= 500)
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+co_oonOsc_buy							= _co_gbl_up
+co_oonOsc_sell							= _co_gbl_dn
+co_oonOsc_line							= _co_gbl_white
+
+oonOsc_groupvars						= 'Arooon Oscillator'
+show_oonOscAroon						= input.bool	(defval = true,		title = 'Visualizar Aroon',	group = oonOsc_groupvars)
+oonOsc_length							= input.int		(defval = 42,		title = "Longitud",			group = oonOsc_groupvars)			// 29
+oonOsc_smooth							= input.int		(defval = 10,		title = "Smooth",			group = oonOsc_groupvars)			// 25
+oonOsc_sign_length						= input.int		(defval = 10,		title = "Signal",			group = oonOsc_groupvars)			// 10
+oonOsc_gain_limit						= 10
+
+
+// ＣＡＬＣＵＬＡＴＩＯＮＳ――――――――――――――
+
+
+// Zero Lag Function John Ehlers
+Fun_oonOsc_zero_lag(_source, _length, _gain_limit) =>
+	// Initialize variables
+	float _alpha						= 2 / (_length + 1)
+	float _ema							= na
+	float _ecu							= na
+	float _least_error					= 1000000
+	float _best_gain					= 0
+
+	_ema								:= na(_ema[1]) ? _source : _alpha * _source + (1 - _alpha) * nz(_ema[1])
+
+	// Loop to find the best gain
+	for int _value						= -_gain_limit to _gain_limit
+		_gain							= _value / 10
+		_ecu							:= na(_ecu[1]) ? _source : _alpha * (_ema + _gain * (_source - nz(_ecu[1]))) + (1 - _alpha) * nz(_ecu[1])
+
+		float _error					= _source - _ecu
+
+		// Check if this gain results in a smaller error
+		if math.abs(_error) < _least_error
+			_least_error				:= math.abs(_error)
+			_best_gain					:= _gain
+
+	_ecu								:= na(_ecu[1]) ? _source : _alpha * (_ema + _best_gain * (_source - nz(_ecu[1]))) + (1 - _alpha) * nz(_ecu[1])
+	_ecu
+
+Fun_oonOsc_calculate_aroon(simple int _length, _smooth) =>
+	_aroonDown							= 100 * (ta.lowestbars(low, _length) + _length) / _length
+	_aroonUp							= 100 * (ta.highestbars(high, _length) + _length) / _length
+	_source								= _aroonUp - _aroonDown
+	_gain_limit							= oonOsc_gain_limit
+	Fun_oonOsc_zero_lag					(_source, _smooth, _gain_limit)
+
+oonOsc_multip							= 50
+fOnOsc_aroon_osc						= Fun_oonOsc_calculate_aroon(oonOsc_length, oonOsc_smooth) + oonOsc_multip
+fOnOsc_sig_line							= ta.sma(fOnOsc_aroon_osc, oonOsc_sign_length)
+
+
+// ＰＬＯＴ ――――――――――――――――――――――――――――
+
+
+oonOsc_plot_line1						= plot(show_oonOscAroon ? fOnOsc_aroon_osc : na,	title = "Oscilador Aroon",	color = color.from_gradient(fOnOsc_aroon_osc, -80 + oonOsc_multip, 80 + oonOsc_multip, co_oonOsc_sell, co_oonOsc_buy))
+oonOsc_plot_line_mid					= plot(show_oonOscAroon ? 0 + oonOsc_multip : na,	title = "Linea media",		color = color.new(co_oonOsc_line, 70))
+
+plot(show_oonOscAroon ? fOnOsc_sig_line : na, "Señal", color = bar_index % 2 == 0 ? color.new(co_oonOsc_line, 50) : na)
+
+fill(oonOsc_plot_line1,					oonOsc_plot_line_mid,		0 + oonOsc_multip, -100 + oonOsc_multip,	na, co_oonOsc_sell)
+fill(oonOsc_plot_line1,					oonOsc_plot_line_mid,		100 + oonOsc_multip, 0 + oonOsc_multip,		co_oonOsc_buy, na)
+
+bgcolor(show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc, 0)		? color.new(co_oonOsc_buy, 85)	: na)
+bgcolor(show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc, 0)		? color.new(co_oonOsc_sell, 85)	: na)
+
+if barstate.islast and show_oonOscAroon
+	label.delete(
+		 label.new(bar_index, fOnOsc_aroon_osc, str.tostring(math.round(fOnOsc_aroon_osc), format.percent),
+				 color					= color(na), 
+				 textcolor				= fOnOsc_aroon_osc > 0 ? co_oonOsc_buy : co_oonOsc_sell, 
+				 style					= label.style_label_left)[1]
+				 )
+
+if show_oonOscAroon
+oonOsc_cross_over					= show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
+oonOsc_cross_under					= show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
+
+plotchar(oonOsc_cross_over,
+		  title						= "cruce reversion ▲",
+		  char						= "●", 
+		  location					= location.absolute, 
+		  color						= co_oonOsc_buy,
+		  size						= size.tiny, 
+		  offset					= -1)
+
+plotchar(oonOsc_cross_under,
+		  title						= "cruce reversion ▼",
+		  char						= "●", 
+		  location					= location.absolute, 
+		  color						= co_oonOsc_sell, 
+		  size						= size.tiny, 
+		  offset					= -1)
+
+bgcolor(fOnOsc_aroon_osc > 0 ? color.new(co_oonOsc_buy, 95) : color.new(co_oonOsc_sell, 95))
+

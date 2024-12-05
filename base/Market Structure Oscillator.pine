@@ -1,0 +1,334 @@
+/// ╔═══════════════════════════════╗
+/// ║ 	Market Structure Oscilador	║
+/// ║ 	@	Allen.					║
+/// ║ 	@	LuxAlgo					║
+/// ╚═══════════════════════════════╝
+
+//@version=5
+indicator('Market Structure Oscilador [Allen]', 'MS Osc', false, format.price, max_lines_count = 500, max_boxes_count = 500, max_labels_count = 500)
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+/// Inputs ────────────────────────────
+
+
+co_msOscBuy								= _co_gbl_buy
+co_msOscSell							= _co_gbl_sell
+co_msOscLong							= _co_gbl_buy
+co_msOscShort							= _co_gbl_sell
+
+co_msOscRange							= _co_gbl_white
+msOscilColorOsc							= _co_gbl_white
+msOscilColorMid							= _co_gbl_white
+
+display									= display.all - display.status_line	
+
+msOsc_VarsGroup							= 'Oscilador Market Structure'
+msOsc_WeightK1							= input.float	(defval = 1,					title = '  Escala Corta',					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msOsc_WeightK2							= input.float	(defval = 3,					title = '  Escala Intermedia',				minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msOsc_WeightK3							= input.float	(defval = 2,					title = '  Escala Larga',					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msOsc_Norm_Smooth						= input.int		(defval = 4,					title = '  Oscilador Suavizado',			minval = 1,			group = msOsc_VarsGroup,					display = display)
+
+msOsc_Group								= 'Oscilador Gradiente'
+msOsc_Show								= input			(defval = true,					title = 'Oscilador Cycle - Gradiente',							group = msOsc_Group)
+
+cyc_Group								= 'Oscilador Cycle'
+cycleOpt								= input			(defval = false,				title = 'Oscilador Cycle - Histograma',							group = cyc_Group)
+cyc_Smooth								= input.int		(defval = 7,					title = '  Cycle Marca Longitud',			minval = 1,			group = cyc_Group,						display = display)
+
+genericGroup							= 'Market Structure en Gráfico'
+msOnChart1								= input			(defval = true,					title = 'Estructura de rango Corto',							group = genericGroup)
+msOnChartK1								= input.string	(defval = '····',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K1',	display = display)
+stMSLblK1T								= input.string	(defval = 'Disabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K1',	display = display),	stMSLblK1 = stMSLblK1T == 'Enabled'
+
+msOnChart2								= input			(defval = true,					title = 'Estructura de rango Intermedio',						group = genericGroup)
+msOnChartK2								= input.string	(defval = '----',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K2',	display = display)
+stMSLblK2T								= input.string	(defval = 'Disabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K2',	display = display),	stMSLblK2 = stMSLblK2T == 'Enabled'
+
+msOnChart3								= input			(defval = true,					title = 'Estructura de rango Largo', 							group = genericGroup)
+msOnChartK3								= input.string	(defval = '⎯⎯⎯⎯',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K3',	display = display)
+stMSLblK3T								= input.string	(defval = 'Enabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K3',	display = display),	stMSLblK3 = stMSLblK3T == 'Enabled'
+
+msOscCG									= 'Rango de Oscilador'
+show_msOscRange1						= input			(false,							title = 'Oscilador de rango Corto',								group = msOscCG,		inline = 'k1w')
+show_msOscRange2						= input			(false,							title = 'Oscilador de rango Medio',								group = msOscCG,		inline = 'k2w')
+show_msOscRange3						= input			(false,							title = 'Oscilador de rango Largo',								group = msOscCG,		inline = 'k3w')
+
+msOscSizeBosChoch						= size.tiny
+
+
+/// Types ─────────────────────────────
+
+
+type SWINGS
+	float	lastPrice
+	float	midPrice
+	float	prevPrice
+
+	int		lastIndex
+	int		midIndex
+	int		prevIndex
+
+	bool	isCrossed
+
+type MS
+	int		type					= 0
+
+
+/// Instances ─────────────────────────
+
+
+var SWINGS stLow						= SWINGS.new()
+var SWINGS stHigh						= SWINGS.new()
+var MS stMS								= MS.new()
+
+var SWINGS itLow						= SWINGS.new()
+var SWINGS itHigh						= SWINGS.new()
+var MS itMS								= MS.new()
+
+var SWINGS ltLow						= SWINGS.new()
+var SWINGS ltHigh						= SWINGS.new()
+var MS ltMS								= MS.new()
+
+
+/// Functions ─────────────────────────
+
+
+Fun_msOsc_queryPatterns(lastPrice, midPrice, prevPrice, isSwingHigh) =>
+	if isSwingHigh
+		prevPrice < midPrice and midPrice >= lastPrice
+	else
+		prevPrice > midPrice and midPrice <= lastPrice
+
+method Fun_msOsc_queryPatterns(SWINGS this, isSwingHigh) =>
+	if isSwingHigh
+		this.prevPrice < this.midPrice and this.midPrice >= this.lastPrice
+	else
+		this.prevPrice > this.midPrice and this.midPrice <= this.lastPrice
+
+method Fun_msOsc_updatePattern(SWINGS this, _price, _index) =>
+	this.isCrossed					:= false
+	this.prevPrice					:= this.midPrice, this.midPrice := this.lastPrice, this.lastPrice := _price
+	this.prevIndex					:= this.midIndex, this.midIndex := this.lastIndex, this.lastIndex := _index
+
+method Fun_msOsc_setType(MS this, value) =>
+	this.type						:= value
+
+Fun_msOsc_normalize(_buy, _sell, _smooth) =>
+	var _os							= 0
+	var float _max					= na
+	var float _min					= na
+	_os := _buy ? 1 : _sell ? -1 : _os
+	
+	_max := _os > _os[1] ? gblSource.C : _os < _os[1] ? _max : math.max(gblSource.C, _max)
+	_min := _os < _os[1] ? gblSource.C : _os > _os[1] ? _min : math.min(gblSource.C, _min)
+
+	ta.sma((gblSource.C - _min)/(_max - _min), _smooth) * 100
+
+Fun_msOsc_shortMarketStructure() => 
+
+	_bull							= false
+	_bear							= false
+
+	if Fun_msOsc_queryPatterns(gblSource.H, gblSource.H[1], gblSource.H[2], true )
+		stHigh.Fun_msOsc_updatePattern(gblSource.H[1], bar_index[1])
+		stHigh.isCrossed			:= false
+
+	if gblSource.C > stHigh.lastPrice and not stHigh.isCrossed
+		stHigh.isCrossed			:= true
+		_bull						:= true
+
+	if Fun_msOsc_queryPatterns(gblSource.L , gblSource.L[1] , gblSource.L[2] , false) 
+		stLow.isCrossed				:= false
+		stLow.Fun_msOsc_updatePattern(gblSource.L[1], bar_index[1])
+
+	if gblSource.C < stLow.lastPrice and not stLow.isCrossed
+		stLow.isCrossed				:= true
+		_bear						:= true
+
+	Fun_msOsc_normalize(_bull, _bear, msOsc_Norm_Smooth)
+
+Fun_msOsc_marketStructure(SWINGS hSwingHigh, SWINGS hSwingLow, SWINGS lSwingHigh, SWINGS lSwingLow) => 
+
+	_bull							= false
+	_bear							= false 
+
+	cSwingHigh						= lSwingHigh.Fun_msOsc_queryPatterns(true)
+
+	if cSwingHigh and cSwingHigh != cSwingHigh[1]
+		hSwingHigh.Fun_msOsc_updatePattern(lSwingHigh.midPrice, lSwingHigh.midIndex)
+		hSwingHigh.isCrossed		:= false
+
+	if gblSource.C > hSwingHigh.lastPrice and not hSwingHigh.isCrossed
+		hSwingHigh.isCrossed		:= true
+		_bull						:= true
+
+	cSwingLow						= lSwingLow.Fun_msOsc_queryPatterns(false)
+
+	if cSwingLow and cSwingLow != cSwingLow[1]
+		hSwingLow.Fun_msOsc_updatePattern(lSwingLow.midPrice, lSwingLow.midIndex)
+		hSwingLow.isCrossed			:= false
+
+	if gblSource.C < hSwingLow.lastPrice and not hSwingLow.isCrossed
+		hSwingLow.isCrossed			:= true
+		_bear						:= true
+
+	Fun_msOsc_normalize(_bull, _bear, msOsc_Norm_Smooth)
+
+Fun_msOsc_collectData() => [Fun_msOsc_shortMarketStructure(), Fun_msOsc_marketStructure(itHigh, itLow, stHigh, stLow), Fun_msOsc_marketStructure(ltHigh, ltLow, itHigh, itLow)]
+
+
+/// Maths ─────────────────────────────
+
+
+log.info('yaz_kizim {0} {1}', ltHigh.lastPrice, ltHigh.isCrossed)
+
+if msOnChart1
+	if gblSource.C > stHigh.lastPrice and not stHigh.isCrossed
+
+		line.new(stHigh.lastIndex, stHigh.lastPrice, gblSource.I, stHigh.lastPrice,
+					  color				= color.new(co_msOscLong, 35),
+					  style				= FunGlobalLineStyle(msOnChartK1),
+					  width				= 1,
+					  force_overlay		= true)
+
+		if stMSLblK1
+			box.new(stHigh.lastIndex, stHigh.lastPrice, gblSource.I, stHigh.lastPrice,
+					  border_color		= color(na),
+					  text				= stMS.type < 0 ? 'CHoCH' : 'BoS',
+					  text_color		= color.new(co_msOscLong, 35),
+					  text_size			= msOscSizeBosChoch,
+					  text_halign		= text.align_left,
+					  text_valign		= text.align_bottom,
+					  force_overlay		= true)
+
+			stMS.Fun_msOsc_setType(1)
+
+	if gblSource.C < stLow.lastPrice and not stLow.isCrossed
+
+		line.new(stLow.lastIndex, stLow.lastPrice, gblSource.I, stLow.lastPrice,
+					  color				= color.new(co_msOscShort, 35),
+					  style				= FunGlobalLineStyle(msOnChartK1),
+					  width				= 1,
+					  force_overlay		= true)
+
+		if stMSLblK1
+			box.new(stLow.lastIndex, stLow.lastPrice, gblSource.I, stLow.lastPrice,
+					  border_color		= color(na),
+					  text				= stMS.type > 0 ? 'CHoCH' : 'BoS',
+					  text_color		= color.new(co_msOscShort, 35),
+					  text_size			= msOscSizeBosChoch,
+					  text_halign		= text.align_left,
+					  text_valign		= text.align_top,
+					  force_overlay		= true)
+
+			stMS.Fun_msOsc_setType(-1)
+
+if msOnChart2
+	if gblSource.C > itHigh.lastPrice and not itHigh.isCrossed
+
+		line.new(itHigh.lastIndex, itHigh.lastPrice, gblSource.I, itHigh.lastPrice,
+					  color				= color.new(co_msOscLong, 35),
+					  style				= FunGlobalLineStyle(msOnChartK2),
+					  width				= 1,
+					  force_overlay		= true)
+		if stMSLblK2
+			box.new(itHigh.lastIndex, itHigh.lastPrice, gblSource.I, itHigh.lastPrice,
+					  border_color		= color(na),
+					  text				= itMS.type < 0 ? 'CHoCH' : 'BoS',
+					  text_color		= color.new(co_msOscLong, 35),
+					  text_size			= msOscSizeBosChoch,
+					  text_halign		= text.align_left,
+					  text_valign		= text.align_bottom,
+					  force_overlay		= true)
+
+			itMS.Fun_msOsc_setType(1)
+
+	if gblSource.C < itLow.lastPrice and not itLow.isCrossed
+
+		line.new(itLow.lastIndex, itLow.lastPrice, gblSource.I, itLow.lastPrice,
+					  color				= color.new(co_msOscShort, 35),
+					  style				= FunGlobalLineStyle(msOnChartK2),
+					  width				= 1,
+					  force_overlay		= true)
+		if stMSLblK2
+			box.new(itLow.lastIndex, itLow.lastPrice, gblSource.I, itLow.lastPrice,
+					  border_color		= color(na),
+					  text				= itMS.type > 0 ? 'CHoCH' : 'BoS',
+					  text_color		= color.new(co_msOscShort, 35),
+					  text_size			= msOscSizeBosChoch,
+					  text_halign		= text.align_left,
+					  text_valign		= text.align_top,
+					  force_overlay		= true)
+
+			itMS.Fun_msOsc_setType(-1)
+
+if msOnChart3
+	if gblSource.C > ltHigh.lastPrice and not ltHigh.isCrossed
+
+		line.new(ltHigh.lastIndex, ltHigh.lastPrice, gblSource.I, ltHigh.lastPrice,
+					  color				= color.new(co_msOscLong, 35),
+					  style				= FunGlobalLineStyle(msOnChartK3),
+					  width				= 1,
+					  force_overlay		= true)
+
+		if stMSLblK3
+			box.new(ltHigh.lastIndex, ltHigh.lastPrice, gblSource.I, ltHigh.lastPrice,
+					  border_color		= color(na),
+					  text				= ltMS.type < 0 ? 'CHoCH' : 'BoS',
+					  text_color		= color.new(co_msOscLong, 35),
+					  text_size			= msOscSizeBosChoch,
+					  text_halign		= text.align_left,
+					  text_valign		= text.align_bottom,
+					  force_overlay		= true)
+
+			ltMS.Fun_msOsc_setType(1)
+
+	if gblSource.C < ltLow.lastPrice and not ltLow.isCrossed
+
+		line.new(ltLow.lastIndex, ltLow.lastPrice, gblSource.I, ltLow.lastPrice,
+					  color				= color.new(co_msOscShort, 35),
+					  style				= FunGlobalLineStyle(msOnChartK3),
+					  width				= 1,
+					  force_overlay		= true)
+
+		if stMSLblK3
+			box.new(ltLow.lastIndex, ltLow.lastPrice, gblSource.I, ltLow.lastPrice,
+					  border_color		= color(na),
+					  text				= ltMS.type > 0 ? 'CHoCH' : 'BoS',
+					  text_color		= color.new(co_msOscShort, 35),
+					  text_size			= msOscSizeBosChoch,
+					  text_halign		= text.align_left,
+					  text_valign		= text.align_top,
+					  force_overlay		= true)
+
+			ltMS.Fun_msOsc_setType(-1)
+
+
+/// Osc ───────────────────────────────
+
+
+/// ─── Lineal
+midLine				= plot(msOsc_Show or show_msOscRange1 or show_msOscRange2 or show_msOscRange3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 80),	display = display,		editable = false)
+
+[stValue1, stValue2, stValue3] = Fun_msOsc_collectData()
+
+/// ─── Oscilador
+msOSC				= (msOsc_WeightK1 * nz(stValue1, 0) + msOsc_WeightK2 * nz(stValue2, 0) + msOsc_WeightK3 * nz(stValue3, 0)) / (msOsc_WeightK1 * (na(stValue1) ? 0 : 1) + msOsc_WeightK2 * (na(stValue2) ? 0 : 1) + msOsc_WeightK3 * (na(stValue3) ? 0 : 1))
+msPlot				= plot(msOsc_Show ? msOSC : na,				'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, color.new(co_msOscSell, 0), color.new(co_msOscBuy, 0)), 1,	display = display)
+
+/// ─── Histogram Cycle
+// plot				(show_msOscRange1 ? stValue1 : na,			'Oscilador de rango corto',				color.new(co_msOscRange, 40),	1,	display = display)
+// plot				(show_msOscRange2 ? stValue2 : na,			'oscilador de rango Intermedio',		color.new(co_msOscRange, 40),	1,	display = display)
+// plot				(show_msOscRange3 ? stValue3 : na,			'Oscilador de rango Largo',				color.new(co_msOscRange, 40),	1,	display = display)
+
+cycleFast			= cycleOpt ? msOSC - ta.ema(msOSC, cyc_Smooth) + 50 : 50
+plotcandle			(50., 50., 50., cycleFast,					'Histograma Cycle',						cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20),	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20) : color.gray)
+
+fill				(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(co_msOscBuy,   0), bottom_color = color.new(co_msOscBuy, 100), title = 'Bullish Gradient Fill')
+fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOscSell, 100), bottom_color = color.new(co_msOscSell,   0), title = 'Bearish Gradient Fill')
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■

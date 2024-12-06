@@ -1,22 +1,26 @@
 /// ╔═══════════════════════════════╗
 /// ║	Globals						║
 /// ╚═══════════════════════════════╝
+
 /// ╔═══════════════════════════════╗
 /// ║	Fx Market Sessions			║
 /// ╔═══════════════════════════════╗
-/// ║	Market Structure Oscillador	║
-/// ╔═══════════════════════════════╗
 /// ║	ZeroLag Trend				║
-/// ╔═══════════════════════════════╗
-/// ║	Aroon Oscillator			║
 /// ╔═══════════════════════════════╗
 /// ║	Volumatic VIDYA				║
 /// ╚═══════════════════════════════╝
+
+
+/// ╔═══════════════════════════════╗
+/// ║	Market Structure Oscillador	║
+/// ╔═══════════════════════════════╗
+/// ║	RSI Supertrend				║
 /// ╔═══════════════════════════════╗
 /// ║	Tsi & Divergences			║
 /// ╔═══════════════════════════════╗
 /// ║	Tsi two						║
 /// ╚═══════════════════════════════╝
+
 /// ╔═══════════════════════════════╗
 /// ║	xTsi Multipanels			║
 /// ║	@	Allen	㔬				║
@@ -120,7 +124,7 @@ _co_gbl_txt_light						= #FFF87C							//	SalesforceYellow
 // OsomeRed									= #FF4054
 
 
-/// Types ─────────────────────────────
+/// ＴＰＳ ―――――――――――――――――――――――――――――
 
 
 type globalTypeOHL
@@ -132,7 +136,7 @@ type globalTypeOHL
 	int   I				    			= bar_index
 
 
-/// Functions ─────────────────────────
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――――――
 
 
 /// ─── function timeframe
@@ -650,7 +654,7 @@ if barstate.islast
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// Const ─────────────────────────────
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
 fxMrkSsGroupGral						= 'General'
@@ -687,9 +691,6 @@ vFxMkSs_KillNwYColor					= _co_gbl_mint
 // vFxMkSs_KillSydColor					= _co_gbl_yellow
 
 vFxMkSs_NoneColor						= _co_gbl_black
-
-
-/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
 /// ─── Timezone
@@ -782,7 +783,7 @@ vFxMkSs_IsWeekends						= dayofweek == 7 or dayofweek == 1
 optFxMkSs_LineKillzone					= '⎯⎯⎯⎯'
 
 
-/// Functions ─────────────────────────
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――――――
 
 
 FunFxMkSs_GetPeriod(_session, _start, _lookback) =>
@@ -955,7 +956,7 @@ FunFxMkSs_RenderKillZones(_on, _color) =>
 	[High , Low ]
 
 
-/// Instances ─────────────────────────
+/// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
 
 
 /// ─── Timeframe
@@ -982,7 +983,7 @@ int timeMkSs_SessTyk					= time(timeframe.period, vFxMkSs_SessTkTimeZ, ms_timeZo
 int timeMkSs_SessSyd					= time(timeframe.period, vFxMkSs_SessSdTimeZ, ms_timeZone)
 
 
-/// Drawing ───────────────────────────
+/// ＰＬＯＴ ――――――――――――――――――――――――――――――
 
 
 /// ─── Session London
@@ -1106,7 +1107,7 @@ show_msOscRange3						= input			(false,							title = 'Oscilador de rango Largo'
 msOscSizeBosChoch						= size.tiny
 
 
-/// Types ─────────────────────────────
+/// ＴＩＰＳ ―――――――――――――――――――――――――――
 
 
 type SWINGS
@@ -1121,10 +1122,10 @@ type SWINGS
 	bool	isCrossed
 
 type MS
-	int		type					= 0
+	int		type						= 0
 
 
-/// Instances ─────────────────────────
+/// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
 
 
 var SWINGS stLow						= SWINGS.new()
@@ -1140,7 +1141,7 @@ var SWINGS ltHigh						= SWINGS.new()
 var MS ltMS								= MS.new()
 
 
-/// Functions ─────────────────────────
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
 
 
 Fun_msOsc_queryPatterns(lastPrice, midPrice, prevPrice, isSwingHigh) =>
@@ -1227,7 +1228,7 @@ Fun_msOsc_marketStructure(SWINGS hSwingHigh, SWINGS hSwingLow, SWINGS lSwingHigh
 Fun_msOsc_collectData() => [Fun_msOsc_shortMarketStructure(), Fun_msOsc_marketStructure(itHigh, itLow, stHigh, stLow), Fun_msOsc_marketStructure(ltHigh, ltLow, itHigh, itLow)]
 
 
-/// Maths ─────────────────────────────
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ――――――――――――
 
 
 log.info('yaz_kizim {0} {1}', ltHigh.lastPrice, ltHigh.isCrossed)
@@ -1354,7 +1355,10 @@ if msOnChart3
 			ltMS.Fun_msOsc_setType(-1)
 
 
-/// Osc ───────────────────────────────
+/// ＯＳＣ ――――――――――――――――――――――――――――
+
+
+/// ＰＬＯＴ ――――――――――――――――――――――――――
 
 
 /// ─── Lineal
@@ -1379,6 +1383,104 @@ fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOs
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+/// ╔═══════════════════════════════╗
+/// ║	RSI Supertrend				║
+/// ║	@	Allen	㔬				║
+/// ╚═══════════════════════════════╝
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+co_sTrend_Up							= _co_gbl_buy
+co_sTrend_Down							= _co_gbl_sell
+co_sTrend_RSI							= _co_gbl_white			// AmeTrBlueFrost
+co_sTrend_Dark							= _co_gbl_black			// PlatziBlue70
+
+
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+show_sTrendSTrend						= input.bool	(defval = false,		title = 'Visualizar Supertrend',	group = 'RSI Settings')
+
+sTrendRSILength							= input.int		(defval = 14,			title = 'Longitud RSI',				group = 'RSI Settings')
+sTrendSmoothLength						= input.int		(defval = 21,			title = 'Longitud RSI Suavisado',	group = 'RSI Settings')
+show_sTrendISmoothed					= input.bool	(defval = false,		title = 'Suavisado RSI',			group = 'RSI Settings')
+
+sTrendMALength							= input.int		(defval = 14,			title = 'Longitud MA',				group = 'MA Settings',			display = display.data_window)
+sTrendMAType							= input.string	(defval = 'HMA',		title = 'Tipo MA',					group = 'MA Settings',			options = ['SMA', 'HMA', 'EMA', 'SMMA', 'WMA', 'VWMA'],	display = display.data_window)
+
+sTrendFactor							= input.float	(defval = 0.8,			title = 'Factor',					group = 'Super Trend Settings')
+sTrendATRLength							= input.int		(defval = 10,			title = 'Longitud ATR',				group = 'Super Trend Settings')
+
+vsTrend_multip_Rsi						= 1.5
+
+
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――――――
+
+
+/// ─── function calculate ATR
+FussTrend_CalculateATR(_source, _atr_length) =>
+	_highest_high						= ta.highest(_source, _atr_length)
+	_lowest_low							= ta.lowest(_source, _atr_length)
+	_true_range							= na(_highest_high[1])		?
+				  _highest_high - _lowest_low						:
+				  math.max(_highest_high - _lowest_low, math.abs(_highest_high - _source[1]), math.abs(_lowest_low - _source[1]))
+
+	ta.rma(_true_range, _atr_length)
+
+
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ――――――――――――――――
+
+
+/// ─── Function to calculate Supertrend
+FussTrend_CalculateSupertrend(_factor, _atr_length, _source) =>
+	_price_source						= _source
+	_atr								= FussTrend_CalculateATR(_source, _atr_length)
+	_upper_band							= _price_source + _factor * _atr
+	_lower_band							= _price_source - _factor * _atr
+	_prev_lowerband						= nz(_lower_band[1])
+	_prev_upperband						= nz(_upper_band[1])
+	_lower_band							:= _lower_band > _prev_lowerband or _source[1] < _prev_lowerband ? _lower_band : _prev_lowerband
+	_upper_band							:= _upper_band < _prev_upperband or _source[1] > _prev_upperband ? _upper_band : _prev_upperband
+	int _trend_direction				= na
+	float _supertrend_value				= na
+	FusTPrevSupertrend					= _supertrend_value[1]
+	if na(_atr[1])
+		_trend_direction				:= 1
+	else if FusTPrevSupertrend			== _prev_upperband
+		_trend_direction				:= _source > _upper_band ? -1 : 1
+	else
+		_trend_direction				:= _source < _lower_band ? 1 : -1
+	_supertrend_value					:= _trend_direction == -1 ? _lower_band : _upper_band
+	[_supertrend_value, _trend_direction]
+
+/// ─── Calculete Rsi ───────
+
+sTrend_RsiValue							= show_sTrendISmoothed and show_sTrendSTrend				?
+			  vsTrend_multip_Rsi * ta.hma(ta.rsi(gblSource.C, sTrendRSILength), sTrendSmoothLength)	:
+			  vsTrend_multip_Rsi * ta.rsi(gblSource.C, sTrendRSILength)
+
+/// ─── Calculating Supertrend based on RSI values
+[sTrendRsiSupertrend, FusTTrendDirection] = FussTrend_CalculateSupertrend(sTrendFactor, sTrendATRLength, sTrend_RsiValue)
+
+
+/// ＰＬＯＴ ――――――――――――――――――――――――――――――
+
+
+/// ─── Plot RSI / MA
+// plot_sTrend_Strend						= plot(show_sTrendSTrend ? sTrendRsiSupertrend	: na,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,			display = display.none)
+plot_sTrend_Strend						= plot(show_sTrendSTrend ? sTrendRsiSupertrend	: na,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,			title = 'Supertrend')
+// plot_sTrend_Rsi							= plot(show_sTrendSTrend ? sTrend_RsiValue		: na,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,			display = display.none)
+plot_sTrend_Rsi							= plot(show_sTrendSTrend ? sTrend_RsiValue		: na,		color = FusTTrendDirection == -1 ? co_sTrend_Up : co_sTrend_Down,			linewidth = 1,	title = '')
+
+
+/// ─── Filling ───────
+// fill(plot_sTrend_Strend, plot_sTrend_Rsi,							color = FusTTrendDirection == 1 ? color.new(co_sTrend_Down, 90) : color.new(co_sTrend_Up, 90),	title = 'Zona de Tendencia')
+// fill(plot_sTrend_Strend, plot_sTrend_Rsi, sTrendRsiSupertrend, sTrend_RsiValue, color.new(chart.bg_color, 1000),	FusTTrendDirection == 1 ? co_sTrend_Down : co_sTrend_Up)
+fill(plot_sTrend_Strend, plot_sTrend_Rsi, sTrend_RsiValue, sTrendRsiSupertrend, color.new(chart.bg_color, 1000),	FusTTrendDirection == 1 ? co_sTrend_Down : co_sTrend_Up)
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1410,7 +1512,7 @@ co_xTsiMuTSIMainShort					= _co_gbl_sell
 co_xTsiMuText							= color.new(_co_gbl_txt_dark,		0)
 
 
-/// INSTANCES ─────────────────────────
+/// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
 
 
 /// Multitimeframe
@@ -1441,10 +1543,9 @@ insxTsiMuPlotColorFast					= ixTsiMuCalcTsiFast	> ixTsiMuCalcEmaFast	? co_xTsiMu
 insxTsiMuPlotColor						= ixTsiMuCalcTsiSlow	> ixTsiMuCalcEmaSlow	? co_xTsiMuTSIBaseUp	: ixTsiMuCalcTsiSlow	<= ixTsiMuCalcEmaSlow	? co_xTsiMuTSIBaseDn	: na
 
 
-/// DISPLAY ───────────────────────────
+/// ＰＬＯＴ ―――――――――――――――――――――――――――
 
 
-/// ─── Plot
 /// plot sobrecompra/sobreventa
 insxTsiMuTsiPlotUpLine					= plot(showxTsiMuTSIDisplay ? 110 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	60,	100,	color.new(_co_gbl_black, 70),	color.new(_co_gbl_sell, 10)),						linewidth = 6)
 insxTsiMuTsiPlotDnLine					= plot(showxTsiMuTSIDisplay ? -10 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	0,	40,		color.new(_co_gbl_buy, 10),		color.new(_co_gbl_black, 70)),						linewidth = 6)
@@ -1579,7 +1680,7 @@ plotshape(showxTsiMuTSIDisplay			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_ba
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// VARS ──────────────────────────────
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
 colorTsiObsPnl_Buy						= _co_gbl_long
@@ -1623,10 +1724,10 @@ stTsiObsPnl_TextSize					= input.string	(defval = 'normal',	title = 'Tamaño de 
 vTsiObsPnl_RsiLength					= 14
 
 
-/// INSTANCES ─────────────────────────
+/// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
 
 
-/// ─── constructor
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
 
 // tsiObsPnl_TSI							= _x * ta.tsi(gbl_Source_C, _short, _long) + _plus
 tsiObsPnlRSI							= ta.rsi(gbl_Source_C, vTsiObsPnl_RsiLength)
@@ -1670,7 +1771,7 @@ vTsiObsPnlTF1d							= request.security(syminfo.tickerid,		'D',		tsiObsPnl_TSI)
 [vTsiObsPnlTFExtMtf1d,		vTsiObsPnlTFExtMtf1d_2,			vTsiObsPnlTFExtMtf1d_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt1d,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 
 
-/// FUNCTIONS ─────────────────────────
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
 
 
 /// ─── New table
@@ -1748,7 +1849,8 @@ FunTsiObsPnlCalculateCellExtend(_col, _row, _var, _var2, _var3) =>
 		  width							= 4)
 
 
-/// VISUAL ────────────────────────────
+
+/// ＰＬＯＴ ―――――――――――――――――――――――――――
 
 
 /// ─── Table TSI

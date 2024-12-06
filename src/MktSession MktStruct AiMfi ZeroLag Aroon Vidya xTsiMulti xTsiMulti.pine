@@ -10,9 +10,10 @@
 /// ║	Volumatic VIDYA				║
 /// ╚═══════════════════════════════╝
 
-
 /// ╔═══════════════════════════════╗
 /// ║	Market Structure Oscillador	║
+/// ╔═══════════════════════════════╗
+/// ║  AI Adaptive Money Flow Index	║
 /// ╔═══════════════════════════════╗
 /// ║	Tsi & Divergences			║
 /// ╔═══════════════════════════════╗
@@ -26,14 +27,14 @@
 
 
 //@version=5
-indicator(title							= 'FxMarketSession & MarketStructureOscil & ZeroLag & Aroon & Vidya & Tsi two & TsiDiv [🎱 Allen 㔬]',
-		  shorttitle					= 'MkS MSOsc ZLag oo/dya xTsiMulti xPnl [🎱 Allen 㔬]',
+indicator(title							= 'FxMarketSession & MarketStructureOscil & ZeroLag & Vidya & "AI MFI & Tsi two & TsiDiv [🎱 Allen 㔬]',
+		  shorttitle					= 'MkS MSOsc ZLag vidya Mfi xTsiMulti [🎱 Allen 㔬]',
 		  overlay						= true,
 		  max_boxes_count				= 500,
 		  max_labels_count				= 500,
 		  max_lines_count				= 500,
 		  max_bars_back					= 1000,
-		  format						= format.price,		// format.percent,
+		  format						= format.price,
 		//   timeframe_gaps				= true,
 		  precision						= 1,
 		  explicit_plot_zorder			= true)
@@ -63,6 +64,10 @@ showxTsiMuTSIDivSpeed					= input.string 	(defval = 'Slow',		title = 'Diverg Spe
 
 strGlobalMultiTimeFrame					= input.string 	(defval = 'Grafico',	title = 'Multi Timeframe',			group = globalGroupTimeframe,
 			  options					=				['Grafico', '15 min', '30 min', '1 Hora', '2 Horas', '3 Horas', '4 Horas', '1 Dia', '1 Semana'])
+
+strGlobalMultiHistogram					= input.string 	(defval = 'Mfi',		title = 'Histograma',				group = globalGroupTimeframe,
+			  options					=				['Mfi', 'Adx'])
+
 strGlobalColorSelector					= input.string 	(defval = 'Allen',		title = 'Color Selector',			group = globalGroupTimeframe,
 			  options					=				['Allen', 'Ultr', 'Light'])
 
@@ -376,9 +381,9 @@ fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,							color.new(c
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 
-/// ╔═══════════════════════════════════╗
-/// ║	Volumatic VIDYA					║
-/// ╚═══════════════════════════════════╝
+/// ╔═══════════════════════════════╗
+/// ║	Volumatic VIDYA				║
+/// ╚═══════════════════════════════╝
 
 
 //// ─────────────────────────────────────────────────────────────────────
@@ -1097,11 +1102,6 @@ msOnChart3								= input			(defval = true,					title = 'Estructura de rango Lar
 msOnChartK3								= input.string	(defval = '⎯⎯⎯⎯',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K3',	display = display)
 stMSLblK3T								= input.string	(defval = 'Enabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K3',	display = display),	stMSLblK3 = stMSLblK3T == 'Enabled'
 
-msOscCG									= 'Rango de Oscilador'
-show_msOscRange1						= input			(false,							title = 'Oscilador de rango Corto',								group = msOscCG,		inline = 'k1w')
-show_msOscRange2						= input			(false,							title = 'Oscilador de rango Medio',								group = msOscCG,		inline = 'k2w')
-show_msOscRange3						= input			(false,							title = 'Oscilador de rango Largo',								group = msOscCG,		inline = 'k3w')
-
 msOscSizeBosChoch						= size.tiny
 
 
@@ -1368,11 +1368,6 @@ midLine				= plot(msOsc_Show or show_msOscRange1 or show_msOscRange2 or show_msO
 msOSC				= (msOsc_WeightK1 * nz(stValue1, 0) + msOsc_WeightK2 * nz(stValue2, 0) + msOsc_WeightK3 * nz(stValue3, 0)) / (msOsc_WeightK1 * (na(stValue1) ? 0 : 1) + msOsc_WeightK2 * (na(stValue2) ? 0 : 1) + msOsc_WeightK3 * (na(stValue3) ? 0 : 1))
 msPlot				= plot(msOsc_Show ? msOSC : na,				'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, color.new(co_msOscSell, 0), color.new(co_msOscBuy, 0)), 1,	display = display)
 
-/// ─── Histogram Cycle
-plot				(show_msOscRange1 ? stValue1 : na,			'Oscilador de rango corto',				color.new(co_msOscRange, 40),	1,	display = display)
-// plot				(show_msOscRange2 ? stValue2 : na,			'oscilador de rango Intermedio',		color.new(co_msOscRange, 40),	1,	display = display)
-plot				(show_msOscRange3 ? stValue3 : na,			'Oscilador de rango Largo',				color.new(co_msOscRange, 40),	1,	display = display)
-
 cycleFast			= cycleOpt ? msOSC - ta.ema(msOSC, cyc_Smooth) + 50 : 50
 plotcandle			(50., 50., 50., cycleFast,					'Histograma Cycle',						cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20),	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20) : color.gray)
 
@@ -1383,13 +1378,84 @@ fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOs
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 
+/// ╔═══════════════════════════════╗
+/// ║  AI Adaptive Money Flow Index	║
+/// ║  @	Allen.					║
+/// ╚═══════════════════════════════╝
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+adapMonToolAdj							= 'Ajusta el MFI en su lugar para que los niveles de Sobrecompra, Sobreventa y Neutral permanezcan fijos'
+
+adapMonGrpSet							= 'Adaptative MFI'
+adapMonGrpLim							= 'Clustering Setting'
+adapMonGrpApar							= 'Apariencia'
+
+adapMonColorLong						= 				_co_gbl_buy
+adapMonColorShort						= 				_co_gbl_sell
+adapMonColorAux							= 				_co_gbl_white
+adapMonColorDark						= 				_co_gbl_black
+
+showadapMonGroup						= input.bool	(defval = true,				title = 'Mostrar Ai Adaptative MFI',						group = adapMonGrpSet)
+adapMonVarADJ							= input.bool	(defval = true,				title = 'Usar MFI ajustado',								group = adapMonGrpApar,		tooltip = adapMonToolAdj)
+
+adapMonVarLENGTH						= input.int		(defval = 10,				title = 'Longitud MFI',							minval = 1,	group = adapMonGrpSet)	// 14
+adapMonVarDataLength					= input.int		(defval = 300,				title = 'Nº de datos de entrenamiento',			minval = 1,	group = adapMonGrpLim)
+adapMonVarIterations					= input.int		(defval = 5,				title = 'Nº de iteraciones por barra',			minval = 1,	group = adapMonGrpLim)
+
+float adapMonVarOverbought				=				75.0			// 80.0
+float adapMonVarNeutral					=				50.0
+float adapMonVarOversold				=				25.0			// 20.0
+
+adapMonVarSRC							=				gbl_Source_3	// Fuente MFI
+
+
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――――――
+
+
+adapMonVarOSC							= ta.mfi(adapMonVarSRC, adapMonVarLENGTH)
+
+var adapMonArrOB						= array.new_float(1, adapMonVarOverbought)
+var adapMonArrNE						= array.new_float(1, adapMonVarNeutral)
+var adapMonArrOS						= array.new_float(1, adapMonVarOversold)
+
+adapMonArrNE_NEW						= array.avg(adapMonArrNE)
+adapMonArrOB_NEW						= array.avg(adapMonArrOB)
+adapMonArrOS_NEW						= array.avg(adapMonArrOS)
+
+positionBetweenBands					= 100 * ((adapMonVarOSC - adapMonArrOS_NEW)/(adapMonArrOB_NEW - adapMonArrOS_NEW))
+
+adapMonIfVAL							= adapMonVarADJ ? positionBetweenBands : adapMonVarOSC
+
+adapMonFuncST							= ta.stdev(adapMonIfVAL, adapMonVarLENGTH)
+
+adapMonIfCOLOR100						= adapMonVarOSC > adapMonArrNE_NEW		? color.new(adapMonColorLong, 90)		: color.new(adapMonColorShort, 90)
+adapMonIfCOLOR0							= adapMonVarOSC > adapMonArrNE_NEW		? color.new(adapMonColorLong, 0)		: color.new(adapMonColorShort, 0)
+
+
+/// ＰＬＯＴ ――――――――――――――――――――――――――
+
+
+adapMonPlotMAIN							= plot	(strGlobalMultiHistogram == 'Mfi' and showadapMonGroup ? adapMonIfVAL : na,						color = adapMonIfCOLOR100)
+adapMonPlotMID							= plot	(strGlobalMultiHistogram == 'Mfi' and showadapMonGroup and adapMonVarADJ ? adapMonVarNeutral : adapMonArrNE_NEW, color = adapMonIfCOLOR100)
+
+/// ─── fill areas de tendencia
+fill									(adapMonPlotMID, adapMonPlotMAIN,																		color = adapMonIfCOLOR100, title = 'Area de Tendencia')
+fill									(adapMonPlotMID, adapMonPlotMAIN, adapMonIfVAL, adapMonVarADJ ? 50 : adapMonArrNE_NEW,					color.new(chart.bg_color, 1000), adapMonVarOSC > adapMonArrNE_NEW ? adapMonColorLong : adapMonColorShort)
+
+
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 
-/// ╔═══════════════════════════════════╗
-/// ║  Tsi & Divergences				║
-/// ║  @	Allen.						║
-/// ╚═══════════════════════════════════╝
+/// ╔═══════════════════════════════╗
+/// ║  Tsi & Divergences			║
+/// ║  @	Allen.					║
+/// ╚═══════════════════════════════╝
 
 
 //// ─────────────────────────────────────────────────────────────────────
@@ -1571,10 +1637,10 @@ plotshape(showxTsiMuTSIDisplay			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_ba
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 
-/// ╔═══════════════════════════════════╗
-/// ║	Panel TSI Multi Timeframe		║
-/// ║	@	Allen.						║
-/// ╚═══════════════════════════════════╝
+/// ╔═══════════════════════════════╗
+/// ║	Panel TSI Multi Timeframe	║
+/// ║	@	Allen.					║
+/// ╚═══════════════════════════════╝
 
 
 //// ─────────────────────────────────────────────────────────────────────

@@ -1,0 +1,90 @@
+//	ADX Histogram with DI lines
+//	by SparkyFlary
+
+//	@version=5
+indicator(title						= 'ADX Histogram with DI lines',
+		  shorttitle				= 'ADX DMI Histogram',
+		  overlay					= false)
+
+
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+color_1								= color.new		(color.green,		0)
+color_2								= color.new		(color.maroon,		0)
+color_3								= color.new		(color.green,		50)
+color_4								= color.new		(color.maroon,		50)
+color_5								= color.new		(color.black,		0)
+color_6								= color.new		(color.gray,		25)
+color_7								= color.new		(color.purple,		0)
+color_8								= color.new		(color.gray,		25)
+
+iDmiAdx_AdxLine						= input(defval = false,				title = 'Mostrar linea ADX',	inline = 'show Check')
+iDmiAdx_AdxrLine					= input(defval = false,				title = 'Mostrar linea ADXR',	inline = 'show Check')
+
+iDmiAdx_length						= input(defval = 14,				title = 'Longitud ADX DI')
+iDmiAdx_Threshold					= input(defval = 20,				title = 'Umbral ADX')
+iDmiAdx_rThreshold					= input(defval = 25,				title = 'Umbral ADXR')
+
+
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
+
+
+iDmiAdx_UP							= ta.change(high)
+iDmiAdx_DN							= -ta.change(low)
+iDmiAdx_PlusDM						= na(iDmiAdx_UP)		? na		: iDmiAdx_UP		> iDmiAdx_DN	and iDmiAdx_UP		> 0	? iDmiAdx_UP	: 0
+iDmiAdx_MinusDM						= na(iDmiAdx_DN)		? na		: iDmiAdx_DN		> iDmiAdx_UP	and iDmiAdx_DN	> 0	? iDmiAdx_DN	: 0
+iDmiAdx_TRUR						= ta.rma(ta.tr,		iDmiAdx_length)
+iDmiAdx_PLUS						= fixnan(100 * ta.rma(iDmiAdx_PlusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
+iDmiAdx_MINUS						= fixnan(100 * ta.rma(iDmiAdx_MinusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
+iDmiAdx_SUM							= iDmiAdx_PLUS + iDmiAdx_MINUS
+iDmiAdx_ADX							= 100 * ta.rma(math.abs(iDmiAdx_PLUS - iDmiAdx_MINUS)	/ (iDmiAdx_SUM == 0 ? 1 : iDmiAdx_SUM), iDmiAdx_length)
+
+
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
+
+
+iDmiAdx_ADXR								= (iDmiAdx_ADX + iDmiAdx_ADX[iDmiAdx_length]) / 2
+
+iDmiAdx_DIFF						= iDmiAdx_PLUS - iDmiAdx_MINUS
+
+coCond_DiffColor					= iDmiAdx_PLUS > iDmiAdx_MINUS and iDmiAdx_DIFF > 5	?
+			  color_1						:
+			  iDmiAdx_PLUS < iDmiAdx_MINUS and iDmiAdx_DIFF < -5	?
+			  color_2						:
+			  iDmiAdx_PLUS > iDmiAdx_MINUS					?
+			  color_3						:
+			  color_4
+
+coIf_DmiAdx_Adx						= iDmiAdx_ADX	> iDmiAdx_Threshold		?
+			  color_5				:
+			  color_6
+
+coIf_DmiAdx_Adxr					= iDmiAdx_ADXR	> iDmiAdx_rThreshold	?
+			  color_7				:
+			  color_8
+
+
+/// ＰＬＯＴ ―――――――――――――――――――――――――――
+
+
+plot(iDmiAdx_AdxrLine	? iDmiAdx_ADXR		: na,
+		  title						= 'ADXR',
+		  style						= plot.style_line,
+		  color						= coIf_DmiAdx_Adxr)
+
+plot(iDmiAdx_DIFF,
+		  title						= 'Histograma DI',
+		  style						= plot.style_columns,
+		  color						= coCond_DiffColor)
+
+plot(iDmiAdx_DIFF,
+		  title						= 'Linea DI',
+		  style						= plot.style_line,
+		  color						= coCond_DiffColor,
+		  linewidth					= 2)
+
+plot(iDmiAdx_AdxLine	? iDmiAdx_ADX		: na,
+		  title						= 'ADX',
+		  style						= plot.style_line,
+		  color						= coIf_DmiAdx_Adx)

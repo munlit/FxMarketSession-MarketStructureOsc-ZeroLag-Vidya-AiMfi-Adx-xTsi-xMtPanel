@@ -40,7 +40,8 @@ indicator(title							= 'FxMarketSession & MarketStructureOscil & ZeroLag & Aroo
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// Globals ───────────────────────────
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
 
 
 strGlobalOptionalSlowTool				= 'Tsi Slow, gráfico principal'
@@ -82,10 +83,10 @@ gbl_Source_3							= showGlobal_HknAshi ? (heAsGblH + heAsGblL + heAsGblC) / 3 :
 /// Switch ────────────────────────────
 
 
-[_co_gbl_buy,	_co_gbl_sell,	_co_gbl_long,	_co_gbl_short,	_co_gbl_up,	_co_gbl_dn,	_co_gbl_neutral]		= switch	strGlobalColorSelector
-	'Allen'								=> [#33FFAC,		#CCF8FF,		#30d453,		#EA1889,		#0061FE,		#E3FF53,		#CCF8FF]
-	'Ultr'								=> [#98F1F4,		#E0D8CA,		#30d453,		#EA1889,		#E3FF53,		#E0D8CA,		#121F3D]
-	'Light'								=> [#0061FE,		#FF4054,		#CCF8FF,		#121F3D,		#E6F7FF,		#121F3D,		#E3FF53]
+[_co_gbl_buy,	_co_gbl_sell,	_co_gbl_long,	_co_gbl_short,	_co_gbl_up,	_co_gbl_dn,	_co_gbl_extra,	_co_gbl_neutral]				= switch	strGlobalColorSelector
+	'Allen'								=> [#33FFAC,	#CCF8FF,	#30d453,	#EA1889,	#30d453,	#0061FE,	#E3FF53,	#CCF8FF]
+	'Ultr'								=> [#98F1F4,	#E0D8CA,	#0035FF,	#F20505,	#E3FF53,	#E0D8CA,	#CCF657,	#121F3D]
+	'Light'								=> [#0061FE,	#FF4054,	#CCF8FF,	#121F3D,	#E6F7FF,	#121F3D,	#121F3D,	#FFF87C]
 
 
 /// Colors ───────────────────────────
@@ -94,10 +95,8 @@ gbl_Source_3							= showGlobal_HknAshi ? (heAsGblH + heAsGblL + heAsGblC) / 3 :
 _co_gbl_white							= #E6F7FF							//	CitiAccentUltraLightBlue
 _co_gbl_pink							= #FFB7FF							//	WavBehPink20
 _co_gbl_sky								= #98F1F4							//	NexusSky
-_co_gbl_mint							= #4FFFC0							//	AllenMint50
-_co_gbl_green							= #30d453							//	AllenGreen50
+_co_gbl_mint							= #7AFFA1							//	SalesforceMint
 _co_gbl_yellow							= #FDF43C							//	BrLiYel30
-_co_gbl_blue							= #0035FF							//	ARoPrimary
 _co_gbl_cocoa							= #E0D8CA							//	NetsuiteCocoa
 _co_gbl_black							= #0C1633							//	PlatziBlue80
 _co_gbl_light							= #FBFD73							//	BrLiYel10
@@ -105,23 +104,20 @@ _co_gbl_txt_dark						= #121F3D							//	PlatziBlue70
 _co_gbl_txt_light						= #FFF87C							//	SalesforceYellow
 
 
-WiskAeroYellow							= #F9F940
-DefiMint								= #41F2A0
-SalesforceMint							= #7AFFA1
-SalesforceLime							= #CCF657
-SalesforceLile							= #D5BEF2
-SalesforceOrange						= #FF8C7D
-SalesforceRed							= #FF4B4B
-SalesforceBlue							= #3F73F7
-Ex1Lime									= #E3FF53
-Ex1Orange600							= #D93D04
-Ex1Red									= #A60303
-Ex1Wine									= #730202
-Ex1Teal									= #1CD8E1
-Ex1Ocean								= #00315e
-TaxusRed								= #F20505
-OsomeBlue								= #0061FE
-OsomeRed								= #FF4054
+// WiskAeroYellow							= #F9F940
+// SalesforceLime							= #CCF657
+// SalesforceLile							= #D5BEF2
+// SalesforceOrange							= #FF8C7D
+// SalesforceRed							= #FF4B4B
+// SalesforceBlue							= #3F73F7
+// Ex1Orange600								= #D93D04
+// Ex1Red									= #A60303
+// Ex1Wine									= #730202
+// Ex1Teal									= #1CD8E1
+// Ex1Ocean									= #00315e
+// TaxusRed									= #F20505
+// OsomeBlue								= #0061FE
+// OsomeRed									= #FF4054
 
 
 /// Types ─────────────────────────────
@@ -279,7 +275,7 @@ gblSource								= globalTypeOHL.new()
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// ＩＮＰＵＴＳ ―――――――――――――――――――――――
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
 co_zeLag_buy							= _co_gbl_up
@@ -298,7 +294,7 @@ var bZeLag_BOX							= box(na)
 series float iZeLag_ATR					= ta.atr(200)
 
 
-/// ＣＡＬＣＵＬＡＴＩＯＮＳ―――――――――――――
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
 
 
 series float iZeLag_EMA					= ta.ema(gblSource.C, zeLag_length)
@@ -386,7 +382,7 @@ fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,							color.new(c
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// ＩＮＰＵＴＳ ――――――――――――――――――――――――――――
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
 // Define colors for up and down trends
@@ -619,28 +615,28 @@ if barstate.islast
 				 force_overlay			= true
 				 )[1])
 
-// Plot trend change markers (up and down arrows)
-plotshape(
-		 series							= vVi_trend_cross_up[1] ? vVidya_smoothed_value[0] : na, 
-		 title							= "Trend Buy", 
-		 style							= shape.labelup, 
-		 location						= location.absolute, 
-		 color							= color.new(col_vVidya_uptrend, 90), 
-		 text							= " ▲ ", 
-		 textcolor						= col_vVidya_uptrend,
-		 force_overlay					= true
-		 )
+// // Plot trend change markers (up and down arrows)
+// plotshape(
+// 		 series							= vVi_trend_cross_up[1] ? vVidya_smoothed_value[0] : na, 
+// 		 title							= "Trend Buy", 
+// 		 style							= shape.labelup, 
+// 		 location						= location.absolute, 
+// 		 color							= color.new(col_vVidya_uptrend, 90), 
+// 		 text							= " ▲ ", 
+// 		 textcolor						= col_vVidya_uptrend,
+// 		 force_overlay					= true
+// 		 )
 
-plotshape(
-		 series							= vVi_trend_cross_down[1] ? vVidya_smoothed_value[0] : na, 
-		 title							= "Trend Sell", 
-		 style							= shape.labeldown, 
-		 location						= location.absolute, 
-		 color							= color.new(col_vVidya_downtrend, 90), 
-		 text							= " ▼ ", 
-		 textcolor						= col_vVidya_downtrend,
-		 force_overlay					= true
-		 )
+// plotshape(
+// 		 series							= vVi_trend_cross_down[1] ? vVidya_smoothed_value[0] : na, 
+// 		 title							= "Trend Sell", 
+// 		 style							= shape.labeldown, 
+// 		 location						= location.absolute, 
+// 		 color							= color.new(col_vVidya_downtrend, 90), 
+// 		 text							= " ▼ ", 
+// 		 textcolor						= col_vVidya_downtrend,
+// 		 force_overlay					= true
+		//  )
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -693,7 +689,7 @@ vFxMkSs_KillNwYColor					= _co_gbl_mint
 vFxMkSs_NoneColor						= _co_gbl_black
 
 
-/// Inputs ────────────────────────────
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
 /// ─── Timezone
@@ -1062,11 +1058,11 @@ if showFxMkSs_KillNwYClose
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// Inputs ────────────────────────────
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
-co_msOscBuy								= _co_gbl_buy
-co_msOscSell							= _co_gbl_sell
+co_msOscBuy								= _co_gbl_up
+co_msOscSell							= _co_gbl_dn
 co_msOscLong							= _co_gbl_buy
 co_msOscShort							= _co_gbl_sell
 
@@ -1371,15 +1367,127 @@ msOSC				= (msOsc_WeightK1 * nz(stValue1, 0) + msOsc_WeightK2 * nz(stValue2, 0) 
 msPlot				= plot(msOsc_Show ? msOSC : na,				'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, color.new(co_msOscSell, 0), color.new(co_msOscBuy, 0)), 1,	display = display)
 
 /// ─── Histogram Cycle
-// plot				(show_msOscRange1 ? stValue1 : na,			'Oscilador de rango corto',				color.new(co_msOscRange, 40),	1,	display = display)
+plot				(show_msOscRange1 ? stValue1 : na,			'Oscilador de rango corto',				color.new(co_msOscRange, 40),	1,	display = display)
 // plot				(show_msOscRange2 ? stValue2 : na,			'oscilador de rango Intermedio',		color.new(co_msOscRange, 40),	1,	display = display)
-// plot				(show_msOscRange3 ? stValue3 : na,			'Oscilador de rango Largo',				color.new(co_msOscRange, 40),	1,	display = display)
+plot				(show_msOscRange3 ? stValue3 : na,			'Oscilador de rango Largo',				color.new(co_msOscRange, 40),	1,	display = display)
 
 cycleFast			= cycleOpt ? msOSC - ta.ema(msOSC, cyc_Smooth) + 50 : 50
 plotcandle			(50., 50., 50., cycleFast,					'Histograma Cycle',						cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20),	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20) : color.gray)
 
 fill				(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(co_msOscBuy,   0), bottom_color = color.new(co_msOscBuy, 100), title = 'Bullish Gradient Fill')
 fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOscSell, 100), bottom_color = color.new(co_msOscSell,   0), title = 'Bearish Gradient Fill')
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+/// ╔═══════════════════════════════╗
+/// ║	Aroon Oscillator			║
+/// ╚═══════════════════════════════╝
+
+
+//// ─────────────────────────────────────────────────────────────────────
+
+
+// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+co_oonOsc_buy							= _co_gbl_up
+co_oonOsc_sell							= _co_gbl_dn
+co_oonOsc_line							= _co_gbl_white
+
+oonOsc_groupvars						= 'Arooon Oscillator'
+show_oonOscAroon						= input.bool	(defval = true,		title = 'Visualizar Aroon',	group = oonOsc_groupvars)
+oonOsc_length							= input.int		(defval = 42,		title = "Longitud",			group = oonOsc_groupvars)			// 29
+oonOsc_smooth							= input.int		(defval = 10,		title = "Smooth",			group = oonOsc_groupvars)			// 25
+oonOsc_sign_length						= input.int		(defval = 10,		title = "Signal",			group = oonOsc_groupvars)			// 10
+oonOsc_gain_limit						= 10
+
+
+// ＣＡＬＣＵＬＡＴＩＯＮＳ――――――――――――――
+
+
+// Zero Lag Function John Ehlers
+Fun_oonOsc_zero_lag(_source, _length, _gain_limit) =>
+	// Initialize variables
+	float _alpha						= 2 / (_length + 1)
+	float _ema							= na
+	float _ecu							= na
+	float _least_error					= 1000000
+	float _best_gain					= 0
+
+	_ema								:= na(_ema[1]) ? _source : _alpha * _source + (1 - _alpha) * nz(_ema[1])
+
+	// Loop to find the best gain
+	for int _value						= -_gain_limit to _gain_limit
+		_gain							= _value / 10
+		_ecu							:= na(_ecu[1]) ? _source : _alpha * (_ema + _gain * (_source - nz(_ecu[1]))) + (1 - _alpha) * nz(_ecu[1])
+
+		float _error					= _source - _ecu
+
+		// Check if this gain results in a smaller error
+		if math.abs(_error) < _least_error
+			_least_error				:= math.abs(_error)
+			_best_gain					:= _gain
+
+	_ecu								:= na(_ecu[1]) ? _source : _alpha * (_ema + _best_gain * (_source - nz(_ecu[1]))) + (1 - _alpha) * nz(_ecu[1])
+	_ecu
+
+Fun_oonOsc_calculate_aroon(simple int _length, _smooth) =>
+	_aroonDown							= 100 * (ta.lowestbars(low, _length) + _length) / _length
+	_aroonUp							= 100 * (ta.highestbars(high, _length) + _length) / _length
+	_source								= _aroonUp - _aroonDown
+	_gain_limit							= oonOsc_gain_limit
+	Fun_oonOsc_zero_lag					(_source, _smooth, _gain_limit)
+
+oonOsc_multip							= 50
+fOnOsc_aroon_osc						= Fun_oonOsc_calculate_aroon(oonOsc_length, oonOsc_smooth) + oonOsc_multip
+fOnOsc_sig_line							= ta.sma(fOnOsc_aroon_osc, oonOsc_sign_length)
+
+
+// ＰＬＯＴ ――――――――――――――――――――――――――――
+
+
+oonOsc_plot_line1						= plot(show_oonOscAroon ? fOnOsc_aroon_osc : na,	title = "Oscilador Aroon",	color = color.from_gradient(fOnOsc_aroon_osc, -80 + oonOsc_multip, 80 + oonOsc_multip, co_oonOsc_sell, co_oonOsc_buy))
+oonOsc_plot_line_mid					= plot(show_oonOscAroon ? 0 + oonOsc_multip : na,	title = "Linea media",		color = color.new(co_oonOsc_line, 70))
+
+plot(show_oonOscAroon ? fOnOsc_sig_line : na, "Señal", color = bar_index % 2 == 0 ? color.new(co_oonOsc_line, 50) : na)
+
+fill(oonOsc_plot_line1,					oonOsc_plot_line_mid,		0 + oonOsc_multip, -100 + oonOsc_multip,	na, co_oonOsc_sell)
+fill(oonOsc_plot_line1,					oonOsc_plot_line_mid,		100 + oonOsc_multip, 0 + oonOsc_multip,		co_oonOsc_buy, na)
+
+// bgcolor(show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc, 0)		? color.new(co_oonOsc_buy, 85)	: na)
+// bgcolor(show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc, 0)		? color.new(co_oonOsc_sell, 85)	: na)
+
+if barstate.islast and show_oonOscAroon
+	label.delete(
+		 label.new(bar_index, fOnOsc_aroon_osc, str.tostring(math.round(fOnOsc_aroon_osc), format.percent),
+				 color					= color(na), 
+				 textcolor				= fOnOsc_aroon_osc > 0 ? co_oonOsc_buy : co_oonOsc_sell, 
+				 style					= label.style_label_left)[1]
+				 )
+
+// if show_oonOscAroon
+// 	oonOsc_cross_over					= show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
+// 	oonOsc_cross_under					= show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
+
+// plotchar(oonOsc_cross_over,
+// 		  title						= "cruce reversion ▲",
+// 		  char						= "●", 
+// 		  location					= location.absolute, 
+// 		  color						= co_oonOsc_buy,
+// 		  size						= size.tiny, 
+// 		  offset					= -1)
+
+// plotchar(oonOsc_cross_under,
+// 		  title						= "cruce reversion ▼",
+// 		  char						= "●", 
+// 		  location					= location.absolute, 
+// 		  color						= co_oonOsc_sell, 
+// 		  size						= size.tiny, 
+// 		  offset					= -1)
+
+bgcolor(fOnOsc_aroon_osc > 0 ? color.new(co_oonOsc_buy, 95) : color.new(co_oonOsc_sell, 95))
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1394,15 +1502,16 @@ fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOs
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// Vars ──────────────────────────────
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
 
 /// ─── Colors ───
 
 co_xTsiMuTSIBaseUp						= _co_gbl_long
 co_xTsiMuTSIBaseDn						= _co_gbl_short
 
-co_xTsiMuTSIFastUp						= _co_gbl_up
-co_xTsiMuTSIFastDn						= _co_gbl_dn
+co_xTsiMuTSIFastUp						= _co_gbl_yellow
+co_xTsiMuTSIFastDn						= _co_gbl_yellow
 
 co_xTsiMuTSIMainLong					= _co_gbl_buy
 co_xTsiMuTSIMainShort					= _co_gbl_sell
@@ -1410,7 +1519,7 @@ co_xTsiMuTSIMainShort					= _co_gbl_sell
 co_xTsiMuText							= color.new(_co_gbl_txt_dark,		0)
 
 
-/// Instances ─────────────────────────
+/// INSTANCES ─────────────────────────
 
 
 /// Multitimeframe
@@ -1441,27 +1550,27 @@ insxTsiMuPlotColorFast					= ixTsiMuCalcTsiFast	> ixTsiMuCalcEmaFast	? co_xTsiMu
 insxTsiMuPlotColor						= ixTsiMuCalcTsiSlow	> ixTsiMuCalcEmaSlow	? co_xTsiMuTSIBaseUp	: ixTsiMuCalcTsiSlow	<= ixTsiMuCalcEmaSlow	? co_xTsiMuTSIBaseDn	: na
 
 
-/// Display ───────────────────────────
+/// DISPLAY ───────────────────────────
 
 
 /// ─── Plot
 /// plot sobrecompra/sobreventa
-insxTsiMuTsiPlotUpLine					= plot(showxTsiMuTSIDisplay ? 110 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	60,	100,	color.new(_co_gbl_black, 70),		color.new(_co_gbl_sell, 10)),						linewidth = 6)
-insxTsiMuTsiPlotDnLine					= plot(showxTsiMuTSIDisplay ? -10 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	0,	40,		color.new(_co_gbl_buy, 10),			color.new(_co_gbl_black, 70)),						linewidth = 6)
+insxTsiMuTsiPlotUpLine					= plot(showxTsiMuTSIDisplay ? 110 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	60,	100,	color.new(_co_gbl_black, 70),	color.new(_co_gbl_sell, 10)),						linewidth = 6)
+insxTsiMuTsiPlotDnLine					= plot(showxTsiMuTSIDisplay ? -10 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	0,	40,		color.new(_co_gbl_buy, 10),		color.new(_co_gbl_black, 70)),						linewidth = 6)
 
 /// plot principal TSI
 /// plot TSI fast
-insxTsiMuTsiPlotFast					= plot(showxTsiMuTSIDisplay and showxTsiMuTSIFast ? ixTsiMuCalcTsiFast	: na,				color = color.new(insxTsiMuPlotColorFast, 50),		linewidth = 2)		//	plot TsiSI
-insxTsiMuEmaPlotFast					= plot(showxTsiMuTSIDisplay and showxTsiMuTSIFast ? ixTsiMuCalcEmaFast	: na,				color = color.new(insxTsiMuPlotColorFast, 70),		linewidth = 1)		//	plot EMA
+insxTsiMuTsiPlotFast					= plot(showxTsiMuTSIDisplay and showxTsiMuTSIFast ? ixTsiMuCalcTsiFast	: na,		color = color.new(insxTsiMuPlotColorFast, 50),		linewidth = 2)		//	plot TsiSI
+insxTsiMuEmaPlotFast					= plot(showxTsiMuTSIDisplay and showxTsiMuTSIFast ? ixTsiMuCalcEmaFast	: na,		color = color.new(insxTsiMuPlotColorFast, 50),		linewidth = 1)		//	plot EMA
 /// fill fast
-fill(insxTsiMuTsiPlotFast, insxTsiMuEmaPlotFast,																					color = showxTsiMuTSIFast ? color.new(insxTsiMuPlotColorFast, 85) : na)	//	fill
+fill(insxTsiMuTsiPlotFast, insxTsiMuEmaPlotFast,							color = showxTsiMuTSIFast ? color.new(insxTsiMuPlotColorFast, 85) : na)	//	fill
 
 /// plot TSI slow
-insxTsiMuTsiPlotLine					= plot(showxTsiMuTSIDisplay and showxTsiMuTSISlow ? ixTsiMuCalcTsiSlow	: na,				color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot TsiSI
-insxTsiMuEmaPlotLine					= plot(showxTsiMuTSIDisplay and showxTsiMuTSISlow ? ixTsiMuCalcEmaSlow	: na,				color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot EMA
+insxTsiMuTsiPlotLine					= plot(showxTsiMuTSIDisplay and showxTsiMuTSISlow ? ixTsiMuCalcTsiSlow	: na,		color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot TsiSI
+insxTsiMuEmaPlotLine					= plot(showxTsiMuTSIDisplay and showxTsiMuTSISlow ? ixTsiMuCalcEmaSlow	: na,		color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot EMA
 
 /// fill principal
-fill(insxTsiMuTsiPlotLine, insxTsiMuEmaPlotLine,																					color = showxTsiMuTSISlow ? color.new(insxTsiMuPlotColor, 60) : na)		//	fill
+fill(insxTsiMuTsiPlotLine, insxTsiMuEmaPlotLine,							color = showxTsiMuTSISlow ? color.new(insxTsiMuPlotColor, 60) : na)		//	fill
 
 
 /// Divergences ───────────────────────
@@ -1579,7 +1688,7 @@ plotshape(showxTsiMuTSIDisplay			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_ba
 //// ─────────────────────────────────────────────────────────────────────
 
 
-/// Vars ──────────────────────────────
+/// VARS ──────────────────────────────
 
 
 colorTsiObsPnl_Buy						= _co_gbl_long
@@ -1623,7 +1732,7 @@ stTsiObsPnl_TextSize					= input.string	(defval = 'normal',	title = 'Tamaño de 
 vTsiObsPnl_RsiLength					= 14
 
 
-/// Instances ─────────────────────────
+/// INSTANCES ─────────────────────────
 
 
 /// ─── constructor
@@ -1670,7 +1779,7 @@ vTsiObsPnlTF1d							= request.security(syminfo.tickerid,		'D',		tsiObsPnl_TSI)
 [vTsiObsPnlTFExtMtf1d,		vTsiObsPnlTFExtMtf1d_2,			vTsiObsPnlTFExtMtf1d_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt1d,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 
 
-/// Functions ─────────────────────────
+/// FUNCTIONS ─────────────────────────
 
 
 /// ─── New table
@@ -1722,8 +1831,8 @@ FunTsiObsPnlCalculateCellValue(_col, _row, _value) =>
 /// ─── Function table cells
 FunTsiObsPnlCalculateCellExtend(_col, _row, _var, _var2, _var3) =>
 	/// ─── signal buy/sell
-	_max								= 120
-	_min								= -20
+	_max								= 100
+	_min								= 0
 	_if_buy								= _var	> _var2	and _var	> _var3	and	_var < _min
 	_if_sell							= _var	< _var2	and _var	< _var3	and	_var > _max
 	_trend_buy							= _var	> _var2	and _var	> _var3
@@ -1748,7 +1857,7 @@ FunTsiObsPnlCalculateCellExtend(_col, _row, _var, _var2, _var3) =>
 		  width							= 4)
 
 
-/// Visual ────────────────────────────
+/// VISUAL ────────────────────────────
 
 
 /// ─── Table TSI
@@ -1762,12 +1871,6 @@ if showTsiObsPnlTimeframesPanel
 	FunTsiObsPnlCalculateCellValue				(1,	1,		tsiObsPnl_TSI)
 	if showTsiObsPnlPanelExt
 		FunTsiObsPnlCalculateCellExtend			(1,	2,		vTsiObsPnlTFExtMtfW,	vTsiObsPnlTFExtMtfW_2,		vTsiObsPnlTFExtMtfW_3)
-
-	// if showTsiObsPnlTF05m
-	// 	FunTsiObsPnlCalculateCellTime			(2,	0,		'5 m')
-	// 	FunTsiObsPnlCalculateCellValue			(2,	1,		vTsiObsPnlTF05m)
-	// 	if showTsiObsPnlPanelExt
-	// 		FunTsiObsPnlCalculateCellExtend		(2,	2,		vTsiObsPnlTFExtMtf05m,	vTsiObsPnlTFExtMtf05m_2,	vTsiObsPnlTFExtMtf05m_3)
 
 	if showTsiObsPnlTF15m
 		FunTsiObsPnlCalculateCellTime			(3,	0,		'15 m')

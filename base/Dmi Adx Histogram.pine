@@ -88,3 +88,21 @@ plot(iDmiAdx_AdxLine	? iDmiAdx_ADX		: na,
 		  title						= 'ADX',
 		  style						= plot.style_line,
 		  color						= coIf_DmiAdx_Adx)
+
+// showDmiAdx_CrossH						= input(defval = true)
+
+// plotDmiAdx_CrossUp						= 0
+// // plotDmiAdx_CrossUp						= ta.crossover(iDmiAdx_DIFF, 0)
+// plotDmiAdx_CrossDn						= 0
+// // plotDmiAdx_CrossDn						= ta.crossunder(iDmiAdx_DIFF, 0)
+
+// plotshape(
+// 		  series						= showDmiAdx_CrossH and iDmiAdx_DIFF == 0,
+// 		  style							= shape.diamond,
+// 		  location						= location.absolute,
+// 		  color							= color.white,
+// 		  size							= size.small,
+// 		  show_last						= 2)
+
+bgcolor(showDmiAdx_CrossH and ta.crossover(iDmiAdx_DIFF, 0) or ta.crossunder(iDmiAdx_DIFF, 0)	? color.new(_co_gbl_white, 85)	: na)
+

@@ -92,24 +92,24 @@ if barstate.islast and show_oonOscAroon
 				 )
 
 if show_oonOscAroon
-oonOsc_cross_over					= show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
-oonOsc_cross_under					= show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
+	oonOsc_cross_over					= show_oonOscAroon and ta.crossover(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
+	oonOsc_cross_under					= show_oonOscAroon and ta.crossunder(fOnOsc_aroon_osc,		fOnOsc_sig_line) ? fOnOsc_aroon_osc[1] : na
 
 plotchar(oonOsc_cross_over,
-		  title						= "cruce reversion ▲",
-		  char						= "●", 
-		  location					= location.absolute, 
-		  color						= co_oonOsc_buy,
-		  size						= size.tiny, 
-		  offset					= -1)
+		  title							= "cruce reversion ▲",
+		  char							= "●", 
+		  location						= location.absolute, 
+		  color							= co_oonOsc_buy,
+		  size							= size.tiny, 
+		  offset						= -1)
 
 plotchar(oonOsc_cross_under,
-		  title						= "cruce reversion ▼",
-		  char						= "●", 
-		  location					= location.absolute, 
-		  color						= co_oonOsc_sell, 
-		  size						= size.tiny, 
-		  offset					= -1)
+		  title							= "cruce reversion ▼",
+		  char							= "●", 
+		  location						= location.absolute, 
+		  color							= co_oonOsc_sell, 
+		  size							= size.tiny, 
+		  offset						= -1)
 
 bgcolor(fOnOsc_aroon_osc > 0 ? color.new(co_oonOsc_buy, 95) : color.new(co_oonOsc_sell, 95))
 

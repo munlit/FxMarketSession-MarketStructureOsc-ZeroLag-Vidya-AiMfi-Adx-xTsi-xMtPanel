@@ -13,7 +13,7 @@
 /// ╔═══════════════════════════════╗
 /// ║	Market Structure Oscillador	║
 /// ╔═══════════════════════════════╗
-/// ║  AI Adaptive Money Flow Index	║
+/// ║	AI Adaptive Money Flow Index║
 /// ╔═══════════════════════════════╗
 /// ║	Tsi & Divergences			║
 /// ╔═══════════════════════════════╗
@@ -27,8 +27,8 @@
 
 
 //@version=5
-indicator(title							= 'FxMarketSession & MarketStructureOscil & ZeroLag & Vidya & "AI MFI & Tsi two & TsiDiv [🎱 Allen 㔬]',
-		  shorttitle					= 'MkS MSOsc ZLag vidya Mfi xTsiMulti [🎱 Allen 㔬]',
+indicator(title							= 'FxMarketSession & MarketStructureOscil & ZeroLag & Vidya & "AIMfi & Adx & TsiTwo & TsiDiv [🎱 Allen 㔬]',
+		  shorttitle					= 'MkS MSOsc ZLag vidya Mfi Adx xTsiM xPanels [🎱 Allen 㔬]',
 		  overlay						= true,
 		  max_boxes_count				= 500,
 		  max_labels_count				= 500,
@@ -1360,7 +1360,7 @@ if msOnChart3
 
 
 /// ─── Lineal
-midLine				= plot(msOsc_Show or show_msOscRange1 or show_msOscRange2 or show_msOscRange3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 80),	display = display,		editable = false)
+midLine				= plot(msOsc_Show ? 50 : na,				'Equilibrio',		color.new(msOscilColorMid, 80),	display = display,		editable = false)
 
 [stValue1, stValue2, stValue3] = Fun_msOsc_collectData()
 
@@ -1379,8 +1379,8 @@ fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOs
 
 
 /// ╔═══════════════════════════════╗
-/// ║  AI Adaptive Money Flow Index	║
-/// ║  @	Allen.					║
+/// ║	AI Adaptive Money Flow Index║
+/// ║	 @	Allen.					║
 /// ╚═══════════════════════════════╝
 
 
@@ -1408,9 +1408,9 @@ adapMonVarLENGTH						= input.int		(defval = 10,				title = 'Longitud MFI',					
 adapMonVarDataLength					= input.int		(defval = 300,				title = 'Nº de datos de entrenamiento',			minval = 1,	group = adapMonGrpLim)
 adapMonVarIterations					= input.int		(defval = 5,				title = 'Nº de iteraciones por barra',			minval = 1,	group = adapMonGrpLim)
 
-float adapMonVarOverbought				=				75.0			// 80.0
-float adapMonVarNeutral					=				50.0
-float adapMonVarOversold				=				25.0			// 20.0
+float adapMonVarOverbought				= 				75.0			// 80.0
+float adapMonVarNeutral					= 				50.0
+float adapMonVarOversold				= 				25.0			// 20.0
 
 adapMonVarSRC							=				gbl_Source_3	// Fuente MFI
 
@@ -1434,8 +1434,7 @@ adapMonIfVAL							= adapMonVarADJ ? positionBetweenBands : adapMonVarOSC
 
 adapMonFuncST							= ta.stdev(adapMonIfVAL, adapMonVarLENGTH)
 
-adapMonIfCOLOR100						= adapMonVarOSC > adapMonArrNE_NEW		? color.new(adapMonColorLong, 90)		: color.new(adapMonColorShort, 90)
-adapMonIfCOLOR0							= adapMonVarOSC > adapMonArrNE_NEW		? color.new(adapMonColorLong, 0)		: color.new(adapMonColorShort, 0)
+adapMonIfCOLOR100						= adapMonVarOSC > adapMonArrNE_NEW		? color.new(adapMonColorLong, 75)		: color.new(adapMonColorShort, 75)
 
 
 /// ＰＬＯＴ ――――――――――――――――――――――――――
@@ -1453,8 +1452,141 @@ fill									(adapMonPlotMID, adapMonPlotMAIN, adapMonIfVAL, adapMonVarADJ ? 50 
 
 
 /// ╔═══════════════════════════════╗
-/// ║  Tsi & Divergences			║
-/// ║  @	Allen.					║
+/// ║	Dmi Adx Di Histogram		║
+/// ║	Base Zero					║
+/// ║	@	Allen.					║
+/// ╚═══════════════════════════════╝
+
+
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+co_DmiAdx_Buy							= _co_gbl_buy
+co_DmiAdx_Sell							= _co_gbl_sell
+
+showDmiAdx_AdxHisto						= input(defval = true,				title = 'Mostrar ADX Histograma')
+showDmiAdx_AdxSigCross					= input(defval = true,				title = 'Mostrar Signal Cross')
+iDmiAdx_length							= input(defval = 14,				title = 'Longitud ADX DI')
+
+
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
+
+
+iDmiAdx_UP								= ta.change(gblSource.H)
+iDmiAdx_DN								= -ta.change(gblSource.L)
+iDmiAdx_PlusDM							= na(iDmiAdx_UP)		? na		: iDmiAdx_UP		> iDmiAdx_DN	and iDmiAdx_UP		> 0	? iDmiAdx_UP	: 0
+iDmiAdx_MinusDM							= na(iDmiAdx_DN)		? na		: iDmiAdx_DN		> iDmiAdx_UP	and iDmiAdx_DN		> 0	? iDmiAdx_DN	: 0
+iDmiAdx_TRUR							= ta.rma(ta.tr,			iDmiAdx_length)
+iDmiAdx_PLUS							= fixnan(100 * ta.rma(iDmiAdx_PlusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
+iDmiAdx_MINUS							= fixnan(100 * ta.rma(iDmiAdx_MinusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
+
+
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
+
+
+iDmiAdx_DIFF							= iDmiAdx_PLUS - iDmiAdx_MINUS
+
+co_DmiAdx_If_Diff						= 
+			  iDmiAdx_PLUS > iDmiAdx_MINUS and 
+			  iDmiAdx_DIFF > 5				?
+			  color.new(co_DmiAdx_Buy,	20)	:
+			  iDmiAdx_PLUS < iDmiAdx_MINUS and
+			  iDmiAdx_DIFF < -5				?
+			  color.new(co_DmiAdx_Sell,	20)	:
+			  iDmiAdx_PLUS > iDmiAdx_MINUS	?
+			  color.new(co_DmiAdx_Buy,	40)	:
+			  color.new(co_DmiAdx_Sell,	40)
+
+co_DmiAdx_If_Bg							= 
+			  iDmiAdx_DIFF > 0				?
+			  co_DmiAdx_Buy					:
+			  co_DmiAdx_Sell
+
+
+/// ＰＬＯＴ ―――――――――――――――――――――――――――
+
+
+plot(strGlobalMultiHistogram == 'Adx' and showDmiAdx_AdxHisto ? iDmiAdx_DIFF : na,
+		  title							= 'Histograma DI',
+		  style							= plot.style_columns,
+		  color							= co_DmiAdx_If_Diff)
+
+// bgcolor(strGlobalMultiHistogram == 'Adx' and showDmiAdx_AdxHisto and showDmiAdx_AdxSigCross and 
+// 		  ta.crossover(iDmiAdx_DIFF, 0)		or
+// 		  ta.crossunder(iDmiAdx_DIFF, 0)	?
+// 		  color.new(co_DmiAdx_If_Bg, 90)	: na)
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+// /// ╔═══════════════════════════════════════╗
+// /// ║	Adx Histogram	Mid 25				║
+// /// ║	Base	25							║
+// /// ║	@	Allen.							║
+// /// ╚═══════════════════════════════════════╝
+
+
+// //// ─────────────────────────────────────────────────────────────────────
+
+
+// colorxAdxDiHi_Buy						= _co_gbl_buy
+// colorxAdxDiHi_Short						= _co_gbl_sell
+// colorxAdxDiHi_Mid						= _co_gbl_extra
+// colorxAdxDiHi_Extra						= _co_gbl_extra
+
+
+// /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+// AdxDiHiGroupVars						= 'Adx Setting'
+// adxDiHi_Length							= input.int(defval = 14,		title = 'Longitud Adx',			group = AdxDiHiGroupVars)
+// adxDiHi_Th								= input.int(defval = 25,		title = 'Umbral',				group = AdxDiHiGroupVars)
+
+
+// /// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
+
+
+// xAdxDiHi_TrueRange						= math.max(math.max(gbl_Source_H - gbl_Source_L, math.abs(gbl_Source_H - nz(gbl_Source_C[1]))), math.abs(gbl_Source_L - nz(gbl_Source_C[1])))
+// xAdxDiHi_DirectMovePlus					= gbl_Source_H - nz(gbl_Source_H[1]) > nz(gbl_Source_L[1]) - gbl_Source_L ? math.max(gbl_Source_H - nz(gbl_Source_H[1]), 0) : 0
+// xAdxDiHi_DirectMoveMinus				= nz(gbl_Source_L[1]) - gbl_Source_L > gbl_Source_H - nz(gbl_Source_H[1]) ? math.max(nz(gbl_Source_L[1]) - gbl_Source_L, 0) : 0
+
+// var float xAdxDiHi_SmoothTrueRange		= na
+// var float xAdxDiHi_SmoothDirectMovePlus	= na
+// var float xAdxDiHi_SmoothDirectMoveMinus= na
+
+// xAdxDiHi_SmoothTrueRange				:= na(xAdxDiHi_SmoothTrueRange) ? xAdxDiHi_TrueRange : xAdxDiHi_SmoothTrueRange - (xAdxDiHi_SmoothTrueRange / adxDiHi_Length) + xAdxDiHi_TrueRange
+// xAdxDiHi_SmoothDirectMovePlus			:= na(xAdxDiHi_SmoothDirectMovePlus) ? xAdxDiHi_DirectMovePlus : xAdxDiHi_SmoothDirectMovePlus - (xAdxDiHi_SmoothDirectMovePlus / adxDiHi_Length) + xAdxDiHi_DirectMovePlus
+// xAdxDiHi_SmoothDirectMoveMinus			:= na(xAdxDiHi_SmoothDirectMoveMinus) ? xAdxDiHi_DirectMoveMinus : xAdxDiHi_SmoothDirectMoveMinus - (xAdxDiHi_SmoothDirectMoveMinus / adxDiHi_Length) + xAdxDiHi_DirectMoveMinus
+
+
+// /// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
+
+
+// xAdxDiHi_DIPlus							= xAdxDiHi_SmoothDirectMovePlus / xAdxDiHi_SmoothTrueRange * 100
+// xAdxDiHi_DIMinus						= xAdxDiHi_SmoothDirectMoveMinus / xAdxDiHi_SmoothTrueRange * 100
+// xAdxDiHi_DX								= math.abs(xAdxDiHi_DIPlus - xAdxDiHi_DIMinus) / (xAdxDiHi_DIPlus + xAdxDiHi_DIMinus) * 100
+// xAdxDiHi_ADX							= ta.sma(xAdxDiHi_DX, adxDiHi_Length)
+
+// xAdxDiHi_Didi							= 25 + (xAdxDiHi_DIPlus - xAdxDiHi_DIMinus)
+
+// xAdxDiHi_CR								= xAdxDiHi_ADX <= 22 ? color.new(colorxAdxDiHi_Buy, 80) : xAdxDiHi_ADX <= 34 ? color.new(colorxAdxDiHi_Buy, 60) : xAdxDiHi_ADX <= 46 ? color.new(colorxAdxDiHi_Buy, 40) : xAdxDiHi_ADX <= 58 ? color.new(colorxAdxDiHi_Buy, 25) : xAdxDiHi_ADX <= 70 ? color.new(colorxAdxDiHi_Buy, 10) : color.new(colorxAdxDiHi_Buy, 0)
+// xAdxDiHi_CG								= xAdxDiHi_ADX <= 22 ? color.new(colorxAdxDiHi_Short, 80) : xAdxDiHi_ADX <= 34 ? color.new(colorxAdxDiHi_Short, 60) : xAdxDiHi_ADX <= 46 ? color.new(colorxAdxDiHi_Short, 40) : xAdxDiHi_ADX <= 58 ? color.new(colorxAdxDiHi_Short, 25) : xAdxDiHi_ADX <= 70 ? color.new(colorxAdxDiHi_Short, 10) : color.new(colorxAdxDiHi_Short, 0)
+
+
+// /// ＰＬＯＴ ―――――――――――――――――――――――――――
+
+
+// plot(strGlobalMultiHistogram == 'Adx' ? xAdxDiHi_Didi : na,		style = plot.style_columns,		linewidth = 4,		color = xAdxDiHi_Didi >= 25 ? xAdxDiHi_CR : xAdxDiHi_CG,		histbase = adxDiHi_Th ,		title = 'DI')
+// plot(strGlobalMultiHistogram == 'Adx' ? xAdxDiHi_Didi : na,		style = plot.style_line,		linewidth = 2,		color = xAdxDiHi_Didi >= 25 ? xAdxDiHi_CR : xAdxDiHi_CG,		histbase = adxDiHi_Th ,		title = 'Linea DI')
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+/// ╔═══════════════════════════════╗
+/// ║	Tsi & Divergences			║
+/// ║	@	Allen.					║
 /// ╚═══════════════════════════════╝
 
 
@@ -1485,11 +1617,12 @@ co_xTsiMuText							= color.new(_co_gbl_txt_dark,		0)
 
 /// instance function calculate multitimeframe Tsi
 [ixTsiMuCalcMultiTfTSI, ixTsiMuCalcMultiTfEMA]= FunGlobalCalcTSI('Slow', 125)
-// [ixTsiMuCalcMultiTfTSI, ixTsiMuCalcMultiTfEMA]= FunGlobalCalcTSI('slow', vxTsiMuFast_x, vxTsiMuFast_plus)
+
 /// instance function global timeframe
 ixTsiMuCalcMultiTfTSIRange				= str.tonumber(FunGlobalTimeFrame(strGlobalMultiTimeFrame)) > 500				? 
 										  FunGlobalCalculateTimeframeIf(FunGlobalTimeFrame(strGlobalMultiTimeFrame))	:
 										  timeframe.period
+
 /// ─── Timeframe multitimeframe Tsi
 arrxTsiMuMultiTimeframeTsiTicker		= request.security(syminfo.tickerid,	ixTsiMuCalcMultiTfTSIRange,	ixTsiMuCalcMultiTfTSI,	barmerge.gaps_on)
 
@@ -1497,10 +1630,9 @@ arrxTsiMuMultiTimeframeTsiTicker		= request.security(syminfo.tickerid,	ixTsiMuCa
 
 /// instance function Tsi fast
 [ixTsiMuCalcTsiFast, ixTsiMuCalcEmaFast]= FunGlobalCalcTSI('Fast', 125)
-// [ixTsiMuCalcTsiFast, ixTsiMuCalcEmaFast]= FunGlobalCalcTSI('fast', vxTsiMuFast_x, vxTsiMuFast_plus)
+
 /// instance function Tsi slow
 [ixTsiMuCalcTsiSlow, ixTsiMuCalcEmaSlow]= FunGlobalCalcTSI('Slow', 180)
-// [ixTsiMuCalcTsiSlow, ixTsiMuCalcEmaSlow]= FunGlobalCalcTSI('slow', vxTsiMuSlow_x, vxTsiMuSlow_plus)
 
 /// ─── plot color fast
 insxTsiMuPlotColorFast					= ixTsiMuCalcTsiFast	> ixTsiMuCalcEmaFast	? co_xTsiMuTSIFastUp	: ixTsiMuCalcTsiFast	<= ixTsiMuCalcEmaFast	? co_xTsiMuTSIFastDn	: na
@@ -1669,7 +1801,6 @@ showTsiObsPnlTF2h						= input.bool	(true,				title = '2 H  ',				group = tsiO
 showTsiObsPnlTF3h						= input.bool	(false,				title = '3 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
 showTsiObsPnlTF4h						= input.bool	(false,				title = '4 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
 showTsiObsPnlTF1d						= input.bool	(false,				title = '1 D  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
-showTsiObsPnlTF1w						= input.bool	(false,				title = '1 S  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
 
 tsiObsPnlGroupSignal					=				'Signal Panel'
 showTsiObsPnlSignalPanel				= input.bool	(true,				title = 'Panel TSI Signal',		group = tsiObsPnlGroupSignal)

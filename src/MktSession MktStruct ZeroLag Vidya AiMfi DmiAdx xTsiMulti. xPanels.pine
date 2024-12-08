@@ -27,8 +27,9 @@
 
 
 //@version=5
-indicator(title							= 'FxMarketSession & MarketStructureOscil & ZeroLag & Vidya & "AIMfi & Adx & TsiTwo & TsiDiv [🎱 Allen 㔬]',
-		  shorttitle					= 'MkS MSOsc ZLag vidya Mfi Adx xTsiM xPanels [🎱 Allen 㔬]',
+indicator(title							= 'FxMarketSession & MarketStructureOsc & ZeroLag & Vidya & AiMfi & Adx & xTsi & xMtPanel [🎱 Allen 㔬]',
+		  shorttitle					= 'MkMS ZlDya MfiAdx xTsiPnl [🎱 Allen 㔬]',
+		//   shorttitle					= 'MkS MSOsc ZLag vidya Mfi Adx xTsiM xPanels [🎱 Allen 㔬]',
 		  overlay						= true,
 		  max_boxes_count				= 500,
 		  max_labels_count				= 500,
@@ -46,18 +47,31 @@ indicator(title							= 'FxMarketSession & MarketStructureOscil & ZeroLag & Vidy
 /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
 
+globalGroupIndicat						= 'Visualización Global'
+globalGroupTimeframe					= 'Configuración Global'
 
-strGlobalOptionalSlowTool				= 'Tsi Slow, gráfico principal'
-strGlobalOptionalFastTool				= 'Tsi Fast'
 strGlobalKeikinAshiTooltip				= 'Establecido para uso en gráficos diferentes a Heikin Ashi, de lo contrario genera distorsión.'
 
-globalGroupTimeframe					= 'Temporalidad Global'
-showxTsiMuTSIDisplay					= input.bool	(defval = true,			title = 'Mostrar xTSI',				group = globalGroupTimeframe)
-showxTsiMuTSISlow						= input.bool	(defval = true,			title = 'Mostrar Tsi',				group = globalGroupTimeframe,		tooltip = strGlobalOptionalSlowTool)
-showxTsiMuTSIFast						= input.bool	(defval = true,			title = 'Mostrar Tsi Fast',			group = globalGroupTimeframe,		tooltip = strGlobalOptionalFastTool)
-showxTsiMuTSIDiverg						= input.bool	(defval = true,			title = 'Divergencias',				group = globalGroupTimeframe)
-showxTsiMuTSIPanelTsi					= input.bool	(defval = true,			title = 'Tsi Panel',				group = globalGroupTimeframe)
-showxTsiMuTSIPanelMtf					= input.bool	(defval = true,			title = 'Mtf Panel',				group = globalGroupTimeframe)
+/// Title Global ――――――――――――――――――――
+
+/// Visual Global ―――――――――――――――――――
+display_xTsiMu_TSI						= input.bool	(defval = true,			title = 'Mostrar xTSI',				group = globalGroupIndicat)
+
+display_zeLagTrend						= input.bool	(defval = true,			title = 'Mostrar ZeroLag Trend',	group = globalGroupIndicat)
+
+display_vVidya_VoVidya					= input.bool	(defval = true,			title = "Mostrar Vidya",			group = globalGroupIndicat)
+
+display_FxMkSs__Sessions				= input.bool	(defval = true,			title = 'Fx Market Sessions',		group = globalGroupIndicat)
+
+display_msOsc_MarketOSC					= input.bool	(defval = true,			title = 'Market Oscillator',		group = globalGroupIndicat)
+
+display_adapMon_MFI						= input.bool	(defval = true,			title = 'Mostrar Ai Adaptative MFI', group = globalGroupIndicat)
+
+display_DmiAdx_AdxHisto					= input.bool	(defval = false,		title = 'Mostrar ADX Histograma',	group = globalGroupIndicat)
+
+display_TsiObsPnlTimeFrPanel			= input.bool	(defval = true,			title = 'Mostrar Panel Tsi',		group = globalGroupIndicat)
+
+display_TsiObsPnlIndicatPanel			= input.bool	(defval = true,			title = 'Mostrar Panel Multi Inc',	group = globalGroupIndicat)
 
 showxTsiMuTSIDivSpeed					= input.string 	(defval = 'Slow',		title = 'Diverg Speed',				group = globalGroupTimeframe,
 			  options					=				['Fast', 'Slow'])
@@ -291,8 +305,9 @@ co_zeLag_signal							= _co_gbl_white
 co_zeLag_text							= _co_gbl_light
 co_zeLag_text_dark						= _co_gbl_txt_dark
 
-zeLag_GroupVar							= 'ZeroLag Trend'
-showZeLag_trend							= input.bool	(true,			title = 'Mostrar ZeroLag Trend',	group = zeLag_GroupVar,		inline = 'zerocheck')
+/// Title Indicator ――――――――――――――――――――
+zeLag_GroupVar							= 'ZEROLAG TREND'
+
 showZeLag_level_box						= input.bool	(true,			title = 'Mostrar box ZeroLag',		group = zeLag_GroupVar,		inline = 'zerocheck')
 zeLag_length							= input.int		(13,			title = 'Longitud',					group = zeLag_GroupVar)
 zeLag_lengthEmax						= input.int		(20,			title = 'Longitud Ema',				group = zeLag_GroupVar)
@@ -333,7 +348,7 @@ method FUN_zeLag_draw_box(color _color, top, _bottom, price) =>
 			 )
 
 // Logic to draw trend levels as boxes on the chart
-if showZeLag_level_box and showZeLag_trend
+if showZeLag_level_box and display_zeLagTrend
 	bool _check_signals					= zeLag_signal_buy or zeLag_signal_sell // Check if there is an up or down signal
 
 	switch
@@ -353,15 +368,15 @@ if showZeLag_level_box and showZeLag_trend
 
 
 // Plot the Zero-Lag Moving Average
-plot_zeLag_EMA							= plot(showZeLag_trend ? iZeLag_EMA : na,			color = color.new(co_zeLag_EMA, 25),			linewidth = 1,		force_overlay		= true)
-plot_zeLag_EMAx							= plot(showZeLag_trend ? iZeLag_EMAx : na,			color = color.new(co_zeLag_EMAx, 25),			linewidth = 2,		force_overlay		= true)
-// plot_zeLag_ZLMA							= plot(showZeLag_trend ? iZeLag_ZLMA : na,			color = color.new(co_zeLag_ZLMA, 75),			linewidth = 1,		force_overlay		= true)
+plot_zeLag_EMA							= plot(display_zeLagTrend ? iZeLag_EMA : na,			color = color.new(co_zeLag_EMA, 25),			linewidth = 1,		force_overlay		= true)
+plot_zeLag_EMAx							= plot(display_zeLagTrend ? iZeLag_EMAx : na,			color = color.new(co_zeLag_EMAx, 25),			linewidth = 2,		force_overlay		= true)
+// plot_zeLag_ZLMA							= plot(display_zeLagTrend ? iZeLag_ZLMA : na,			color = color.new(co_zeLag_ZLMA, 75),			linewidth = 1,		force_overlay		= true)
 fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,							color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
 // fill(plot_zeLag_ZLMA, plot_zeLag_EMAx, iZeLag_ZLMA, iZeLag_EMAx,							color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
 // fill(plot_zeLag_ZLMA, plot_zeLag_EMA, iZeLag_ZLMA, iZeLag_EMA,							color.new(co_zeLag_ZLMA, 90),					color.new(co_zeLag_EMA, 60))
 
 // // Plot shapes for up and down signals
-// plotshape(showZeLag_trend and zeLag_signal_buy ? iZeLag_ZLMA : na,
+// plotshape(display_zeLagTrend and zeLag_signal_buy ? iZeLag_ZLMA : na,
 // 		  title							= '',
 // 		  style							= shape.diamond,
 // 		  location						= location.absolute,
@@ -369,7 +384,7 @@ fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,							color.new(c
 // 		  size							= size.tiny,
 // 		  force_overlay					= true)
 
-// plotshape(showZeLag_trend and zeLag_signal_sell ? iZeLag_ZLMA : na,
+// plotshape(display_zeLagTrend and zeLag_signal_sell ? iZeLag_ZLMA : na,
 // 		  title							= '',
 // 		  style							= shape.diamond,
 // 		  location						= location.absolute,
@@ -397,11 +412,14 @@ col_vVidya_uptrend						= _co_gbl_up
 col_vVidya_downtrend					= _co_gbl_dn
 col_vVidya_txt							= _co_gbl_white
 
-show_vVidya_shadow						= input.bool(true,					title = "Shadow",		group = "Color",		inline = "vidya vars")
+/// Title Indicator ――――――――――――――――――――
+vVidya_GroupInput						= 'VOLUMATIC VIDYA'
 
-vVidya_length							= input.int(defval = 10,			title = "Longitud")
-vVidya_momentum							= input.int(defval = 20,			title = "Momentum")
-vVidya_band_distance					= input.float(defval = 2,			title = "Factor de distancia entre bandas",		step = 0.1)
+show_vVidya_shadow						= input.bool(true,				title = "Vidya Shadow",						group = vVidya_GroupInput,		inline = "vidya vars")
+
+vVidya_length							= input.int(defval = 10,		title = "Longitud",							group = vVidya_GroupInput)
+vVidya_momentum							= input.int(defval = 20,		title = "Momentum",							group = vVidya_GroupInput)
+vVidya_band_distance					= input.float(defval = 2,		title = "Factor de distancia entre bandas",	group = vVidya_GroupInput,		step = 0.1)
 
 // Define pivot
 int		vVidya_pivot_leftbars			= 3
@@ -507,7 +525,7 @@ float	vVi_pivot_high					= ta.pivothigh(vVidya_pivot_leftbars, vVidya_pivot_righ
 float	vVi_pivot_low					= ta.pivotlow(close, vVidya_pivot_leftbars, vVidya_pivot_rightbars)
 
 // Create and store lines for pivot lows (support zones)
-if low[vVidya_pivot_rightbars] > vVidya_smoothed_value and vVi_pivot_low 
+if low[vVidya_pivot_rightbars] > vVidya_smoothed_value and vVi_pivot_low and display_vVidya_VoVidya 
 	vVidya_pivotline					:= line.new(
 		  bar_index[vVidya_pivot_rightbars], 
 		  low[vVidya_pivot_rightbars], 
@@ -521,7 +539,7 @@ if low[vVidya_pivot_rightbars] > vVidya_smoothed_value and vVi_pivot_low
 	vVidya_volumevalue					:= math.sum(volume, vVidya_pivot_rightbars + vVidya_pivot_leftbars) / (vVidya_pivot_rightbars + vVidya_pivot_leftbars)
 
 // Create and store lines for pivot highs (resistance zones)
-if high[vVidya_pivot_rightbars] < vVidya_smoothed_value and vVi_pivot_high 
+if high[vVidya_pivot_rightbars] < vVidya_smoothed_value and vVi_pivot_high and display_vVidya_VoVidya
 	vVidya_pivotline					:= line.new(
 		  bar_index[vVidya_pivot_rightbars], 
 		  high[vVidya_pivot_rightbars], 
@@ -565,48 +583,48 @@ string vVidya_delta_volume =
 /// ＰＬＯＴ ――――――――――――――――――――――――――――――
 
 
-_fvVi_show								= show_vVidya_shadow
-_fvVi_opacity							= 70
-_fvVi_opacity_none						= 100
-_fvVi_line_width						= 2
-_fvVi_line_style						= plot.style_linebr
+fvVi_show								= show_vVidya_shadow
+fvVi_opacity							= 70
+fvVi_opacity_none						= 100
+fvVi_line_width						= 2
+fvVi_line_style						= plot.style_linebr
 
 col_vVidya_plotBuy						= color.new(col_vVidya_uptrend, 50)
 col_vVidya_plotSell						= color.new(col_vVidya_downtrend, 50)
 
 // Determine the color of the trend
-_fvVi_color_conditional					= vVidya_trend_up ? col_vVidya_plotBuy : not vVidya_trend_up ? col_vVidya_plotSell : chart.fg_color
+fvVi_color_conditional					= vVidya_trend_up ? col_vVidya_plotBuy : not vVidya_trend_up ? col_vVidya_plotSell : chart.fg_color
 
-_fvVi_value_up							= vVidya_smoothed_value
-_fvVi_value_dn							= hl2
+fvVi_value_up							= vVidya_smoothed_value
+fvVi_value_dn							= hl2
 
 // Plot the VIDYA trend line
-_fvVi_plot_up							= plot(_fvVi_value_up,
-		  color							= _fvVi_color_conditional,
-		  linewidth						= _fvVi_line_width,
-		  style							= _fvVi_line_style,
+fvVi_plot_up							= plot(display_vVidya_VoVidya ? fvVi_value_up : na,
+		  color							= fvVi_color_conditional,
+		  linewidth						= fvVi_line_width,
+		  style							= fvVi_line_style,
 		  force_overlay					= true)
 
-_fvVi_plot_dn							= plot(_fvVi_value_dn,
+fvVi_plot_dn							= plot(display_vVidya_VoVidya ? fvVi_value_dn : na,
 		  display						= display.none,
 		  force_overlay					= true)
 
 // Fill between the plot and the VIDYA line
-fill(_fvVi_plot_up, _fvVi_plot_dn,
-		  _fvVi_value_up,
-		  _fvVi_value_dn,
-		  color.new(_fvVi_color_conditional, _fvVi_show ? _fvVi_opacity : _fvVi_opacity_none),
+fill(fvVi_plot_up, fvVi_plot_dn,
+		  fvVi_value_up,
+		  fvVi_value_dn,
+		  color.new(fvVi_color_conditional, fvVi_show ? fvVi_opacity : fvVi_opacity_none),
 		  na
 		  )
 
 // Display labels for volume and trend statistics on the last bar
-if barstate.islast
+if barstate.islast and display_vVidya_VoVidya
 	label.delete(
 		 label.new(bar_index + 10, vVidya_smoothed_value, 
 		 "Compra: " + str.tostring(vVidya_volume_uptrend, format.volume) + "\n" +
 		 "Venta: " + str.tostring(vVidya_volume_downtrend, format.volume) + "\n" +
 		 "Delta: " + vVidya_delta_volume, 
-		 color							= color.new(_fvVi_color_conditional, 90),
+		 color							= color.new(fvVi_color_conditional, 90),
 		 style							= label.style_label_left, 
 		 textcolor						= _co_gbl_white,
 		 force_overlay					= true
@@ -616,7 +634,7 @@ if barstate.islast
 		 label.new(bar_index, vVidya_smoothed_value, 
 				 text					= "✪", 
 				 color					= #00000003,
-				 textcolor				= _fvVi_color_conditional, 
+				 textcolor				= fvVi_color_conditional, 
 				 style					= label.style_label_center, 
 				 size					= size.large,
 				 force_overlay			= true
@@ -659,8 +677,10 @@ if barstate.islast
 
 /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
+/// Title Indicator ――――――――――――――――――――
+fxMrkSsGroupGral						= 'FX MARKET SESSIONS'
+// fxMrkSsGroupGral						= 'General'
 
-fxMrkSsGroupGral						= 'General'
 fxMrkSsGroupSyd							= 'Sesión Sydney'
 fxMrkSsGroupTyo							= 'Sesión Tokyo'
 fxMrkSsGroupLon							= 'Sesión Londres'
@@ -757,7 +777,7 @@ vFxMkSs_SessSdExtend					= input.string	(vFxMkSs_No,			title = 'Extender',						
 optFxMkSs_LineStyle						= input.string	('····',				title = 'Box style', 										group = fxMrkSsGroupLine,
 		  options						= 				['⎯⎯⎯⎯', '----', '····'])
 vFxMkSs_BorderWidth						= input.int		(1,						title = 'Ancho de Linea',	minval = 0,						group = fxMrkSsGroupLine)
-vFxMkSs_BgOpacity						= input.int		(90,					title = 'Transp fondo', minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+vFxMkSs_BgOpacity						= input.int		(90,					title = 'Transp fondo',	minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
 vFxMkSs_LineOpacity						= input.int		(30,					title = 'Transp contorno',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
 
 /// ─── Labels
@@ -990,32 +1010,39 @@ int timeMkSs_SessSyd					= time(timeframe.period, vFxMkSs_SessSdTimeZ, ms_timeZo
 
 
 /// ─── Session London
-[DRAWMkSsSessLon,		DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessLon,		DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
+
 /// ─── Session New York
-[DRAWMkSsSessNewY,		DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessNewY,		DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
+
 /// ─── Session Tokyo
-[DRAWMkSsSessTyk,		DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessTyk,		DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
+
 /// ─── Session Sydney
-[DRAWMkSsSessSyd,		DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]				= FunFxMkSs_DrawBox(showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessSyd,		DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
 
 /// ─── KillZones London
-if showFxMkSs_KillLonOpen
+if showFxMkSs_KillLonOpen and display_FxMkSs__Sessions
 	[DwMkSs_KillLon_Open, DwMkSs_KillLon_Op]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonOpen,	vFxMkSs_KillLonColor)
-if showFxMkSs_KillLonRally
+
+if showFxMkSs_KillLonRally and display_FxMkSs__Sessions
 	[DwMkSs_KillLon_Rally, DwMkSs_KillLon_Rl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonRally,	vFxMkSs_KillLonColor)
-if showFxMkSs_KillLonClose
+
+if showFxMkSs_KillLonClose and display_FxMkSs__Sessions
 	[DwMkSs_KillLon_Close, DwMkSs_KillLon_Cl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonClose,	vFxMkSs_KillLonColor)
 
 /// ─── KillZones New York
-if showFxMkSs_KillNwYOpen
+if showFxMkSs_KillNwYOpen and display_FxMkSs__Sessions
 	[DwMkSs_KillNwY_Open, DwMkSs_KillNwY_Op]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYOpen,	vFxMkSs_KillNwYColor)
-if showFxMkSs_KillNwYRally
+
+if showFxMkSs_KillNwYRally and display_FxMkSs__Sessions
 	[DwMkSs_KillNwY_Rally, DwMkSs_KillNwY_Rl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYRally,	vFxMkSs_KillNwYColor)
-if showFxMkSs_KillNwYClose
+
+if showFxMkSs_KillNwYClose and display_FxMkSs__Sessions
 	[DwMkSs_KillNwY_Close, DwMkSs_KillNwY_Cl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYClose,	vFxMkSs_KillNwYColor)
 
 // /// ─── Drawing Table Sessions
-// if showTsiObsPnlTimeframesPanel
+// if display_TsiObsPnlTimeFrPanel
 // 	FunTsiObsPnlCalculateCellName				(0,	0,		'Sessions')
 // 	FunSessionCellTime							(1,	0,		'Status')
 // 	FunSessionCellTime							(2,	0,		'Open ')				//	(2,	0,		'Time')
@@ -1076,20 +1103,22 @@ msOscilColorMid							= _co_gbl_white
 
 display									= display.all - display.status_line	
 
-msOsc_VarsGroup							= 'Oscilador Market Structure'
+/// Title Indicator ――――――――――――――――――――
+msOsc_VarsGroup							= 'OSCILADOR MARKET STRUCTURE'
+
 msOsc_WeightK1							= input.float	(defval = 1,					title = '  Escala Corta',					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
 msOsc_WeightK2							= input.float	(defval = 3,					title = '  Escala Intermedia',				minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
 msOsc_WeightK3							= input.float	(defval = 2,					title = '  Escala Larga',					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
 msOsc_Norm_Smooth						= input.int		(defval = 4,					title = '  Oscilador Suavizado',			minval = 1,			group = msOsc_VarsGroup,					display = display)
 
 msOsc_Group								= 'Oscilador Gradiente'
-msOsc_Show								= input			(defval = true,					title = 'Oscilador Cycle - Gradiente',							group = msOsc_Group)
+show_msOsc_OSC								= input			(defval = true,					title = 'Oscilador Cycle - Gradiente',							group = msOsc_Group)
 
 cyc_Group								= 'Oscilador Cycle'
 cycleOpt								= input			(defval = false,				title = 'Oscilador Cycle - Histograma',							group = cyc_Group)
 cyc_Smooth								= input.int		(defval = 7,					title = '  Cycle Marca Longitud',			minval = 1,			group = cyc_Group,						display = display)
 
-genericGroup							= 'Market Structure en Gráfico'
+genericGroup							= 'MS en Gráfico'
 msOnChart1								= input			(defval = true,					title = 'Estructura de rango Corto',							group = genericGroup)
 msOnChartK1								= input.string	(defval = '····',				title = '  Linea',		options = ['⎯⎯⎯⎯', '----', '····'],		group = genericGroup,	inline = 'K1',	display = display)
 stMSLblK1T								= input.string	(defval = 'Disabled',			title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K1',	display = display),	stMSLblK1 = stMSLblK1T == 'Enabled'
@@ -1360,19 +1389,20 @@ if msOnChart3
 
 
 /// ─── Lineal
-midLine				= plot(msOsc_Show ? 50 : na,				'Equilibrio',		color.new(msOscilColorMid, 80),	display = display,		editable = false)
+plotOsc_midLine		= plot(display_msOsc_MarketOSC and show_msOsc_OSC ? 50 : na,	'Equilibrio',							display = display.none,		editable = false)
+// plotOsc_midLine		= plot(display_msOsc_MarketOSC and show_msOsc_OSC ? 50 : na,	'Equilibrio',							color.new(msOscilColorMid, 80),	display = display,		editable = false)
 
 [stValue1, stValue2, stValue3] = Fun_msOsc_collectData()
 
 /// ─── Oscilador
 msOSC				= (msOsc_WeightK1 * nz(stValue1, 0) + msOsc_WeightK2 * nz(stValue2, 0) + msOsc_WeightK3 * nz(stValue3, 0)) / (msOsc_WeightK1 * (na(stValue1) ? 0 : 1) + msOsc_WeightK2 * (na(stValue2) ? 0 : 1) + msOsc_WeightK3 * (na(stValue3) ? 0 : 1))
-msPlot				= plot(msOsc_Show ? msOSC : na,				'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, color.new(co_msOscSell, 0), color.new(co_msOscBuy, 0)), 1,	display = display)
+msPlot				= plot(display_msOsc_MarketOSC and show_msOsc_OSC ? msOSC : na,	'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, color.new(co_msOscSell, 0), color.new(co_msOscBuy, 0)), 1,	display = display)
 
 cycleFast			= cycleOpt ? msOSC - ta.ema(msOSC, cyc_Smooth) + 50 : 50
-plotcandle			(50., 50., 50., cycleFast,					'Histograma Cycle',						cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20),	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20) : color.gray)
+plotcandle			(50., 50., 50., cycleFast,										'Histograma Cycle',						cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20),	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? color.new(co_msOscBuy, 20) : color.new(co_msOscSell, 20) : color.gray)
 
-fill				(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(co_msOscBuy,   0), bottom_color = color.new(co_msOscBuy, 100), title = 'Bullish Gradient Fill')
-fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOscSell, 100), bottom_color = color.new(co_msOscSell,   0), title = 'Bearish Gradient Fill')
+fill				(msPlot, plotOsc_midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(co_msOscBuy,   0), bottom_color = color.new(co_msOscBuy, 100), title = 'Bullish Gradient Fill')
+fill				(msPlot, plotOsc_midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOscSell, 100), bottom_color = color.new(co_msOscSell,   0), title = 'Bearish Gradient Fill')
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1389,10 +1419,10 @@ fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(co_msOs
 
 /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
+/// Title Indicator ――――――――――――――――――――
+adapMonGrpSet							= 'ADAPTATIVE MFI'
 
 adapMonToolAdj							= 'Ajusta el MFI en su lugar para que los niveles de Sobrecompra, Sobreventa y Neutral permanezcan fijos'
-
-adapMonGrpSet							= 'Adaptative MFI'
 adapMonGrpLim							= 'Clustering Setting'
 adapMonGrpApar							= 'Apariencia'
 
@@ -1401,12 +1431,12 @@ adapMonColorShort						= 				_co_gbl_sell
 adapMonColorAux							= 				_co_gbl_white
 adapMonColorDark						= 				_co_gbl_black
 
-showadapMonGroup						= input.bool	(defval = true,				title = 'Mostrar Ai Adaptative MFI',						group = adapMonGrpSet)
-adapMonVarADJ							= input.bool	(defval = true,				title = 'Usar MFI ajustado',								group = adapMonGrpApar,		tooltip = adapMonToolAdj)
+showadapMonVarADJ						= input.bool	(defval = true,				title = 'Mostrar MFI ajustado',								group = adapMonGrpApar,		tooltip = adapMonToolAdj)
+showadapMonStDev						= input.bool	(defval = false,			title = 'Mostrar Desviación Estándar',						group = adapMonGrpApar,		tooltip = adapMonToolAdj)
 
-adapMonVarLENGTH						= input.int		(defval = 10,				title = 'Longitud MFI',							minval = 1,	group = adapMonGrpSet)	// 14
-adapMonVarDataLength					= input.int		(defval = 300,				title = 'Nº de datos de entrenamiento',			minval = 1,	group = adapMonGrpLim)
-adapMonVarIterations					= input.int		(defval = 5,				title = 'Nº de iteraciones por barra',			minval = 1,	group = adapMonGrpLim)
+adapMonVarLENGTH						= input.int		(defval = 10,				title = 'Longitud MFI',						minval = 1,		group = adapMonGrpSet)	// 14
+adapMonVarDataLength					= input.int		(defval = 300,				title = 'Nº de datos de entrenamiento',		minval = 1,		group = adapMonGrpLim)
+adapMonVarIterations					= input.int		(defval = 5,				title = 'Nº de iteraciones por barra',		minval = 1,		group = adapMonGrpLim)
 
 float adapMonVarOverbought				= 				75.0			// 80.0
 float adapMonVarNeutral					= 				50.0
@@ -1430,9 +1460,11 @@ adapMonArrOS_NEW						= array.avg(adapMonArrOS)
 
 positionBetweenBands					= 100 * ((adapMonVarOSC - adapMonArrOS_NEW)/(adapMonArrOB_NEW - adapMonArrOS_NEW))
 
-adapMonIfVAL							= adapMonVarADJ ? positionBetweenBands : adapMonVarOSC
+adapMonIfVAL							= showadapMonVarADJ ? positionBetweenBands : adapMonVarOSC
 
-adapMonFuncST							= ta.stdev(adapMonIfVAL, adapMonVarLENGTH)
+adapMonFuncStD							= ta.stdev(adapMonIfVAL, adapMonVarLENGTH)
+
+ifAdapMonDesvStd						= showadapMonStDev ? adapMonFuncStD	: adapMonIfVAL
 
 adapMonIfCOLOR100						= adapMonVarOSC > adapMonArrNE_NEW		? color.new(adapMonColorLong, 75)		: color.new(adapMonColorShort, 75)
 
@@ -1440,12 +1472,14 @@ adapMonIfCOLOR100						= adapMonVarOSC > adapMonArrNE_NEW		? color.new(adapMonCo
 /// ＰＬＯＴ ――――――――――――――――――――――――――
 
 
-adapMonPlotMAIN							= plot	(strGlobalMultiHistogram == 'Mfi' and showadapMonGroup ? adapMonIfVAL : na,						color = adapMonIfCOLOR100)
-adapMonPlotMID							= plot	(strGlobalMultiHistogram == 'Mfi' and showadapMonGroup and adapMonVarADJ ? adapMonVarNeutral : adapMonArrNE_NEW, color = adapMonIfCOLOR100)
+adapMonPlotMAIN							= plot	(strGlobalMultiHistogram == 'Mfi' and display_adapMon_MFI ? ifAdapMonDesvStd : na,					color = adapMonIfCOLOR100)
+adapMonPlotMID							= plot	(strGlobalMultiHistogram == 'Mfi' and display_adapMon_MFI and showadapMonVarADJ ? adapMonVarNeutral : adapMonArrNE_NEW, color = adapMonIfCOLOR100)
+
+// adapMonPlotStDev						= plot	(strGlobalMultiHistogram == 'Mfi' and display_adapMon_MFI ? adapMonFuncST : na,					color = adapMonIfCOLOR100)
 
 /// ─── fill areas de tendencia
 fill									(adapMonPlotMID, adapMonPlotMAIN,																		color = adapMonIfCOLOR100, title = 'Area de Tendencia')
-fill									(adapMonPlotMID, adapMonPlotMAIN, adapMonIfVAL, adapMonVarADJ ? 50 : adapMonArrNE_NEW,					color.new(chart.bg_color, 1000), adapMonVarOSC > adapMonArrNE_NEW ? adapMonColorLong : adapMonColorShort)
+fill									(adapMonPlotMID, adapMonPlotMAIN, ifAdapMonDesvStd, showadapMonVarADJ ? 50 : adapMonArrNE_NEW,					color.new(chart.bg_color, 1000), adapMonVarOSC > adapMonArrNE_NEW ? adapMonColorLong : adapMonColorShort)
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1464,9 +1498,11 @@ fill									(adapMonPlotMID, adapMonPlotMAIN, adapMonIfVAL, adapMonVarADJ ? 50 
 co_DmiAdx_Buy							= _co_gbl_buy
 co_DmiAdx_Sell							= _co_gbl_sell
 
-showDmiAdx_AdxHisto						= input(defval = true,				title = 'Mostrar ADX Histograma')
-showDmiAdx_AdxSigCross					= input(defval = true,				title = 'Mostrar Signal Cross')
-iDmiAdx_length							= input(defval = 14,				title = 'Longitud ADX DI')
+/// Title Indicator ――――――――――――――――――――
+dmiAdx_GroupInput						= 'ADX HISTOGRAM'
+
+showDmiAdx_AdxSigCross					= input(defval = true,			title = 'Mostrar Signal Cross',		group = dmiAdx_GroupInput)
+iDmiAdx_length							= input(defval = 14,			title = 'Longitud ADX DI',			group = dmiAdx_GroupInput)
 
 
 /// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
@@ -1506,12 +1542,12 @@ co_DmiAdx_If_Bg							=
 /// ＰＬＯＴ ―――――――――――――――――――――――――――
 
 
-plot(strGlobalMultiHistogram == 'Adx' and showDmiAdx_AdxHisto ? iDmiAdx_DIFF : na,
+plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto ? iDmiAdx_DIFF : na,
 		  title							= 'Histograma DI',
 		  style							= plot.style_columns,
 		  color							= co_DmiAdx_If_Diff)
 
-// bgcolor(strGlobalMultiHistogram == 'Adx' and showDmiAdx_AdxHisto and showDmiAdx_AdxSigCross and 
+// bgcolor(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto and showDmiAdx_AdxSigCross and 
 // 		  ta.crossover(iDmiAdx_DIFF, 0)		or
 // 		  ta.crossunder(iDmiAdx_DIFF, 0)	?
 // 		  color.new(co_DmiAdx_If_Bg, 90)	: na)
@@ -1538,8 +1574,9 @@ plot(strGlobalMultiHistogram == 'Adx' and showDmiAdx_AdxHisto ? iDmiAdx_DIFF : n
 
 // /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
+// /// Title Indicator ――――――――――――――――――――
+// AdxDiHiGroupVars						= 'ADX HISTOGRAM two'
 
-// AdxDiHiGroupVars						= 'Adx Setting'
 // adxDiHi_Length							= input.int(defval = 14,		title = 'Longitud Adx',			group = AdxDiHiGroupVars)
 // adxDiHi_Th								= input.int(defval = 25,		title = 'Umbral',				group = AdxDiHiGroupVars)
 
@@ -1586,6 +1623,7 @@ plot(strGlobalMultiHistogram == 'Adx' and showDmiAdx_AdxHisto ? iDmiAdx_DIFF : n
 
 /// ╔═══════════════════════════════╗
 /// ║	Tsi & Divergences			║
+/// ║	Tsi Multi Speed				║
 /// ║	@	Allen.					║
 /// ╚═══════════════════════════════╝
 
@@ -1608,6 +1646,16 @@ co_xTsiMuTSIMainLong					= _co_gbl_buy
 co_xTsiMuTSIMainShort					= _co_gbl_sell
 
 co_xTsiMuText							= color.new(_co_gbl_txt_dark,		0)
+
+/// Title Indicator ――――――――――――――――――――
+xTsiMu_GroupInput						= 'xTSI Ultra'
+strxTsiMuTSIOptSlowTool					= 'Tsi Slow, gráfico principal'
+strxTsiMuTSIOptFastTool					= 'Tsi Fast'
+
+showxTsiMuTSISlow						= input.bool	(defval = true,			title = 'Mostrar Tsi',				group = xTsiMu_GroupInput,		tooltip = strxTsiMuTSIOptSlowTool)
+showxTsiMuTSIFast						= input.bool	(defval = true,			title = 'Mostrar Tsi Fast',			group = xTsiMu_GroupInput,		tooltip = strxTsiMuTSIOptFastTool)
+showxTsiMuTSIDiverg						= input.bool	(defval = true,			title = 'Divergencias',				group = xTsiMu_GroupInput)
+
 
 
 /// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
@@ -1645,19 +1693,19 @@ insxTsiMuPlotColor						= ixTsiMuCalcTsiSlow	> ixTsiMuCalcEmaSlow	? co_xTsiMuTSI
 
 
 /// plot sobrecompra/sobreventa
-insxTsiMuTsiPlotUpLine					= plot(showxTsiMuTSIDisplay ? 110 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	60,	100,	color.new(_co_gbl_black, 70),	color.new(_co_gbl_sell, 10)),						linewidth = 6)
-insxTsiMuTsiPlotDnLine					= plot(showxTsiMuTSIDisplay ? -10 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	0,	40,		color.new(_co_gbl_buy, 10),		color.new(_co_gbl_black, 70)),						linewidth = 6)
+insxTsiMuTsiPlotUpLine					= plot(display_xTsiMu_TSI ? 110 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	60,	100,	color.new(_co_gbl_black, 70),	color.new(_co_gbl_sell, 10)),						linewidth = 6)
+insxTsiMuTsiPlotDnLine					= plot(display_xTsiMu_TSI ? -10 : na,		color = color.from_gradient(ixTsiMuCalcTsiSlow,	0,	40,		color.new(_co_gbl_buy, 10),		color.new(_co_gbl_black, 70)),						linewidth = 6)
 
 /// plot principal TSI
 /// plot TSI fast
-insxTsiMuTsiPlotFast					= plot(showxTsiMuTSIDisplay and showxTsiMuTSIFast ? ixTsiMuCalcTsiFast	: na,		color = color.new(insxTsiMuPlotColorFast, 50),		linewidth = 2)		//	plot TsiSI
-insxTsiMuEmaPlotFast					= plot(showxTsiMuTSIDisplay and showxTsiMuTSIFast ? ixTsiMuCalcEmaFast	: na,		color = color.new(insxTsiMuPlotColorFast, 50),		linewidth = 1)		//	plot EMA
+insxTsiMuTsiPlotFast					= plot(display_xTsiMu_TSI and showxTsiMuTSIFast ? ixTsiMuCalcTsiFast	: na,		color = color.new(insxTsiMuPlotColorFast, 50),		linewidth = 2)		//	plot TsiSI
+insxTsiMuEmaPlotFast					= plot(display_xTsiMu_TSI and showxTsiMuTSIFast ? ixTsiMuCalcEmaFast	: na,		color = color.new(insxTsiMuPlotColorFast, 50),		linewidth = 1)		//	plot EMA
 /// fill fast
 fill(insxTsiMuTsiPlotFast, insxTsiMuEmaPlotFast,							color = showxTsiMuTSIFast ? color.new(insxTsiMuPlotColorFast, 85) : na)	//	fill
 
 /// plot TSI slow
-insxTsiMuTsiPlotLine					= plot(showxTsiMuTSIDisplay and showxTsiMuTSISlow ? ixTsiMuCalcTsiSlow	: na,		color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot TsiSI
-insxTsiMuEmaPlotLine					= plot(showxTsiMuTSIDisplay and showxTsiMuTSISlow ? ixTsiMuCalcEmaSlow	: na,		color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot EMA
+insxTsiMuTsiPlotLine					= plot(display_xTsiMu_TSI and showxTsiMuTSISlow ? ixTsiMuCalcTsiSlow	: na,		color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot TsiSI
+insxTsiMuEmaPlotLine					= plot(display_xTsiMu_TSI and showxTsiMuTSISlow ? ixTsiMuCalcEmaSlow	: na,		color = color.new(insxTsiMuPlotColor, 20),			linewidth = 2)		//	plot EMA
 
 /// fill principal
 fill(insxTsiMuTsiPlotLine, insxTsiMuEmaPlotLine,							color = showxTsiMuTSISlow ? color.new(insxTsiMuPlotColor, 60) : na)		//	fill
@@ -1692,7 +1740,7 @@ tsiDiInsOSCHL							= vxTsiMu_speed_back				> ta.valuewhen(insxTsiMuPLFound, vxT
 tsiDiInsPRICELL							= low[vxTsiMuLBR]					< ta.valuewhen(insxTsiMuPLFound, low[vxTsiMuLBR], 1)
 tsiDiInsBULLCond						= showxTsiMuTSIDiverg				and tsiDiInsPRICELL	and tsiDiInsOSCHL	and insxTsiMuPLFound
 
-plotshape(showxTsiMuTSIDisplay			and	tsiDiInsBULLCond				? vxTsiMu_speed_back : na,
+plotshape(display_xTsiMu_TSI			and	tsiDiInsBULLCond				? vxTsiMu_speed_back : na,
 			  offset					= -vxTsiMuLBR,
 			  title						= 'Etiqueta de Compra',
 			  text						= ' Buy ',
@@ -1712,7 +1760,7 @@ tsiDiInsOSCLL							= vxTsiMu_speed_back				< ta.valuewhen(insxTsiMuPLFound, vxT
 tsiDiInsPRICEHL							= low[vxTsiMuLBR]					> ta.valuewhen(insxTsiMuPLFound, low[vxTsiMuLBR], 1)
 tsiDiInsHiddenBullCond					= showxTsiMuTSIDiverg				and tsiDiInsPRICEHL	and tsiDiInsOSCLL	and insxTsiMuPLFound
 
-plotshape(showxTsiMuTSIDisplay			and tsiDiInsHiddenBullCond			? vxTsiMu_speed_back : na,
+plotshape(display_xTsiMu_TSI			and tsiDiInsHiddenBullCond			? vxTsiMu_speed_back : na,
 			  offset					= -vxTsiMuLBR,
 			  title						= 'Compra trend',
 			  text						= ' ▲ % ',
@@ -1733,7 +1781,7 @@ tsiDiInsOSCLH							= vxTsiMu_speed_back				< ta.valuewhen(insxTsiMuPHFound, vxT
 tsiDiInsPRICEHH							= high[vxTsiMuLBR]					> ta.valuewhen(insxTsiMuPHFound, high[vxTsiMuLBR], 1)
 tsiDiInsBEARCond						= showxTsiMuTSIDiverg				and tsiDiInsPRICEHH	and tsiDiInsOSCLH	and insxTsiMuPHFound
 
-plotshape(showxTsiMuTSIDisplay			and tsiDiInsBEARCond				? vxTsiMu_speed_back : na,
+plotshape(display_xTsiMu_TSI			and tsiDiInsBEARCond				? vxTsiMu_speed_back : na,
 			  offset					= -vxTsiMuLBR,
 			  title						= 'Etiqueta de Venta',
 			  text						= ' Sell ',
@@ -1753,7 +1801,7 @@ tsiDiInsOSCHH							= vxTsiMu_speed_back				> ta.valuewhen(insxTsiMuPHFound, vxT
 tsiDiInsPRICELH							= high[vxTsiMuLBR]					< ta.valuewhen(insxTsiMuPHFound, high[vxTsiMuLBR], 1)
 tsiDiInsHiddenBearCond					= showxTsiMuTSIDiverg				and tsiDiInsPRICELH	and tsiDiInsOSCHH	and insxTsiMuPHFound
 
-plotshape(showxTsiMuTSIDisplay			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_back : na,
+plotshape(display_xTsiMu_TSI			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_back : na,
 			  offset					= -vxTsiMuLBR,
 			  title						= 'Venta trend',
 			  text						= ' ▼ % ',
@@ -1771,6 +1819,8 @@ plotshape(showxTsiMuTSIDisplay			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_ba
 
 /// ╔═══════════════════════════════╗
 /// ║	Panel TSI Multi Timeframe	║
+/// ║	Panel TSI Multi Speed		║
+/// ║	Panel Multi Indicator		║
 /// ║	@	Allen.					║
 /// ╚═══════════════════════════════╝
 
@@ -1790,9 +1840,11 @@ colorTsiObsPnl_TextDark					= _co_gbl_txt_dark
 colorTsiObsPnl_TextLight				= _co_gbl_txt_light
 colorTsiObsPnl_TiPnBg					= _co_gbl_yellow
 
+tsiObsPnlGroupTimeframes				=				'xTSI PANEL'
+/// Title Indicator ――――――――――――――――――――
+
 /// ─── Inputs
-tsiObsPnlGroupTimeframes				=				'Timeframe Panel'
-showTsiObsPnlTimeframesPanel			= input.bool	(true,				title = 'Panel TSI',			group = tsiObsPnlGroupTimeframes,		inline = 'show p')
+
 showTsiObsPnlPanelExt					= input.bool	(true,				title = 'Ampliado',				group = tsiObsPnlGroupTimeframes,		inline = 'show p')
 showTsiObsPnlTF15m						= input.bool	(true,				title = '15m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
 showTsiObsPnlTF30m						= input.bool	(false,				title = '30m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
@@ -1802,18 +1854,25 @@ showTsiObsPnlTF3h						= input.bool	(false,				title = '3 H  ',				group = tsi
 showTsiObsPnlTF4h						= input.bool	(false,				title = '4 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
 showTsiObsPnlTF1d						= input.bool	(false,				title = '1 D  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
 
-tsiObsPnlGroupSignal					=				'Signal Panel'
-showTsiObsPnlSignalPanel				= input.bool	(true,				title = 'Panel TSI Signal',		group = tsiObsPnlGroupSignal)
-showTsiObsPnlSignalTsi					= input.bool	(true,				title = 'Tsi ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
-showTsiObsPnlSignalMtf					= input.bool	(true,				title = 'Mtf ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
-showTsiObsPnlSignalRsi					= input.bool	(false,				title = 'Rsi ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
-showTsiObsPnlSignalMfi					= input.bool	(true,				title = 'Mfi ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
-showTsiObsPnlSignalAdx					= input.bool	(true,				title = 'Adx ',					group = tsiObsPnlGroupSignal,			inline = 'signal')
+/// Title Indicator ――――――――――――――――――――
+tsiObsPnlGroupIndicat					=				'PANEL MULTI INDiCATOR'
+
+showTsiObsPnlIndicatDelta				= input.bool	(true,				title = 'Delta',				group = tsiObsPnlGroupIndicat,			inline = 'signal')
+showTsiObsPnlIndicatTsi					= input.bool	(true,				title = 'Tsi ',					group = tsiObsPnlGroupIndicat,			inline = 'signal')
+showTsiObsPnlIndicatMtf					= input.bool	(true,				title = 'Mtf ',					group = tsiObsPnlGroupIndicat,			inline = 'signal')
+showTsiObsPnlIndicatRsi					= input.bool	(false,				title = 'Rsi ',					group = tsiObsPnlGroupIndicat,			inline = 'signal')
+showTsiObsPnlIndicatMfi					= input.bool	(true,				title = 'Mfi ',					group = tsiObsPnlGroupIndicat,			inline = 'signal')
+showTsiObsPnlIndicatAdx					= input.bool	(true,				title = 'Adx ',					group = tsiObsPnlGroupIndicat,			inline = 'signal')
 
 tsiObsPnl_PosiVert						= input.string	(defval = 'Abajo',	title = ' Y: ',					group = tsiObsPnlGroupTimeframes,		inline = 'ubic',
 		  options						=				['Arriba', 'Medio','Abajo'])
 tsiObsPnl_PosiHoriz						= input.string	(defval = 'Centro',	title = ' X: ',					group = tsiObsPnlGroupTimeframes,		inline = 'ubic',
 		  options						=				['Izquierda', 'Centro','Derecha'])
+
+tsiObsPnl_LocatMlIndVert				= input.string	(defval = 'Medio',	title = ' Y: ',					group = tsiObsPnlGroupIndicat,			inline = 'ubic signal',
+		  options						=				['Arriba', 'Medio','Abajo'])
+tsiObsPnl_LocatMlIndHoriz				= input.string	(defval = 'Derecha',title = ' X: ',					group = tsiObsPnlGroupIndicat,			inline = 'ubic signal',
+		  options						=				['Izquierda', 'Derecha'])
 
 stTsiObsPnl_TextSize					= input.string	(defval = 'normal',	title = 'Tamaño de texto',
 		  options						= ['auto','tiny','small','normal','large','huge'])
@@ -1827,13 +1886,15 @@ vTsiObsPnl_RsiLength					= 14
 /// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
 
 // tsiObsPnl_TSI							= _x * ta.tsi(gbl_Source_C, _short, _long) + _plus
-tsiObsPnlRSI							= ta.rsi(gbl_Source_C, vTsiObsPnl_RsiLength)
+tsiObsPnl_RSI							= ta.rsi(gbl_Source_C, vTsiObsPnl_RsiLength)
 
-tsiObsPnl_TSI							= ixTsiMuCalcTsiSlow
+tsiObsPnlDELTA							= vVidya_delta_volume
+
+tsiObsPnl_TSI							= ixTsiMuCalcTsiSlow			// SpeedOptions		= Fast/Slow
 tsiObsPnlMTFRange						= FunGlobalCalculateTimeframeIf(timeframe.period)
-// tsiObsPnlEma							= iTsiMuDiCalculateMultiTfEMA
-// tsiObsPnlMFI							= adapMonIfVAL
-// tsiObsPnlADX							= xAdxDiHi_Didi
+tsiObsPnl_Ema							= ixTsiMuCalcEmaSlow			// SpeedOptions		= Fast/Slow
+tsiObsPnl_MFI							= ifAdapMonDesvStd
+tsiObsPnl_ADX							= iDmiAdx_DIFF
 
 /// ─── TSI invoke multitimeframe
 fTsiObsPnlExtNow						= FunGlobalCalculateTimeframeIf(timeframe.period)
@@ -1846,7 +1907,7 @@ fTsiObsPnlExt4h							= FunGlobalCalculateTimeframeIf('240')
 fTsiObsPnlExt1d							= '1D'
 
 /// instance function global timeframe
-iTsiObsPnlCalcSignal					= timeframe.period
+iTsiObsPnlTFGbl					= timeframe.period
 
 /// ─── TSI timeframes
 vTsiObsPnlTF15m							= request.security(syminfo.tickerid,		'15',		tsiObsPnl_TSI)
@@ -1858,14 +1919,22 @@ vTsiObsPnlTF4h							= request.security(syminfo.tickerid,		'240',		tsiObsPnl_TSI
 vTsiObsPnlTF1d							= request.security(syminfo.tickerid,		'D',		tsiObsPnl_TSI)
 
 /// ─── TSI timeframes extend
-[vTsiObsPnlTFExtMtfW,		vTsiObsPnlTFExtMtfW_2,			vTsiObsPnlTFExtMtfW_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExtNow,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-[vTsiObsPnlTFExtMtf15m,		vTsiObsPnlTFExtMtf15m_2,		vTsiObsPnlTFExtMtf15m_3]						= request.security(syminfo.tickerid,	fTsiObsPnlExt15m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-[vTsiObsPnlTFExtMtf30m,		vTsiObsPnlTFExtMtf30m_2,		vTsiObsPnlTFExtMtf30m_3]						= request.security(syminfo.tickerid,	fTsiObsPnlExt30m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-[vTsiObsPnlTFExtMtf1h,		vTsiObsPnlTFExtMtf1h_2,			vTsiObsPnlTFExtMtf1h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt1h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-[vTsiObsPnlTFExtMtf2h,		vTsiObsPnlTFExtMtf2h_2,			vTsiObsPnlTFExtMtf2h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt2h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-[vTsiObsPnlTFExtMtf3h,		vTsiObsPnlTFExtMtf3h_2,			vTsiObsPnlTFExtMtf3h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt3h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-[vTsiObsPnlTFExtMtf4h,		vTsiObsPnlTFExtMtf4h_2,			vTsiObsPnlTFExtMtf4h_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt4h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
-[vTsiObsPnlTFExtMtf1d,		vTsiObsPnlTFExtMtf1d_2,			vTsiObsPnlTFExtMtf1d_3]							= request.security(syminfo.tickerid,	fTsiObsPnlExt1d,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtfW,		vTsiObsPnlTFExtMtfW_2,			vTsiObsPnlTFExtMtfW_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExtNow,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf15m,		vTsiObsPnlTFExtMtf15m_2,		vTsiObsPnlTFExtMtf15m_3]			= request.security(syminfo.tickerid,	fTsiObsPnlExt15m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf30m,		vTsiObsPnlTFExtMtf30m_2,		vTsiObsPnlTFExtMtf30m_3]			= request.security(syminfo.tickerid,	fTsiObsPnlExt30m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf1h,		vTsiObsPnlTFExtMtf1h_2,			vTsiObsPnlTFExtMtf1h_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt1h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf2h,		vTsiObsPnlTFExtMtf2h_2,			vTsiObsPnlTFExtMtf2h_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt2h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf3h,		vTsiObsPnlTFExtMtf3h_2,			vTsiObsPnlTFExtMtf3h_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt3h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf4h,		vTsiObsPnlTFExtMtf4h_2,			vTsiObsPnlTFExtMtf4h_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt4h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf1d,		vTsiObsPnlTFExtMtf1d_2,			vTsiObsPnlTFExtMtf1d_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt1d,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+
+/// ─── TSI timeframes signal
+[vTsiObsPnlMultiInTsi,	vTsiObsPnlMultiInTsi_2,	vTsiObsPnlMultiInTsi_3,	vTsiObsPnlMultiInTsi_4]	= request.security(syminfo.tickerid,	iTsiObsPnlTFGbl,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2],	tsiObsPnl_TSI[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlMultiInEma,	vTsiObsPnlMultiInEma_2,	vTsiObsPnlMultiInEma_3,	vTsiObsPnlMultiInEma_4]	= request.security(syminfo.tickerid,	iTsiObsPnlTFGbl,	[tsiObsPnl_Ema,	tsiObsPnl_Ema[1],	tsiObsPnl_Ema[2],	tsiObsPnl_Ema[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlMultiInMtf,	vTsiObsPnlMultiInMtf_2,	vTsiObsPnlMultiInMtf_3,	vTsiObsPnlMultiInMtf_4]	= request.security(syminfo.tickerid,	tsiObsPnlMTFRange,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2],	tsiObsPnl_TSI[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlMultiInRsi,	vTsiObsPnlMultiInRsi_2,	vTsiObsPnlMultiInRsi_3,	vTsiObsPnlMultiInRsi_4]	= request.security(syminfo.tickerid,	iTsiObsPnlTFGbl,	[tsiObsPnl_RSI,	tsiObsPnl_RSI[1],	tsiObsPnl_RSI[2],	tsiObsPnl_RSI[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlMultiInMfi,	vTsiObsPnlMultiInMfi_2,	vTsiObsPnlMultiInMfi_3,	vTsiObsPnlMultiInMfi_4]	= request.security(syminfo.tickerid,	iTsiObsPnlTFGbl,	[tsiObsPnl_MFI,	tsiObsPnl_MFI[1],	tsiObsPnl_MFI[2],	tsiObsPnl_MFI[3]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlMultiInAdx,	vTsiObsPnlMultiInAdx_2,	vTsiObsPnlMultiInAdx_3,	vTsiObsPnlMultiInAdx_4]	= request.security(syminfo.tickerid,	iTsiObsPnlTFGbl,	[tsiObsPnl_ADX,	tsiObsPnl_ADX[1],	tsiObsPnl_ADX[2],	tsiObsPnl_ADX[3]],	lookahead = barmerge.lookahead_on)
 
 
 /// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
@@ -1879,6 +1948,14 @@ var vTsiPnlNewTable						= table.new(
 	  border_width						= 2,
 	  frame_color						= color.new(colorTsiObsPnl_Black, 15),
 	  force_overlay						= true)
+
+/// ─── New table indicators
+var vTsiPnlNewTableMtlIndicat			= table.new(
+		  position						= FunGlobalVertical(tsiObsPnl_LocatMlIndVert) + '_' + FunGlobalHorizontal(tsiObsPnl_LocatMlIndHoriz),
+		  columns						= 1,
+		  rows							= 6,
+		  border_width					= 2,
+		  frame_color					= color.new(colorTsiObsPnl_Black, 15))
 
 /// ─── Function table name
 FunTsiObsPnlCalculateCellName(_col, _row, _text) =>
@@ -1917,11 +1994,11 @@ FunTsiObsPnlCalculateCellValue(_col, _row, _value) =>
 		  text_color					= colorTsiObsPnl_TextDark,
 		  width							= 5)
 
-/// ─── Function table cells
-FunTsiObsPnlCalculateCellExtend(_col, _row, _var, _var2, _var3) =>
+/// ─── Function table cells Signal
+FunTsiObsPnlCalculateCellSgn(_col, _row, _var, _var2, _var3) =>
 	/// ─── signal buy/sell
-	_max								= 100
-	_min								= 0
+	_max								= 120
+	_min								= -20
 	_if_buy								= _var	> _var2	and _var	> _var3	and	_var < _min
 	_if_sell							= _var	< _var2	and _var	< _var3	and	_var > _max
 	_trend_buy							= _var	> _var2	and _var	> _var3
@@ -1945,63 +2022,118 @@ FunTsiObsPnlCalculateCellExtend(_col, _row, _var, _var2, _var3) =>
 		  text_color					= colorTsiObsPnl_TextDark,
 		  width							= 4)
 
+/// ─── Function table multi indicador
+FunTsiObsPnlCalcMultiIndic(_col, _row, _title, _var, _var2, _var3, _var4, _min, _max) =>
+	/// ─── signal buy/sell
+	_if_buy								= _var		> _var3		and _var2		> _var4		and	_var > vTsiObsPnlMultiInEma	and	_var < _min
+	_if_sell							= _var		< _var3		and _var2		< _var4		and _var < vTsiObsPnlMultiInEma	and	_var > _max
+	_if_condition						= _if_sell	?	' 🔴 ⬊ '	:	_if_buy	?	' 🟢 ⬈ '	:	'  '
+
+	_div								= 6
+	_fract_max							= math.round(_max - (_max / _div))
+	_fract_min							= math.ceil(_min + (_max / _div))
+
+	_cell_color							= _var >= _max ? colorTsiObsPnl_Sell : _var <= _min ? colorTsiObsPnl_Buy : colorTsiObsPnl_Neutral
+	_signal_opacity						= _var >= _max or _var <= _min ? 30 : _var >= _fract_max or _var <= _fract_min ? 40 : 65
+	_cell_text							= _title + '\n' + str.tostring(_var, '#.00') + '\n' + _if_condition
+
+	/// ─── table
+	table.cell							(vTsiPnlNewTableMtlIndicat, _col, _row, _cell_text,
+		  bgcolor						= color.new(_cell_color, _signal_opacity),
+		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= colorTsiObsPnl_TextDark,
+		  width							= 4)
+
+/// ─── Function cell delta
+FunTsiObsPnlCalcDelta(_col, _row, _text, _value) =>
+	_cell_text							= _text + '\n' + _value
+
+	table.cell							(vTsiPnlNewTableMtlIndicat, _col, _row, _cell_text,
+		  bgcolor						= color.new(colorTsiObsPnl_TiPnBg, 10),
+  		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= color.new(colorTsiObsPnl_TextDark, 10)
+		  )
+		//   width							= 3)
 
 
 /// ＰＬＯＴ ―――――――――――――――――――――――――――
 
 
 /// ─── Table TSI
-if showTsiObsPnlTimeframesPanel
-	FunTsiObsPnlCalculateCellName				(0,	0,		'  ')
-	FunTsiObsPnlCalculateCellName				(0,	1,		'Tsi')
+if display_TsiObsPnlTimeFrPanel
+	FunTsiObsPnlCalculateCellName			(0,	0,		'  ')
+	FunTsiObsPnlCalculateCellName			(0,	1,		'Tsi')
 	if showTsiObsPnlPanelExt
-		FunTsiObsPnlCalculateCellName			(0,	2,		'Plus')
+		FunTsiObsPnlCalculateCellName		(0,	2,		'Plus')
 
-	FunTsiObsPnlCalculateCellTime				(1,	0,		'Ahora')
-	FunTsiObsPnlCalculateCellValue				(1,	1,		tsiObsPnl_TSI)
+	FunTsiObsPnlCalculateCellTime			(1,	0,		'Ahora')
+	FunTsiObsPnlCalculateCellValue			(1,	1,		tsiObsPnl_TSI)
 	if showTsiObsPnlPanelExt
-		FunTsiObsPnlCalculateCellExtend			(1,	2,		vTsiObsPnlTFExtMtfW,	vTsiObsPnlTFExtMtfW_2,		vTsiObsPnlTFExtMtfW_3)
+		FunTsiObsPnlCalculateCellSgn		(1,	2,		vTsiObsPnlTFExtMtfW,	vTsiObsPnlTFExtMtfW_2,		vTsiObsPnlTFExtMtfW_3)
 
 	if showTsiObsPnlTF15m
-		FunTsiObsPnlCalculateCellTime			(3,	0,		'15 m')
-		FunTsiObsPnlCalculateCellValue			(3,	1,		vTsiObsPnlTF15m)
+		FunTsiObsPnlCalculateCellTime		(3,	0,		'15 m')
+		FunTsiObsPnlCalculateCellValue		(3,	1,		vTsiObsPnlTF15m)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellExtend		(3,	2,		vTsiObsPnlTFExtMtf15m,	vTsiObsPnlTFExtMtf15m_2,	vTsiObsPnlTFExtMtf15m_3)
+			FunTsiObsPnlCalculateCellSgn	(3,	2,		vTsiObsPnlTFExtMtf15m,	vTsiObsPnlTFExtMtf15m_2,	vTsiObsPnlTFExtMtf15m_3)
 
 	if showTsiObsPnlTF30m
-		FunTsiObsPnlCalculateCellTime			(4,	0,		'30 m')
-		FunTsiObsPnlCalculateCellValue			(4,	1,		vTsiObsPnlTF30m)
+		FunTsiObsPnlCalculateCellTime		(4,	0,		'30 m')
+		FunTsiObsPnlCalculateCellValue		(4,	1,		vTsiObsPnlTF30m)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellExtend		(4,	2,		vTsiObsPnlTFExtMtf30m,	vTsiObsPnlTFExtMtf30m_2,	vTsiObsPnlTFExtMtf30m_3)
+			FunTsiObsPnlCalculateCellSgn	(4,	2,		vTsiObsPnlTFExtMtf30m,	vTsiObsPnlTFExtMtf30m_2,	vTsiObsPnlTFExtMtf30m_3)
 
 	if showTsiObsPnlTF1h
-		FunTsiObsPnlCalculateCellTime			(5,	0,		'1 H')
-		FunTsiObsPnlCalculateCellValue			(5,	1,		vTsiObsPnlTF1h)
+		FunTsiObsPnlCalculateCellTime		(5,	0,		'1 H')
+		FunTsiObsPnlCalculateCellValue		(5,	1,		vTsiObsPnlTF1h)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellExtend		(5,	2,		vTsiObsPnlTFExtMtf1h,	vTsiObsPnlTFExtMtf1h_2,		vTsiObsPnlTFExtMtf1h_3)
+			FunTsiObsPnlCalculateCellSgn	(5,	2,		vTsiObsPnlTFExtMtf1h,	vTsiObsPnlTFExtMtf1h_2,		vTsiObsPnlTFExtMtf1h_3)
 
 	if showTsiObsPnlTF2h
-		FunTsiObsPnlCalculateCellTime			(6,	0,		'2 H')
-		FunTsiObsPnlCalculateCellValue			(6,	1,		vTsiObsPnlTF2h)
+		FunTsiObsPnlCalculateCellTime		(6,	0,		'2 H')
+		FunTsiObsPnlCalculateCellValue		(6,	1,		vTsiObsPnlTF2h)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellExtend		(6,	2,		vTsiObsPnlTFExtMtf2h,	vTsiObsPnlTFExtMtf2h_2,		vTsiObsPnlTFExtMtf2h_3)
+			FunTsiObsPnlCalculateCellSgn	(6,	2,		vTsiObsPnlTFExtMtf2h,	vTsiObsPnlTFExtMtf2h_2,		vTsiObsPnlTFExtMtf2h_3)
 
 	if showTsiObsPnlTF3h
-		FunTsiObsPnlCalculateCellTime			(7,	0,		'3 H')
-		FunTsiObsPnlCalculateCellValue			(7,	1,		vTsiObsPnlTF3h)
+		FunTsiObsPnlCalculateCellTime		(7,	0,		'3 H')
+		FunTsiObsPnlCalculateCellValue		(7,	1,		vTsiObsPnlTF3h)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellExtend		(7,	2,		vTsiObsPnlTFExtMtf3h,	vTsiObsPnlTFExtMtf3h_2,		vTsiObsPnlTFExtMtf3h_3)
+			FunTsiObsPnlCalculateCellSgn	(7,	2,		vTsiObsPnlTFExtMtf3h,	vTsiObsPnlTFExtMtf3h_2,		vTsiObsPnlTFExtMtf3h_3)
 
 	if showTsiObsPnlTF4h
-		FunTsiObsPnlCalculateCellTime			(8,	0,		'4 H')
-		FunTsiObsPnlCalculateCellValue			(8,	1,		vTsiObsPnlTF4h)
+		FunTsiObsPnlCalculateCellTime		(8,	0,		'4 H')
+		FunTsiObsPnlCalculateCellValue		(8,	1,		vTsiObsPnlTF4h)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellExtend		(8,	2,		vTsiObsPnlTFExtMtf4h,	vTsiObsPnlTFExtMtf4h_2,		vTsiObsPnlTFExtMtf4h_3)
+			FunTsiObsPnlCalculateCellSgn	(8,	2,		vTsiObsPnlTFExtMtf4h,	vTsiObsPnlTFExtMtf4h_2,		vTsiObsPnlTFExtMtf4h_3)
 
 	if showTsiObsPnlTF1d
-		FunTsiObsPnlCalculateCellTime			(9,	0,		'1 D')
-		FunTsiObsPnlCalculateCellValue			(9,	1,		vTsiObsPnlTF1d)
+		FunTsiObsPnlCalculateCellTime		(9,	0,		'1 D')
+		FunTsiObsPnlCalculateCellValue		(9,	1,		vTsiObsPnlTF1d)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellExtend		(9,	2,		vTsiObsPnlTFExtMtf1d,	vTsiObsPnlTFExtMtf1d_2,		vTsiObsPnlTFExtMtf1d_3)
+			FunTsiObsPnlCalculateCellSgn	(9,	2,		vTsiObsPnlTFExtMtf1d,	vTsiObsPnlTFExtMtf1d_2,		vTsiObsPnlTFExtMtf1d_3)
+
+
+/// ─── Table Signal
+if display_TsiObsPnlIndicatPanel
+	if showTsiObsPnlIndicatDelta
+		FunTsiObsPnlCalcDelta		(0,	0,	'Delta', tsiObsPnlDELTA)
+
+	if showTsiObsPnlIndicatTsi
+		FunTsiObsPnlCalcMultiIndic	(0,	1,	'Tsi',	vTsiObsPnlMultiInTsi,	vTsiObsPnlMultiInTsi_2,	vTsiObsPnlMultiInTsi_3,	vTsiObsPnlMultiInTsi_4,	0,	100)
+
+	if showTsiObsPnlIndicatMtf
+		FunTsiObsPnlCalcMultiIndic	(0,	2,	'Mtf',	vTsiObsPnlMultiInMtf,	vTsiObsPnlMultiInMtf_2,	vTsiObsPnlMultiInMtf_3,	vTsiObsPnlMultiInMtf_4,	20,	80)
+
+	if showTsiObsPnlIndicatRsi
+		FunTsiObsPnlCalcMultiIndic	(0,	3,	'Rsi',	vTsiObsPnlMultiInRsi,	vTsiObsPnlMultiInRsi_2,	vTsiObsPnlMultiInRsi_3,	vTsiObsPnlMultiInRsi_4,	30,	70)
+
+	if showTsiObsPnlIndicatMfi
+		FunTsiObsPnlCalcMultiIndic	(0, 4,	'Mfi',	vTsiObsPnlMultiInMfi,	vTsiObsPnlMultiInMfi_2,	vTsiObsPnlMultiInMfi_3,	vTsiObsPnlMultiInMfi_4,	0, 100)
+
+	if showTsiObsPnlIndicatAdx
+		FunTsiObsPnlCalcMultiIndic	(0,	5,	'Adx',	vTsiObsPnlMultiInAdx,	vTsiObsPnlMultiInAdx_2,	vTsiObsPnlMultiInAdx_3,	vTsiObsPnlMultiInAdx_4,	-6,	6)	// base zero
+		// FunTsiObsPnlCalcMultiIndic	(0,	5,	'Adx',	vTsiObsPnlMultiInAdx,	vTsiObsPnlMultiInAdx_2,	vTsiObsPnlMultiInAdx_3,	vTsiObsPnlMultiInAdx_4,	10,	40) // base 25
+
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■

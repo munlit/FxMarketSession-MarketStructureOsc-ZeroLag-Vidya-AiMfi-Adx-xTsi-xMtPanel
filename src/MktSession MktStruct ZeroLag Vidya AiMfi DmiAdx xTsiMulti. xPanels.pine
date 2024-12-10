@@ -15,8 +15,6 @@
 /// ╔═══════════════════════════════╗
 /// ║	AI Adaptive Money Flow Index║
 /// ╔═══════════════════════════════╗
-/// ║	Tsi & Divergences			║
-/// ╔═══════════════════════════════╗
 /// ║	Tsi two						║
 /// ╚═══════════════════════════════╝
 
@@ -1849,14 +1847,16 @@ tsiObsPnlGroupTimeframes				=				'xTSI PANEL'
 
 /// ─── Inputs
 
-showTsiObsPnlPanelExt					= input.bool	(true,				title = 'Ampliado',				group = tsiObsPnlGroupTimeframes,		inline = 'show p')
-showTsiObsPnlTF15m						= input.bool	(true,				title = '15m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
-showTsiObsPnlTF30m						= input.bool	(false,				title = '30m  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
-showTsiObsPnlTF1h						= input.bool	(true,				title = '1 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
-showTsiObsPnlTF2h						= input.bool	(true,				title = '2 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
-showTsiObsPnlTF3h						= input.bool	(false,				title = '3 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
-showTsiObsPnlTF4h						= input.bool	(false,				title = '4 H  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
-showTsiObsPnlTF1d						= input.bool	(false,				title = '1 D  ',				group = tsiObsPnlGroupTimeframes,		inline = 'timefr3')
+showTsiObsPnlPanelExt					= input.bool	(true,				title = 'Mostrar Signals',		group = tsiObsPnlGroupTimeframes,		inline = 'showsignals')
+
+showTsiObsPnlTF15m						= input.bool	(true,				title = '15m ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
+showTsiObsPnlTF30m						= input.bool	(false,				title = '30m ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
+showTsiObsPnlTF45m						= input.bool	(false,				title = '45m ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
+showTsiObsPnlTF1h						= input.bool	(true,				title = '1H  ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr')
+showTsiObsPnlTF2h						= input.bool	(true,				title = '2H  ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
+showTsiObsPnlTF3h						= input.bool	(true,				title = '3H  ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
+showTsiObsPnlTF4h						= input.bool	(true,				title = '4H  ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
+showTsiObsPnlTF1d						= input.bool	(false,				title = '1D  ',					group = tsiObsPnlGroupTimeframes,		inline = 'timefr2')
 
 /// Title Indicator ――――――――――――――――――――
 tsiObsPnlGroupIndicat					=				'PANEL MULTI INDiCATOR'
@@ -1904,6 +1904,7 @@ tsiObsPnl_ADX							= iDmiAdx_DIFF
 fTsiObsPnlExtNow						= FunGlobalCalculateTimeframeIf(timeframe.period)
 fTsiObsPnlExt15m						= FunGlobalCalculateTimeframeIf('15')
 fTsiObsPnlExt30m						= FunGlobalCalculateTimeframeIf('30')
+fTsiObsPnlExt45m						= FunGlobalCalculateTimeframeIf('45')
 fTsiObsPnlExt1h							= FunGlobalCalculateTimeframeIf('60')
 fTsiObsPnlExt2h							= FunGlobalCalculateTimeframeIf('120')
 fTsiObsPnlExt3h							= FunGlobalCalculateTimeframeIf('180')
@@ -1916,6 +1917,7 @@ iTsiObsPnlTFGbl					= timeframe.period
 /// ─── TSI timeframes
 vTsiObsPnlTF15m							= request.security(syminfo.tickerid,		'15',		tsiObsPnl_TSI)
 vTsiObsPnlTF30m							= request.security(syminfo.tickerid,		'30',		tsiObsPnl_TSI)
+vTsiObsPnlTF45m							= request.security(syminfo.tickerid,		'45',		tsiObsPnl_TSI)
 vTsiObsPnlTF1h							= request.security(syminfo.tickerid,		'60',		tsiObsPnl_TSI)
 vTsiObsPnlTF2h							= request.security(syminfo.tickerid,		'120',		tsiObsPnl_TSI)
 vTsiObsPnlTF3h							= request.security(syminfo.tickerid,		'180',		tsiObsPnl_TSI)
@@ -1926,6 +1928,7 @@ vTsiObsPnlTF1d							= request.security(syminfo.tickerid,		'D',		tsiObsPnl_TSI)
 [vTsiObsPnlTFExtMtfW,		vTsiObsPnlTFExtMtfW_2,			vTsiObsPnlTFExtMtfW_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExtNow,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf15m,		vTsiObsPnlTFExtMtf15m_2,		vTsiObsPnlTFExtMtf15m_3]			= request.security(syminfo.tickerid,	fTsiObsPnlExt15m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf30m,		vTsiObsPnlTFExtMtf30m_2,		vTsiObsPnlTFExtMtf30m_3]			= request.security(syminfo.tickerid,	fTsiObsPnlExt30m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
+[vTsiObsPnlTFExtMtf45m,		vTsiObsPnlTFExtMtf45m_2,		vTsiObsPnlTFExtMtf45m_3]			= request.security(syminfo.tickerid,	fTsiObsPnlExt45m,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf1h,		vTsiObsPnlTFExtMtf1h_2,			vTsiObsPnlTFExtMtf1h_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt1h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf2h,		vTsiObsPnlTFExtMtf2h_2,			vTsiObsPnlTFExtMtf2h_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt2h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
 [vTsiObsPnlTFExtMtf3h,		vTsiObsPnlTFExtMtf3h_2,			vTsiObsPnlTFExtMtf3h_3]				= request.security(syminfo.tickerid,	fTsiObsPnlExt3h,	[tsiObsPnl_TSI,	tsiObsPnl_TSI[1],	tsiObsPnl_TSI[2]],	lookahead = barmerge.lookahead_on)
@@ -2010,6 +2013,7 @@ FunTsiObsPnlCalculateCellSgn(_col, _row, _var, _var2, _var3) =>
 
 	_if_condition						= _if_sell		?	'🔴'	:	_if_buy		?	'🟢'	:	' '
 	_trend_condition					= _trend_sell	?	'⬊ '	:	_trend_buy	?	'⬈ '	:	' '
+	// _trend_condition					= _trend_sell	?	'⬊ '	:	'⬈ '
 
 	_div								= 6
 	_fract_max							= math.round(_max - (_max / _div))
@@ -2076,16 +2080,22 @@ if display_TsiObsPnlTimeFrPanel
 		FunTsiObsPnlCalculateCellSgn		(1,	2,		vTsiObsPnlTFExtMtfW,	vTsiObsPnlTFExtMtfW_2,		vTsiObsPnlTFExtMtfW_3)
 
 	if showTsiObsPnlTF15m
-		FunTsiObsPnlCalculateCellTime		(3,	0,		'15 m')
-		FunTsiObsPnlCalculateCellValue		(3,	1,		vTsiObsPnlTF15m)
+		FunTsiObsPnlCalculateCellTime		(2,	0,		'15 m')
+		FunTsiObsPnlCalculateCellValue		(2,	1,		vTsiObsPnlTF15m)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellSgn	(3,	2,		vTsiObsPnlTFExtMtf15m,	vTsiObsPnlTFExtMtf15m_2,	vTsiObsPnlTFExtMtf15m_3)
+			FunTsiObsPnlCalculateCellSgn	(2,	2,		vTsiObsPnlTFExtMtf15m,	vTsiObsPnlTFExtMtf15m_2,	vTsiObsPnlTFExtMtf15m_3)
 
 	if showTsiObsPnlTF30m
-		FunTsiObsPnlCalculateCellTime		(4,	0,		'30 m')
-		FunTsiObsPnlCalculateCellValue		(4,	1,		vTsiObsPnlTF30m)
+		FunTsiObsPnlCalculateCellTime		(3,	0,		'30 m')
+		FunTsiObsPnlCalculateCellValue		(3,	1,		vTsiObsPnlTF30m)
 		if showTsiObsPnlPanelExt
-			FunTsiObsPnlCalculateCellSgn	(4,	2,		vTsiObsPnlTFExtMtf30m,	vTsiObsPnlTFExtMtf30m_2,	vTsiObsPnlTFExtMtf30m_3)
+			FunTsiObsPnlCalculateCellSgn	(3,	2,		vTsiObsPnlTFExtMtf30m,	vTsiObsPnlTFExtMtf30m_2,	vTsiObsPnlTFExtMtf30m_3)
+
+	if showTsiObsPnlTF45m
+		FunTsiObsPnlCalculateCellTime		(4,	0,		'45 m')
+		FunTsiObsPnlCalculateCellValue		(4,	1,		vTsiObsPnlTF45m)
+		if showTsiObsPnlPanelExt
+			FunTsiObsPnlCalculateCellSgn	(4,	2,		vTsiObsPnlTFExtMtf45m,	vTsiObsPnlTFExtMtf45m_2,	vTsiObsPnlTFExtMtf45m_3)
 
 	if showTsiObsPnlTF1h
 		FunTsiObsPnlCalculateCellTime		(5,	0,		'1 H')

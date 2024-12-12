@@ -1502,135 +1502,165 @@ fill				(msPlot, plotOsc_midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 
-/// ╔═══════════════════════════════╗
-/// ║	Dmi Adx Di Histogram		║
-/// ║	Base Zero					║
-/// ║	@	Allen.					║
-/// ╚═══════════════════════════════╝
-
-
-/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
-
-
-co_DmiAdx_Buy							= _co_gbl_buy
-co_DmiAdx_Sell							= _co_gbl_sell
-
-/// Title Indicator ――――――――――――――――――――
-dmiAdx_GroupInput						= 'ADX HISTOGRAM'
-
-showDmiAdx_AdxSigCross					= input(defval = true,			title = 'Mostrar Signal Cross',		group = dmiAdx_GroupInput)
-iDmiAdx_length							= input(defval = 14,			title = 'Longitud ADX DI',			group = dmiAdx_GroupInput)
-
-
-/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
-
-
-iDmiAdx_UP								= ta.change(gblSource.H)
-iDmiAdx_DN								= -ta.change(gblSource.L)
-iDmiAdx_PlusDM							= na(iDmiAdx_UP)		? na		: iDmiAdx_UP		> iDmiAdx_DN	and iDmiAdx_UP		> 0	? iDmiAdx_UP	: 0
-iDmiAdx_MinusDM							= na(iDmiAdx_DN)		? na		: iDmiAdx_DN		> iDmiAdx_UP	and iDmiAdx_DN		> 0	? iDmiAdx_DN	: 0
-iDmiAdx_TRUR							= ta.rma(ta.tr,			iDmiAdx_length)
-iDmiAdx_PLUS							= fixnan(100 * ta.rma(iDmiAdx_PlusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
-iDmiAdx_MINUS							= fixnan(100 * ta.rma(iDmiAdx_MinusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
-
-
-/// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
-
-
-iDmiAdx_DIFF							= iDmiAdx_PLUS - iDmiAdx_MINUS
-
-co_DmiAdx_If_Diff						= 
-			  iDmiAdx_PLUS > iDmiAdx_MINUS and 
-			  iDmiAdx_DIFF > 5				?
-			  color.new(co_DmiAdx_Buy,	20)	:
-			  iDmiAdx_PLUS < iDmiAdx_MINUS and
-			  iDmiAdx_DIFF < -5				?
-			  color.new(co_DmiAdx_Sell,	20)	:
-			  iDmiAdx_PLUS > iDmiAdx_MINUS	?
-			  color.new(co_DmiAdx_Buy,	40)	:
-			  color.new(co_DmiAdx_Sell,	40)
-
-co_DmiAdx_If_Bg							= 
-			  iDmiAdx_DIFF > 0				?
-			  co_DmiAdx_Buy					:
-			  co_DmiAdx_Sell
-
-
-/// ＰＬＯＴ ―――――――――――――――――――――――――――
-
-
-plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto ? iDmiAdx_DIFF : na,
-		  title							= 'Histograma DI',
-		  style							= plot.style_columns,
-		  color							= co_DmiAdx_If_Diff)
-
-// bgcolor(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto and showDmiAdx_AdxSigCross and 
-// 		  ta.crossover(iDmiAdx_DIFF, 0)		or
-// 		  ta.crossunder(iDmiAdx_DIFF, 0)	?
-// 		  color.new(co_DmiAdx_If_Bg, 90)	: na)
-
-
-/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
-
-// /// ╔═══════════════════════════════════════╗
-// /// ║	Adx Histogram	Mid 25				║
-// /// ║	Base	25							║
-// /// ║	@	Allen.							║
-// /// ╚═══════════════════════════════════════╝
-
-
-// //// ─────────────────────────────────────────────────────────────────────
-
-
-// colorxAdxDiHi_Buy						= _co_gbl_buy
-// colorxAdxDiHi_Short						= _co_gbl_sell
+// /// ╔═══════════════════════════════╗
+// /// ║	Dmi Adx Di Histogram		║
+// /// ║	Base Zero					║
+// /// ║	@	Allen.					║
+// /// ╚═══════════════════════════════╝
 
 
 // /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
 
-// /// Title Indicator ――――――――――――――――――――
-// AdxDiHiGroupVars						= 'ADX HISTOGRAM two'
 
-// adxDiHi_Length							= input.int(defval = 14,		title = 'Longitud Adx',			group = AdxDiHiGroupVars)
-// adxDiHi_Th								= input.int(defval = 25,		title = 'Umbral',				group = AdxDiHiGroupVars)
+// co_DmiAdx_Buy							= _co_gbl_buy
+// co_DmiAdx_Sell							= _co_gbl_sell
+
+// /// Title Indicator ――――――――――――――――――――
+// dmiAdx_GroupInput						= 'ADX HISTOGRAM'
+
+// showDmiAdx_AdxSigCross					= input(defval = true,			title = 'Mostrar Signal Cross',		group = dmiAdx_GroupInput)
+// iDmiAdx_length							= input(defval = 14,			title = 'Longitud ADX DI',			group = dmiAdx_GroupInput)
 
 
 // /// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
 
 
-// xAdxDiHi_TrueRange						= math.max(math.max(gbl_Source_H - gbl_Source_L, math.abs(gbl_Source_H - nz(gbl_Source_C[1]))), math.abs(gbl_Source_L - nz(gbl_Source_C[1])))
-// xAdxDiHi_DirectMovePlus					= gbl_Source_H - nz(gbl_Source_H[1]) > nz(gbl_Source_L[1]) - gbl_Source_L ? math.max(gbl_Source_H - nz(gbl_Source_H[1]), 0) : 0
-// xAdxDiHi_DirectMoveMinus				= nz(gbl_Source_L[1]) - gbl_Source_L > gbl_Source_H - nz(gbl_Source_H[1]) ? math.max(nz(gbl_Source_L[1]) - gbl_Source_L, 0) : 0
-
-// var float xAdxDiHi_SmoothTrueRange		= na
-// var float xAdxDiHi_SmoothDirectMovePlus	= na
-// var float xAdxDiHi_SmoothDirectMoveMinus= na
-
-// xAdxDiHi_SmoothTrueRange				:= na(xAdxDiHi_SmoothTrueRange) ? xAdxDiHi_TrueRange : xAdxDiHi_SmoothTrueRange - (xAdxDiHi_SmoothTrueRange / adxDiHi_Length) + xAdxDiHi_TrueRange
-// xAdxDiHi_SmoothDirectMovePlus			:= na(xAdxDiHi_SmoothDirectMovePlus) ? xAdxDiHi_DirectMovePlus : xAdxDiHi_SmoothDirectMovePlus - (xAdxDiHi_SmoothDirectMovePlus / adxDiHi_Length) + xAdxDiHi_DirectMovePlus
-// xAdxDiHi_SmoothDirectMoveMinus			:= na(xAdxDiHi_SmoothDirectMoveMinus) ? xAdxDiHi_DirectMoveMinus : xAdxDiHi_SmoothDirectMoveMinus - (xAdxDiHi_SmoothDirectMoveMinus / adxDiHi_Length) + xAdxDiHi_DirectMoveMinus
+// iDmiAdx_UP								= ta.change(gblSource.H)
+// iDmiAdx_DN								= -ta.change(gblSource.L)
+// iDmiAdx_PlusDM							= na(iDmiAdx_UP)		? na		: iDmiAdx_UP		> iDmiAdx_DN	and iDmiAdx_UP		> 0	? iDmiAdx_UP	: 0
+// iDmiAdx_MinusDM							= na(iDmiAdx_DN)		? na		: iDmiAdx_DN		> iDmiAdx_UP	and iDmiAdx_DN		> 0	? iDmiAdx_DN	: 0
+// iDmiAdx_TRUR							= ta.rma(ta.tr,			iDmiAdx_length)
+// iDmiAdx_PLUS							= fixnan(100 * ta.rma(iDmiAdx_PlusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
+// iDmiAdx_MINUS							= fixnan(100 * ta.rma(iDmiAdx_MinusDM,	iDmiAdx_length)	/ iDmiAdx_TRUR)
 
 
 // /// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
 
 
-// xAdxDiHi_DIPlus							= xAdxDiHi_SmoothDirectMovePlus / xAdxDiHi_SmoothTrueRange * 100
-// xAdxDiHi_DIMinus						= xAdxDiHi_SmoothDirectMoveMinus / xAdxDiHi_SmoothTrueRange * 100
-// xAdxDiHi_DX								= math.abs(xAdxDiHi_DIPlus - xAdxDiHi_DIMinus) / (xAdxDiHi_DIPlus + xAdxDiHi_DIMinus) * 100
-// xAdxDiHi_ADX							= ta.sma(xAdxDiHi_DX, adxDiHi_Length)
+// iDmiAdx_DIFF							= iDmiAdx_PLUS - iDmiAdx_MINUS
 
-// xAdxDiHi_Didi							= 25 + (xAdxDiHi_DIPlus - xAdxDiHi_DIMinus)
+// co_DmiAdx_If_Diff						= 
+// 			  iDmiAdx_PLUS > iDmiAdx_MINUS and 
+// 			  iDmiAdx_DIFF > 5				?
+// 			  color.new(co_DmiAdx_Buy,	20)	:
+// 			  iDmiAdx_PLUS < iDmiAdx_MINUS and
+// 			  iDmiAdx_DIFF < -5				?
+// 			  color.new(co_DmiAdx_Sell,	20)	:
+// 			  iDmiAdx_PLUS > iDmiAdx_MINUS	?
+// 			  color.new(co_DmiAdx_Buy,	40)	:
+// 			  color.new(co_DmiAdx_Sell,	40)
 
-// xAdxDiHi_CR								= xAdxDiHi_ADX <= 22 ? color.new(colorxAdxDiHi_Buy, 80) : xAdxDiHi_ADX <= 34 ? color.new(colorxAdxDiHi_Buy, 60) : xAdxDiHi_ADX <= 46 ? color.new(colorxAdxDiHi_Buy, 40) : xAdxDiHi_ADX <= 58 ? color.new(colorxAdxDiHi_Buy, 25) : xAdxDiHi_ADX <= 70 ? color.new(colorxAdxDiHi_Buy, 10) : color.new(colorxAdxDiHi_Buy, 0)
-// xAdxDiHi_CG								= xAdxDiHi_ADX <= 22 ? color.new(colorxAdxDiHi_Short, 80) : xAdxDiHi_ADX <= 34 ? color.new(colorxAdxDiHi_Short, 60) : xAdxDiHi_ADX <= 46 ? color.new(colorxAdxDiHi_Short, 40) : xAdxDiHi_ADX <= 58 ? color.new(colorxAdxDiHi_Short, 25) : xAdxDiHi_ADX <= 70 ? color.new(colorxAdxDiHi_Short, 10) : color.new(colorxAdxDiHi_Short, 0)
+// co_DmiAdx_If_Bg							= 
+// 			  iDmiAdx_DIFF > 0				?
+// 			  co_DmiAdx_Buy					:
+// 			  co_DmiAdx_Sell
 
 
 // /// ＰＬＯＴ ―――――――――――――――――――――――――――
 
 
-// plot(strGlobalMultiHistogram == 'Adx' ? xAdxDiHi_Didi : na,		style = plot.style_columns,		linewidth = 4,		color = xAdxDiHi_Didi >= 25 ? xAdxDiHi_CR : xAdxDiHi_CG,		histbase = adxDiHi_Th ,		title = 'DI')
-// plot(strGlobalMultiHistogram == 'Adx' ? xAdxDiHi_Didi : na,		style = plot.style_line,		linewidth = 2,		color = xAdxDiHi_Didi >= 25 ? xAdxDiHi_CR : xAdxDiHi_CG,		histbase = adxDiHi_Th ,		title = 'Linea DI')
+// plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto ? iDmiAdx_DIFF : na,
+// 		  title							= 'Histograma DI',
+// 		  style							= plot.style_columns,
+// 		  color							= co_DmiAdx_If_Diff)
+
+// // bgcolor(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto and showDmiAdx_AdxSigCross and 
+// // 		  ta.crossover(iDmiAdx_DIFF, 0)		or
+// // 		  ta.crossunder(iDmiAdx_DIFF, 0)	?
+// // 		  color.new(co_DmiAdx_If_Bg, 90)	: na)
+
+
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+/// ╔═══════════════════════════════════════╗
+/// ║	Adx Histogram           			║
+/// ║	Base	50							║
+/// ║	@	Allen.							║
+/// ╚═══════════════════════════════════════╝
+
+
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+
+colorxAdxDiHi_Buy						= _co_gbl_buy
+colorxAdxDiHi_Sell						= _co_gbl_sell
+colorxAdxDiHi_Extra						= _co_gbl_extra
+
+/// Title Indicator ――――――――――――――――――――
+AdxDiHiGroupVars						= 'ADX HISTOGRAM 50'
+
+adxDiHi_Length							= input.int(defval = 14,		title = 'Longitud Adx',			group = AdxDiHiGroupVars)
+adxDiHi_Th								= input.int(defval = 50,		title = 'Umbral',				group = AdxDiHiGroupVars)
+
+
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
+
+
+xAdxDiHi_TrueRange						= math.max(math.max(gbl_Source_H				- gbl_Source_L, math.abs(gbl_Source_H			- nz(gbl_Source_C[1]))),		math.abs(gbl_Source_L		- nz(gbl_Source_C[1])))
+xAdxDiHi_DirectMovePlus					= gbl_Source_H			- nz(gbl_Source_H[1])	> nz(gbl_Source_L[1])	- gbl_Source_L			? math.max(gbl_Source_H			- nz(gbl_Source_H[1]), 0)	: 0
+xAdxDiHi_DirectMoveMinus				= nz(gbl_Source_L[1])	- gbl_Source_L			> gbl_Source_H			- nz(gbl_Source_H[1])	? math.max(nz(gbl_Source_L[1])	- gbl_Source_L, 0)			: 0
+
+var float xAdxDiHi_SmoothTrueRange		= na
+var float xAdxDiHi_SmoothDirectMovePlus	= na
+var float xAdxDiHi_SmoothDirectMoveMinus= na
+
+xAdxDiHi_SmoothTrueRange				:= na(xAdxDiHi_SmoothTrueRange)			? xAdxDiHi_TrueRange		: xAdxDiHi_SmoothTrueRange			- (xAdxDiHi_SmoothTrueRange			/ adxDiHi_Length)	+ xAdxDiHi_TrueRange
+xAdxDiHi_SmoothDirectMovePlus			:= na(xAdxDiHi_SmoothDirectMovePlus)	? xAdxDiHi_DirectMovePlus	: xAdxDiHi_SmoothDirectMovePlus		- (xAdxDiHi_SmoothDirectMovePlus	/ adxDiHi_Length)	+ xAdxDiHi_DirectMovePlus
+xAdxDiHi_SmoothDirectMoveMinus			:= na(xAdxDiHi_SmoothDirectMoveMinus)	? xAdxDiHi_DirectMoveMinus	: xAdxDiHi_SmoothDirectMoveMinus	- (xAdxDiHi_SmoothDirectMoveMinus	/ adxDiHi_Length)	+ xAdxDiHi_DirectMoveMinus
+
+
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
+
+
+xAdxDiHi_DIPlus							= xAdxDiHi_SmoothDirectMovePlus				/ xAdxDiHi_SmoothTrueRange		* 100
+xAdxDiHi_DIMinus						= xAdxDiHi_SmoothDirectMoveMinus			/ xAdxDiHi_SmoothTrueRange		* 100
+xAdxDiHi_DX								= math.abs(xAdxDiHi_DIPlus					- xAdxDiHi_DIMinus)		/ (xAdxDiHi_DIPlus		+ xAdxDiHi_DIMinus)		* 100
+xAdxDiHi_ADX							= ta.sma(xAdxDiHi_DX,						adxDiHi_Length)
+
+xAdxDiHi_Didi							= adxDiHi_Th		+ (xAdxDiHi_DIPlus		- xAdxDiHi_DIMinus)
+
+xAdxDiHi_CR								= 
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	10	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 30		?	28	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	44	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	58	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	70	:
+										  85
+xAdxDiHi_CG								= 
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	10	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 30		?	28	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	44	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	58	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	70	:
+										  85
+
+
+/// ＰＬＯＴ ―――――――――――――――――――――――――――
+
+
+plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto	? xAdxDiHi_Didi	: na,
+	  style								= plot.style_columns,
+	  linewidth							= 4,
+	  color								= xAdxDiHi_Didi			>= adxDiHi_Th	?
+		  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
+		  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
+	  histbase							= adxDiHi_Th,
+	  title								= 'DI')
+
+// plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto	? xAdxDiHi_Didi	: na,
+// 	  style								= plot.style_line,
+// 	  linewidth							= 2,
+// 	  color								= xAdxDiHi_Didi			>= adxDiHi_Th	?
+// 		  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
+// 		  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
+// 	  histbase							= adxDiHi_Th,
+// 	  title								= 'Linea DI')
+
+// plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto	? xAdxDiHi_ADX	: na,
+// 	  linewidth							= 1,
+// 	  color								= color.new(colorxAdxDiHi_Extra, 10),
+// 	  title								= "ADX")
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1916,7 +1946,8 @@ tsiObsPnl_TSI							= ixTsiMuCalcTsiSlow			// SpeedOptions		= Fast/Slow
 tsiObsPnlMTFRange						= FunGlobalCalculateTimeframeIf(timeframe.period)
 tsiObsPnl_Ema							= ixTsiMuCalcEmaSlow			// SpeedOptions		= Fast/Slow
 tsiObsPnl_MFI							= ifAdapMonDesvStd
-tsiObsPnl_ADX							= iDmiAdx_DIFF
+tsiObsPnl_ADX							= xAdxDiHi_Didi
+// tsiObsPnl_ADX							= iDmiAdx_DIFF
 
 /// ─── TSI invoke multitimeframe
 fTsiObsPnlExtNow						= FunGlobalCalculateTimeframeIf(timeframe.period)

@@ -39,7 +39,7 @@ indicator(title							= 'FxMarketSession & MarketStructureOsc & ZeroLag & Vidya 
 		  explicit_plot_zorder			= true)
 
 
-//// ─────────────────────────────────────────────────────────────────────
+/// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 
 /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
@@ -73,6 +73,9 @@ display_TsiObsPnlIndicatPanel			= input.bool	(defval = true,			title = 'Mostrar 
 
 showxTsiMuTSIDivSpeed					= input.string 	(defval = 'Slow',		title = 'Diverg Speed',				group = globalGroupTimeframe,
 			  options					=				['Fast', 'Slow'])
+
+strGlobalAreasTimeFrame					= input.string 	(defval = '30 min',		title = 'Mostrar Sessions x TimeF',	group = globalGroupTimeframe,
+			  options					=				['All', '2 Horas', '1 Hora', '45 min', '30 min'])
 
 strGlobalMultiTimeFrame					= input.string 	(defval = 'Grafico',	title = 'Multi Timeframe',			group = globalGroupTimeframe,
 			  options					=				['Grafico', '15 min', '30 min', '1 Hora', '2 Horas', '3 Horas', '4 Horas', '1 Dia', '1 Semana'])
@@ -143,7 +146,7 @@ _co_gbl_txt_light						= #FFF87C							//	SalesforceYellow
 // OsomeRed									= #FF4054
 
 
-/// ＴＰＳ ―――――――――――――――――――――――――――――
+/// ＴＰＳ ―――――――――――――――――――――――――――――――――
 
 
 type globalTypeOHL
@@ -247,7 +250,6 @@ FunGlobalTimeZone(_timezone) =>
 
 
 /// ─── function tsi
-// FunGlobalCalcTSI(_speed, _x, _plus) =>
 FunGlobalCalcTSI(_speed, _x) =>
 	_plus								= 50
 	_source								= gbl_Source_C
@@ -281,7 +283,7 @@ FunGlobalCalculateTimeframeIf(_timeframe) =>
 	_result								= _minor_dayly ? str.tostring(math.round(_conditional)) : timeframe.period
 
 
-/// ─── Instances ─────────────────────
+/// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
 
 
 gblSource								= globalTypeOHL.new()
@@ -811,6 +813,15 @@ optFxMkSs_LineKillzone					= '⎯⎯⎯⎯'
 /// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――――――
 
 
+/// ─── function visual areas
+FunFxMkSs_AreasIfTimeframe(_cond) =>
+	switch _cond
+		'2 Horas'						=> 120	
+		'1 Hora'						=> 60	
+		'45 min'						=> 45	
+		'30 min'						=> 30	
+
+
 FunFxMkSs_GetPeriod(_session, _start, _lookback) =>
 	_result								= math.max(_start, 1)
 	for i 								= _result to _lookback
@@ -985,43 +996,47 @@ FunFxMkSs_RenderKillZones(_on, _color) =>
 
 
 /// ─── Timeframe
-string ms_timeZone						= (FunGlobalTimeZone(optFxMkSs_TimeZone) == vFxMkSs_No or FunGlobalTimeZone(optFxMkSs_TimeZone) == '') ? na : FunGlobalTimeZone(optFxMkSs_TimeZone)
+iTimeMkSs_TimeFCond						= FunFxMkSs_AreasIfTimeframe(strGlobalAreasTimeFrame)
+bool	timeMkSs_TimeFrameIf			= str.tonumber(timeframe.period)		<=	iTimeMkSs_TimeFCond
+// timeMkSs_TimeFrameIf					= str.tonumber(timeframe.period)	<	60	?	timeframe.period	: na
+
+string	ms_timeZone						= (FunGlobalTimeZone(optFxMkSs_TimeZone) == vFxMkSs_No or FunGlobalTimeZone(optFxMkSs_TimeZone) == '') ? na : FunGlobalTimeZone(optFxMkSs_TimeZone)
 
 /// ─── Timeframe London
-int timeMkSs_SessLon					= time(timeframe.period, vFxMkSs_SessLnTimeZ, ms_timeZone)
+int		timeMkSs_SessLon				= time(timeframe.period,	vFxMkSs_SessLnTimeZ,		ms_timeZone)
 
 timeMkSs_KillLonOpen					= time(timeframe.period,	vFxMkSs_KillLonTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 timeMkSs_KillLonRally					= time(timeframe.period,	vFxMkSs_KillLonTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 timeMkSs_KillLonClose					= time(timeframe.period,	vFxMkSs_KillLonTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 
 /// ─── Timeframe New York
-int timeMkSs_SessNewY					= time(timeframe.period, vFxMkSs_SessNyTimeZ, ms_timeZone)
+int timeMkSs_SessNewY					= time(timeframe.period,	vFxMkSs_SessNyTimeZ,		ms_timeZone)
 
 timeMkSs_KillNwYOpen					= time(timeframe.period,	vFxMkSs_KillNwYTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 timeMkSs_KillNwYRally					= time(timeframe.period,	vFxMkSs_KillNwYTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 timeMkSs_KillNwYClose					= time(timeframe.period,	vFxMkSs_KillNwYTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
 
 /// ─── Timeframe Tokyo
-int timeMkSs_SessTyk					= time(timeframe.period, vFxMkSs_SessTkTimeZ, ms_timeZone)
+int timeMkSs_SessTyk					= time(timeframe.period,	vFxMkSs_SessTkTimeZ,		ms_timeZone)
 
 /// ─── Timeframe Sydney
-int timeMkSs_SessSyd					= time(timeframe.period, vFxMkSs_SessSdTimeZ, ms_timeZone)
+int timeMkSs_SessSyd					= time(timeframe.period,	vFxMkSs_SessSdTimeZ,		ms_timeZone)
 
 
 /// ＰＬＯＴ ――――――――――――――――――――――――――――――
 
 
 /// ─── Session London
-[DRAWMkSsSessLon,		DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessLon,		DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
 
 /// ─── Session New York
-[DRAWMkSsSessNewY,		DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessNewY,		DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
 
 /// ─── Session Tokyo
-[DRAWMkSsSessTyk,		DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessTyk,		DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
 
 /// ─── Session Sydney
-[DRAWMkSsSessSyd,		DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]				= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessSyd,		DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
 
 /// ─── KillZones London
 if showFxMkSs_KillLonOpen and display_FxMkSs__Sessions
@@ -1570,8 +1585,6 @@ plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto ? iDmiAdx_DIFF
 
 // colorxAdxDiHi_Buy						= _co_gbl_buy
 // colorxAdxDiHi_Short						= _co_gbl_sell
-// colorxAdxDiHi_Mid						= _co_gbl_extra
-// colorxAdxDiHi_Extra						= _co_gbl_extra
 
 
 // /// ＩＮＰＵＴＳ ――――――――――――――――――――――――
@@ -1658,10 +1671,13 @@ showxTsiMuTSISlow						= input.bool	(defval = true,			title = 'Mostrar Tsi',				
 showxTsiMuTSIFast						= input.bool	(defval = true,			title = 'Mostrar Tsi Fast',			group = xTsiMu_GroupInput,		tooltip = strxTsiMuTSIOptFastTool)
 showxTsiMuTSIDiverg						= input.bool	(defval = true,			title = 'Divergencias',				group = xTsiMu_GroupInput)
 
+ixTsiMu_RSILength						= 14
 
 
 /// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
 
+/// rsi
+ixTsiMu_RSI								= ta.rsi(gbl_Source_C, ixTsiMu_RSILength)
 
 /// Multitimeframe
 
@@ -1711,6 +1727,10 @@ insxTsiMuEmaPlotLine					= plot(display_xTsiMu_TSI and showxTsiMuTSISlow ? ixTsi
 
 /// fill principal
 fill(insxTsiMuTsiPlotLine, insxTsiMuEmaPlotLine,							color = showxTsiMuTSISlow ? color.new(insxTsiMuPlotColor, 60) : na)		//	fill
+
+
+/// plot rsi
+// plot(tsiObsPnl_RSI, color = color.new(_co_gbl_sky, 60), linewidth = 2)
 
 
 /// Divergences ───────────────────────
@@ -1881,8 +1901,6 @@ tsiObsPnl_LocatMlIndHoriz				= input.string	(defval = 'Derecha',title = ' X: ',	
 stTsiObsPnl_TextSize					= input.string	(defval = 'normal',	title = 'Tamaño de texto',
 		  options						= ['auto','tiny','small','normal','large','huge'])
 
-vTsiObsPnl_RsiLength					= 14
-
 
 /// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
 
@@ -1890,7 +1908,7 @@ vTsiObsPnl_RsiLength					= 14
 /// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
 
 // tsiObsPnl_TSI							= _x * ta.tsi(gbl_Source_C, _short, _long) + _plus
-tsiObsPnl_RSI							= ta.rsi(gbl_Source_C, vTsiObsPnl_RsiLength)
+tsiObsPnl_RSI							= ixTsiMu_RSI
 
 tsiObsPnlDELTA							= vVidya_delta_volume
 

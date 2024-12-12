@@ -1,0 +1,115 @@
+/// ╔═══════════════════════════════════════╗
+/// ║	Adx Histogram           			║
+/// ║	Base	50							║
+/// ║	@	Allen.							║
+/// ╚═══════════════════════════════════════╝
+
+//@version=5
+indicator("ADX & DI Histogram", overlay = false, scale = scale.left)
+
+//// ─────────────────────────────────────────────────────────────────────
+
+BrLiYel10								= #FBFD73
+BrLiYel30								= #FDF43C
+AllenSky10								= #CCF8FF
+AllenMint60								= #33FFAC
+
+colorxAdxDiHi_Buy						= AllenMint60
+colorxAdxDiHi_Sell						= AllenSky10
+colorxAdxDiHi_Extra						= BrLiYel10
+
+
+/// ＩＮＰＵＴＳ ――――――――――――――――――――――――
+
+/// Title Indicator ――――――――――――――――――――
+AdxDiHiGroupVars						= 'ADX HISTOGRAM two'
+
+adxDiHi_Length							= input.int(defval = 14,		title = 'Longitud Adx',			group = AdxDiHiGroupVars)
+adxDiHi_Th								= input.int(defval = 50,		title = 'Umbral',				group = AdxDiHiGroupVars)
+
+
+/// ＴＰＳ ―――――――――――――――――――――――――――――――――
+
+
+type globalTypeOHL
+	float O						    	= open
+	float H				    			= high
+	float L				    			= low
+	float C				    			= close
+	float V				    			= volume
+	int   I				    			= bar_index
+
+
+/// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
+
+
+gblSource								= globalTypeOHL.new()
+
+
+/// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――
+
+
+xAdxDiHi_TrueRange						= math.max(math.max(gblSource.H					- gblSource.L, math.abs(gblSource.H				- nz(gblSource.C[1]))),			math.abs(gblSource.L		- nz(gblSource.C[1])))
+xAdxDiHi_DirectMovePlus					= gblSource.H			- nz(gblSource.H[1])	> nz(gblSource.L[1])	- gblSource.L			? math.max(gblSource.H			- nz(gblSource.H[1]), 0)	: 0
+xAdxDiHi_DirectMoveMinus				= nz(gblSource.L[1])	- gblSource.L			> gblSource.H			- nz(gblSource.H[1])	? math.max(nz(gblSource.L[1])	- gblSource.L, 0)			: 0
+
+var float xAdxDiHi_SmoothTrueRange		= na
+var float xAdxDiHi_SmoothDirectMovePlus	= na
+var float xAdxDiHi_SmoothDirectMoveMinus= na
+
+xAdxDiHi_SmoothTrueRange				:= na(xAdxDiHi_SmoothTrueRange)			? xAdxDiHi_TrueRange		: xAdxDiHi_SmoothTrueRange			- (xAdxDiHi_SmoothTrueRange			/ adxDiHi_Length)	+ xAdxDiHi_TrueRange
+xAdxDiHi_SmoothDirectMovePlus			:= na(xAdxDiHi_SmoothDirectMovePlus)	? xAdxDiHi_DirectMovePlus	: xAdxDiHi_SmoothDirectMovePlus		- (xAdxDiHi_SmoothDirectMovePlus	/ adxDiHi_Length)	+ xAdxDiHi_DirectMovePlus
+xAdxDiHi_SmoothDirectMoveMinus			:= na(xAdxDiHi_SmoothDirectMoveMinus)	? xAdxDiHi_DirectMoveMinus	: xAdxDiHi_SmoothDirectMoveMinus	- (xAdxDiHi_SmoothDirectMoveMinus	/ adxDiHi_Length)	+ xAdxDiHi_DirectMoveMinus
+
+
+/// ＣＡＬＣＵＬＡＴＩＯＮＳ ―――――――――――――
+
+
+xAdxDiHi_DIPlus							= xAdxDiHi_SmoothDirectMovePlus				/ xAdxDiHi_SmoothTrueRange		* 100
+xAdxDiHi_DIMinus						= xAdxDiHi_SmoothDirectMoveMinus			/ xAdxDiHi_SmoothTrueRange		* 100
+xAdxDiHi_DX								= math.abs(xAdxDiHi_DIPlus					- xAdxDiHi_DIMinus)		/ (xAdxDiHi_DIPlus		+ xAdxDiHi_DIMinus)		* 100
+xAdxDiHi_ADX							= ta.sma(xAdxDiHi_DX,						adxDiHi_Length)
+
+xAdxDiHi_Didi							= adxDiHi_Th		+ (xAdxDiHi_DIPlus		- xAdxDiHi_DIMinus)
+
+xAdxDiHi_CR								= 
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	10	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 30		?	28	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	44	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	58	:
+										  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	70	:
+										  85
+xAdxDiHi_CG								= 
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	10	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 30		?	28	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	44	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	58	:
+										  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	70	:
+										  85
+
+
+/// ＰＬＯＴ ―――――――――――――――――――――――――――
+
+
+plot(xAdxDiHi_Didi,
+			  style						= plot.style_columns,
+			  linewidth					= 4,
+			  color						= xAdxDiHi_Didi			>= adxDiHi_Th	?
+			  	  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
+				  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
+			  histbase					= adxDiHi_Th,
+			  title						= 'DI')
+
+plot(xAdxDiHi_Didi,
+			  style						= plot.style_line,
+			  linewidth					= 2,
+			  color						= xAdxDiHi_Didi			>= adxDiHi_Th	?
+			  	  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
+				  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
+			  histbase					= adxDiHi_Th,
+			  title						= 'Linea DI')
+
+plot(xAdxDiHi_ADX,
+			  linewidth					= 1,
+			  color						= color.new(colorxAdxDiHi_Extra, 10),
+			  title						= "ADX")

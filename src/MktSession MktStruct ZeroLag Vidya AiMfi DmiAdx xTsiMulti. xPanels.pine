@@ -387,23 +387,6 @@ plot_zeLag_EMA50						= plot(iZeLag_EMA50,		display = display.none,	force_overla
 
 fill(plot_zeLag_EMA, plot_zeLag_EMAx, iZeLag_EMA, iZeLag_EMAx,								color.new(co_zeLag_EMAx, 90),					color.new(co_zeLag_EMA, 70))
 
-// // Plot shapes for up and down signals
-// plotshape(display_zeLagTrend and zeLag_signal_buy ? iZeLag_ZLMA : na,
-// 		  title							= '',
-// 		  style							= shape.diamond,
-// 		  location						= location.absolute,
-// 		  color							= co_zeLag_buy,
-// 		  size							= size.tiny,
-// 		  force_overlay					= true)
-
-// plotshape(display_zeLagTrend and zeLag_signal_sell ? iZeLag_ZLMA : na,
-// 		  title							= '',
-// 		  style							= shape.diamond,
-// 		  location						= location.absolute,
-// 		  color							= co_zeLag_sell,
-// 		  size							= size.tiny,
-// 		  force_overlay					= true)
-
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
@@ -483,16 +466,6 @@ method Fun_vVidya_extend_liquidity_lines(array<line> _line_array, _price_level, 
 				if _price_cross and _is_short_line
 					line.set_x2(_liquidity_line, bar_index)
 					_line_array.remove(i)
-
-					// Add volume label to the liquidity zone
-					// label.new(bar_index-1, _price_level[1], 
-					// 		 str.tostring(_volume, format.volume), 
-					// 		 color		= color.rgb(0, 0, 0, 99), 
-					// 		 style		= _cross ? label.style_label_lower_left : label.style_label_upper_left,
-					// 		 textcolor	= color.new(col_vVidya_txt, 30), 
-					// 		 size		= size.small,
-					// 		 force_overlay	= true
-					// 		 )
 
 					// Add a circle label to represent liquidity zone
 					label.new(bar_index-1, _price_level[1], 
@@ -651,29 +624,6 @@ if barstate.islast and display_vVidya_VoVidya
 				 size					= size.large,
 				 force_overlay			= true
 				 )[1])
-
-// Plot trend change markers (up and down arrows)
-// plotshape(
-// 		 series							= vVi_trend_cross_up[1] ? vVidya_smoothed_value[0] : na, 
-// 		 title							= "Trend Buy", 
-// 		 style							= shape.labelup, 
-// 		 location						= location.absolute, 
-// 		 color							= color.new(col_vVidya_uptrend, 90), 
-// 		 text							= " ▲ ", 
-// 		 textcolor						= col_vVidya_uptrend,
-// 		 force_overlay					= true
-// 		 )
-
-// plotshape(
-// 		 series							= vVi_trend_cross_down[1] ? vVidya_smoothed_value[0] : na, 
-// 		 title							= "Trend Sell", 
-// 		 style							= shape.labeldown, 
-// 		 location						= location.absolute, 
-// 		 color							= color.new(col_vVidya_downtrend, 90), 
-// 		 text							= " ▼ ", 
-// 		 textcolor						= col_vVidya_downtrend,
-// 		 force_overlay					= true
-// 		 )
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1065,42 +1015,6 @@ if showFxMkSs_KillNwYRally and display_FxMkSs__Sessions
 
 if showFxMkSs_KillNwYClose and display_FxMkSs__Sessions
 	[DwMkSs_KillNwY_Close, DwMkSs_KillNwY_Cl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYClose,	vFxMkSs_KillNwYColor)
-
-// /// ─── Drawing Table Sessions
-// if display_MltObsPnlTimeFrPanel
-// 	FunMltObsPnlCalculateCellName				(0,	0,		'Sessions')
-// 	FunSessionCellTime							(1,	0,		'Status')
-// 	FunSessionCellTime							(2,	0,		'Open ')				//	(2,	0,		'Time')
-// 	FunSessionCellTime							(3,	0,		'Close ')
-// 	FunSessionCellTime							(4,	0,		'Killzones ')
-
-// 	if showSessionPanelLondon
-// 		FunSessionCellName						(0,	1,		'London')
-// 		FunSessionCellTimeActive				(1,	1,		'O/C')
-// 		FunSessionCellTimeOpen					(2,	1,		'03:00')				//	(2,	1,		'03:00 12:00')
-// 		FunSessionCellTimeClose					(3,	1,		'12:00')
-// 		FunSessionCellTimeKillzones				(4,	1,		'Killzones')
-
-// 	if showSessionPanelNewYork
-// 		FunSessionCellName						(0,	2,		'New York')
-// 		FunSessionCellTimeActive				(1,	2,		'O/C')
-// 		FunSessionCellTimeOpen					(2, 2,		'08:00')				//	(2,	2,		'08:00 17:00')
-// 		FunSessionCellTimeClose					(3, 2,		'17:00')
-// 		FunSessionCellTimeKillzones				(4,	2,		'Killzones')
-
-// 	if showSessionPanelSydney
-// 		FunSessionCellName						(0,	3,		'Sydney')
-// 		FunSessionCellTimeActive				(1,	3,		'O/C')
-// 		FunSessionCellTimeOpen					(2,	3,		'16:00')				//	(2,	3,		'16:00 01:00')
-// 		FunSessionCellTimeClose					(3,	3,		'01:00')
-// 		FunSessionCellTimeKillzones				(4,	3,		'Killzones')
-
-// 	if showSessionPanelTokyo
-// 		FunSessionCellName						(0,	4,		'Tokyo')
-// 		FunSessionCellTimeActive				(1,	4,		'O/C')
-// 		FunSessionCellTimeOpen					(2,	4,		'19:00')				//	(2,	4,		'19:00 03:00')
-// 		FunSessionCellTimeClose					(3,	4,		'03:00')
-// 		FunSessionCellTimeKillzones				(4,	4,		'Killzones')
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -1655,20 +1569,6 @@ plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto	? xAdxDiHi_Did
 	  histbase							= adxDiHi_Th,
 	  title								= 'DI')
 
-// plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto	? xAdxDiHi_Didi	: na,
-// 	  style								= plot.style_line,
-// 	  linewidth							= 2,
-// 	  color								= xAdxDiHi_Didi			>= adxDiHi_Th	?
-// 		  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
-// 		  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
-// 	  histbase							= adxDiHi_Th,
-// 	  title								= 'Linea DI')
-
-// plot(strGlobalMultiHistogram == 'Adx' and display_DmiAdx_AdxHisto	? xAdxDiHi_ADX	: na,
-// 	  linewidth							= 1,
-// 	  color								= color.new(colorxAdxDiHi_Extra, 10),
-// 	  title								= "ADX")
-
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
@@ -1764,7 +1664,6 @@ insxTsiMuEmaPlotLine					= plot(display_xTsiMu_TSI and showxTsiMuTSISlow ? ixTsi
 
 /// fill principal
 fill(insxTsiMuTsiPlotLine, insxTsiMuEmaPlotLine,							color = showxTsiMuTSISlow ? color.new(insxTsiMuPlotColor, 60) : na)		//	fill
-
 
 /// plot rsi
 // plot(MltObsPnl_RSI, color = color.new(_co_gbl_sky, 60), linewidth = 2)
@@ -1877,8 +1776,7 @@ plotshape(display_xTsiMu_TSI			and tsiDiInsHiddenBearCond			? vxTsiMu_speed_back
 
 
 /// ╔═══════════════════════════════╗
-/// ║	Panel TSI Multi Timeframe	║
-/// ║	Panel TSI Multi Speed		║
+/// ║	Panel Multi Timeframe		║
 /// ║	Panel Multi Indicator		║
 /// ║	@	Allen.					║
 /// ╚═══════════════════════════════╝
@@ -1947,8 +1845,6 @@ stMltObsPnl_TextSize					= input.string	(defval = 'normal',	title = 'Tamaño de 
 
 
 MltObsPnl_Middle						= adxDiHi_Th
-
-// MltObsPnl_TSI							= _x * ta.tsi(gbl_Source_C, _short, _long) + _plus
 
 MltObsPnl_ZeroLag						= iZeLag_EMA		>	iZeLag_EMA50	?	'Buy'	:	'Sell'		//	ZeroLag
 MltObsPnl_Vidya							= fvVi_vidya_dn		>	fvVi_vidya_up	?	'Buy'	:	'Sell'		//	Vidya

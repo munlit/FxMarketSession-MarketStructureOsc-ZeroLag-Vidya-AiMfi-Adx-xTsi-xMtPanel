@@ -2060,7 +2060,7 @@ FunTsiObsPnlCalcCellHead(_col, _row, _title) =>
 		  bgcolor						= color.new(_bgcolor,	_opacity),
 		  text_size						= _txtsize,
 		  text_color					= _txtcolor,
-		  width							= 5)
+		  width							= 8)
 
 /// ─── Function table value
 FunTsiObsPnlCalculateCellValue(_col, _row, _value) =>
@@ -2075,55 +2075,40 @@ FunTsiObsPnlCalculateCellValue(_col, _row, _value) =>
 		  text_color					= co_TsiObsPnl_TextDark,
 		  width							= 5)
 
-/// ─── Function Time frame
+/// ─── Function Timeframe x 3
 FunTsiObsPnlCalcTimeFrames() =>
-	// timeframe x 3
 	_tf_first							= timeframe.period
 	_number								= str.tonumber(_tf_first)
+	_mayor								= 60
+	_minor								= 15
 
-	_tf_second							= _number		>=	60	?
-										  _number		+	60	:
-										  _number		+	15 
+	_tf_second							= _number		>=	_mayor	?
+										  _number		+	_mayor	:
+										  _number		+	_minor
 
-	_tf_third							= _tf_second	>=	60	?
-										  _tf_second	+	60	:
-										  _tf_second	+	15 
+	_tf_third							= _tf_second	>=	_mayor	?
+										  _tf_second	+	_mayor	:
+										  _tf_second	+	_minor
 
-	[_tf_first, _tf_second, _tf_third]
+	_result_first						= _tf_first
+	_result_second						= str.tostring(_tf_second)
+	_result_third						= str.tostring(_tf_third)
+
+	[_result_first, _result_second, _result_third]
 
 /// ─── Instance Cells Timeframes
 [insTsiObsPnlTF_First, insTsiObsPnlTF_Second, insTsiObsPnlTF_Third]	= FunTsiObsPnlCalcTimeFrames()
 
-FunTsiObsPnlCalcTicker(_index) =>
-	_tf_first							= insTsiObsPnlTF_First
-	_tf_second							= str.tostring(insTsiObsPnlTF_Second)
-	_tf_third							= str.tostring(insTsiObsPnlTF_Third)
-
-	//	vars arrays ticker timeframe
-	// if _timeframe > timeframe.period
-	_ticker_now							= _index
-	_ticker_next						= request.security(syminfo.tickerid,	_tf_second,	_index, lookahead = barmerge.lookahead_on)
-	_ticker_mayor						= request.security(syminfo.tickerid,	_tf_third,	_index, lookahead = barmerge.lookahead_on)
-	// else
-	// 	_ticker							:= _index
-	// 	_ticker_2						:= _index[1]
-	// 	_ticker_3						:= _index[2]
-	// 	_ticker_4						:= _index[3]
-	[_ticker_now, _ticker_next, _ticker_mayor]
-
 /// ─── Function table cells Signal
 FunTsiObsPnlCalcDirections(_col, _row, _timeframe, _index, _distance) =>
+	//	var arrays ticker timeframe
+	[_ticker, _ticker_2, _ticker_3, _ticker_4] = request.security(syminfo.tickerid,
+			  _timeframe,
+			  [_index,	_index[1],	_index[2],	_index[3]])
+			//   lookahead					= barmerge.lookahead_on)
+
 	_mid								= tsiObsPnl_Middle
 	_div								= 5
-
-	_tf_first							= insTsiObsPnlTF_First
-	_tf_second							= str.tostring(insTsiObsPnlTF_Second)
-	_tf_third							= str.tostring(insTsiObsPnlTF_Third)
-
-	_ticker								= 0
-	_ticker_2							= 0
-	_ticker_3							= 0
-	_ticker_4							= 0
 
 	//	overbought/oversold
 	_overbought							=  _mid			+	_distance
@@ -2132,49 +2117,36 @@ FunTsiObsPnlCalcDirections(_col, _row, _timeframe, _index, _distance) =>
 	_fract_bougth						= math.round		(_overbought	-	(_overbought	/	_div))
 	_fract_sold							= math.ceil			(_oversold		+	(_overbought	/	_div))
 
-	//	vars arrays ticker timeframe
-	if _timeframe > timeframe.period
-		[_ticker, _ticker_2, _ticker_3, _ticker_4] = request.security(syminfo.tickerid,	_timeframe,	[_index, _index[1], _index[2], _index[3]], lookahead = barmerge.lookahead_on)
-	else
-		_ticker							:= _index
-		_ticker_2						:= _index[1]
-		_ticker_3						:= _index[2]
-		_ticker_4						:= _index[3]
-
-	// _ticker							= request.security(syminfo.tickerid,	_timeframe,		_index,		lookahead	= barmerge.lookahead_on)
-	// _ticker_2						= request.security(syminfo.tickerid,	_timeframe,		_index[1],	lookahead	= barmerge.lookahead_on)
-	// _ticker_3						= request.security(syminfo.tickerid,	_timeframe,		_index[2],	lookahead	= barmerge.lookahead_on)
-	// _ticker_4						= request.security(syminfo.tickerid,	_timeframe,		_index[3],	lookahead	= barmerge.lookahead_on)
-
 	/// ─── signal buy/sell
 	_if_buy								= _ticker		>	_ticker_3		and	_ticker_2		>	_ticker_4	and _ticker		<=	_fract_sold
 	_if_sell							= _ticker		<	_ticker_3		and	_ticker_2		<	_ticker_4	and _ticker		>=	_fract_bougth
 
-	_if_structure						= _if_buy		?	' 🟢 '			:	_if_sell		?	' 🔴 '	:	' '
+	_if_structure						= _if_buy		?	'🟢'			:	_if_sell		?	'🔴'	:	'    '
 
-	_cell_color								=
-		  _ticker	>=	_fract_bougth		?
-		  co_TsiObsPnl_Buy					:
-		  _ticker	<=	_fract_sold			?
-		  co_TsiObsPnl_Sell					:
+	_cell_color							=
+		  _ticker	>=	_fract_bougth	?
+		  co_TsiObsPnl_Buy				:
+		  _ticker	<=	_fract_sold		?
+		  co_TsiObsPnl_Sell				:
 		  co_TsiObsPnl_Neutral
 
-	_cell_opacity							=
-			  _ticker	>=	_overbought		or
-			  _ticker	<=	_oversold		?
-			  25							:
-			  _ticker	>=	_fract_bougth	or
-			  _ticker	<=	_fract_sold		?
-			  40							:
-			  60
+	_cell_opacity						=
+		  _ticker	>=	_overbought		or
+		  _ticker	<=	_oversold		?
+		  25							:
+		  _ticker	>=	_fract_bougth	or
+		  _ticker	<=	_fract_sold		?
+		  40							:
+		  60
 
-	_cell_text							= str.tostring(_ticker, '#')	+ ' ' +  _if_structure
+	_cell_text							= str.tostring(_ticker, '#.0')	+ ' ' +  _if_structure
 
 	table.cell							(vTsiPnlNewTable, _col, _row, _cell_text,
-			  bgcolor						= color.new(_cell_color,	_cell_opacity),
-			  text_size						= stTsiObsPnl_TextSize,
-			  text_color					= co_TsiObsPnl_TextDark,
-			  width							= 4)
+		  bgcolor						= color.new(_cell_color,	_cell_opacity),
+		  text_size						= stTsiObsPnl_TextSize,
+		  text_color					= co_TsiObsPnl_TextDark,
+		  text_halign					= text.align_right,
+		  width							= 4)
 
 /// ─── Function table multi indicador
 FunTsiObsPnlCalcMultiIndic(_col, _row, _title, _index, _distance) =>
@@ -2182,15 +2154,15 @@ FunTsiObsPnlCalcMultiIndic(_col, _row, _title, _index, _distance) =>
 	_timeframe							= timeframe.period
 
 	//	var arrays ticker timeframe
-	[_ticker, _ticker2, _ticker3, _ticker4] = request.security(syminfo.tickerid,
-			  _timeframe,
-			  [_index,	_index[1],	_index[2],	_index[3]],
-			  lookahead					= barmerge.lookahead_on)
+	[_ticker, _ticker_2, _ticker_3, _ticker_4] = request.security(syminfo.tickerid,
+		  _timeframe,
+		  [_index,	_index[1],	_index[2],	_index[3]],
+		  lookahead					= barmerge.lookahead_on)
 
 	/// ─── signal buy/sell
-	_if_buy								= _ticker		>	_ticker3		and	_ticker2		>	_ticker4
-	_if_sell							= _ticker		<	_ticker3		and	_ticker2		<	_ticker4
-	_if_structure						= _if_buy		?	' ⬈ '			:	_if_sell		?	' ⬊ '	:	' '
+	_if_buy								= _ticker		>	_ticker_3		and	_ticker_2		>	_ticker_4
+	_if_sell							= _ticker		<	_ticker_3		and	_ticker_2		<	_ticker_4
+	_if_structure						= _if_buy		?	' ⬈'			:	_if_sell		?	' ⬊'	:	' '
 
 	_mid								= tsiObsPnl_Middle
 	_div								= 5
@@ -2198,26 +2170,26 @@ FunTsiObsPnlCalcMultiIndic(_col, _row, _title, _index, _distance) =>
 	_overbought							=  _mid			+	_distance
 	_oversold							=  _mid			-	_distance
 
-	_fract_max							= math.round		(_overbought	-	(_overbought	/	_div))
-	_fract_min							= math.ceil			(_oversold		+	(_overbought	/	_div))
+	_fract_upper						= math.round		(_overbought	-	(_overbought	/	_div))
+	_fract_lower						= math.ceil			(_oversold		+	(_overbought	/	_div))
 
 	_cell_color							=
-			  _ticker	>=	_fract_max	?
-			  co_TsiObsPnl_Buy			:
-			  _ticker	<=	_fract_min	?
-			  co_TsiObsPnl_Sell			:
-			  co_TsiObsPnl_Neutral
+		  _ticker	>=	_fract_upper	?
+		  co_TsiObsPnl_Buy				:
+		  _ticker	<=	_fract_lower	?
+		  co_TsiObsPnl_Sell				:
+		  co_TsiObsPnl_Neutral
 
 	_cell_opacity						=
-			  _ticker	>=	_overbought	or
-			  _ticker	<=	_oversold	?
-			  25	:
-			  _ticker	>=	_fract_max	or
-			  _ticker	<=	_fract_min	?
-			  40	:
-			  60
+		  _ticker	>=	_overbought		or
+		  _ticker	<=	_oversold		?
+		  25							:
+		  _ticker	>=	_fract_upper	or
+		  _ticker	<=	_fract_lower	?
+		  40							:
+		  60
 
-	_cell_text							= str.tostring(_ticker, '#')	+ _if_structure		+ '\n'	+ _title
+	_cell_text							= str.tostring(_ticker, '#.0')	+ ' ' +	_if_structure		+ '\n'	+ _title
 
 	/// ─── table
 	table.cell							(vTsiPnlNewTableMtlIndicat, _col, _row, _cell_text,
@@ -2243,36 +2215,36 @@ FunTsiObsPnlCalcDelta(_col, _row, _text, _value) =>
 
 /// ─── Table Multitimeframe Indicators
 if display_TsiObsPnlMultiTFIndicPanel
-	FunTsiObsPnlCalcCellName				(0,		0,		'')
-	FunTsiObsPnlCalcCellName				(0,		1,		'Promedio')
+	FunTsiObsPnlCalcCellHead				(0,		0,		'')
+	FunTsiObsPnlCalcCellHead				(0,		1,		'Promedio')
 	if showTsiObsPnlRow_TREND
-		FunTsiObsPnlCalcCellName			(0,		2,		'TREND')
+		FunTsiObsPnlCalcCellHead			(0,		2,		'TREND')
 	if showTsiObsPnlRow_VIDYA
-		FunTsiObsPnlCalcCellName			(0,		3,		'DYA')
+		FunTsiObsPnlCalcCellHead			(0,		3,		'DYA')
 	if showTsiObsPnlRow_DELTA
-		FunTsiObsPnlCalcCellName			(0,		4,		'Delta')
+		FunTsiObsPnlCalcCellHead			(0,		4,		'Delta')
 	if showTsiObsPnlRow_OSC
-		FunTsiObsPnlCalcCellName			(0,		5,		'OSC')
+		FunTsiObsPnlCalcCellHead			(0,		5,		'OSC')
 	if showTsiObsPnlRow_tSLOW
-		FunTsiObsPnlCalcCellName			(0,		6,		'TSI')
+		FunTsiObsPnlCalcCellHead			(0,		6,		'TSI')
 	if showTsiObsPnlRow_tFAST
-		FunTsiObsPnlCalcCellName			(0,		7,		'TSI Fast')
+		FunTsiObsPnlCalcCellHead			(0,		7,		'TSI Fast')
 	if showTsiObsPnlRow_RSI
-		FunTsiObsPnlCalcCellName			(0,		8,		'RSI')
+		FunTsiObsPnlCalcCellHead			(0,		8,		'RSI')
 	if showTsiObsPnlRow_MFI
-		FunTsiObsPnlCalcCellName			(0,		9,		'MFI')
+		FunTsiObsPnlCalcCellHead			(0,		9,		'MFI')
 	if showTsiObsPnlRow_ADX
-		FunTsiObsPnlCalcCellName			(0,		10,		'ADX')
+		FunTsiObsPnlCalcCellHead			(0,		10,		'ADX')
 
 	if showTsiObsPnlColu_Now
 		FunTsiObsPnlCalcCellHead			(1,		0,		'Actual')
-		// FunTsiObsPnlCalculateCellValue		(1,		1,		vTsiObsPnlTFNow)
+		// FunTsiObsPnlCalcXTendency			(1,		1,		vTsiObsPnlTFNow)
 		// if showTsiObsPnlRow_TREND
-			// FunTsiObsPnlCalculateCellSgn	(1,		2,		insTsiObsPnlTF_First,		tsiObsPnl_ZeroLag)
+			// FunTsiObsPnlCalcZeroLag			(1,		2,		insTsiObsPnlTF_First,		tsiObsPnl_ZeroLag)
 		// if showTsiObsPnlRow_VIDYA
-			// FunTsiObsPnlCalculateCellSgn	(1,		3,		insTsiObsPnlTF_First,		tsiObsPnl_Vidya)
-		if showTsiObsPnlRow_DELTA
-			FunTsiObsPnlCalcDirections		(1,		4,		insTsiObsPnlTF_First,		tsiObsPnl_DELTA,		40)
+			// FunTsiObsPnlCalcVidya			(1,		3,		insTsiObsPnlTF_First,		tsiObsPnl_Vidya)
+		// if showTsiObsPnlRow_DELTA
+			// FunTsiObsPnlCalcDelta			(1,		4,		'',		tsiObsPnl_DELTA)
 		if showTsiObsPnlRow_OSC
 			FunTsiObsPnlCalcDirections		(1,		5,		insTsiObsPnlTF_First,		tsiObsPnl_OSC,			40)
 		if showTsiObsPnlRow_tSLOW
@@ -2288,47 +2260,47 @@ if display_TsiObsPnlMultiTFIndicPanel
 
 	// if showTsiObsPnlColu_Next
 	// 	FunTsiObsPnlCalcCellHead			(2,		0,		'Plus')
-	// 	// FunTsiObsPnlCalculateCellValue		(2,		1,		vTsiObsPnlTFNow)
-	// 	// if showTsiObsPnlRow_TREND
-	// 		// FunTsiObsPnlCalculateCellTrend	(2,		2,		insTsiObsPnlTF_Second,		tsiObsPnl_ZeroLag)
-	// 	// if showTsiObsPnlRow_VIDYA
-	// 		// FunTsiObsPnlCalculateCellTrend	(2,		3,		insTsiObsPnlTF_Second,		tsiObsPnl_Vidya)
+		// FunTsiObsPnlCalculateCellValue		(2,		1,		vTsiObsPnlTFNow)
+		// if showTsiObsPnlRow_TREND
+			// FunTsiObsPnlCalculateCellTrend	(2,		2,		insTsiObsPnlTF_Second,		tsiObsPnl_ZeroLag)
+		// if showTsiObsPnlRow_VIDYA
+			// FunTsiObsPnlCalculateCellTrend	(2,		3,		insTsiObsPnlTF_Second,		tsiObsPnl_Vidya)
 	// 	if showTsiObsPnlRow_DELTA
 	// 		FunTsiObsPnlCalcDirections		(2,		4,		insTsiObsPnlTF_Second,		tsiObsPnl_DELTA,		40)
-	// 	if showTsiObsPnlRow_OSC
-	// 		FunTsiObsPnlCalcDirections		(2,		5,		insTsiObsPnlTF_Second,		tsiObsPnl_OSC,			40)
-	// 	if showTsiObsPnlRow_tSLOW
-	// 		FunTsiObsPnlCalcDirections		(2,		6,		insTsiObsPnlTF_Second,		tsiObsPnl_TSI_slow,		40)
-	// 	if showTsiObsPnlRow_tFAST
-	// 		FunTsiObsPnlCalcDirections		(2,		7,		insTsiObsPnlTF_Second,		tsiObsPnl_Tsi_fast,		35)
-	// 	if showTsiObsPnlRow_RSI
-	// 		FunTsiObsPnlCalcDirections		(2,		8,		insTsiObsPnlTF_Second,		tsiObsPnl_RSI,			30)
-	// 	if showTsiObsPnlRow_MFI
-	// 		FunTsiObsPnlCalcDirections		(2,		9,		insTsiObsPnlTF_Second,		tsiObsPnl_MFI,			25)
-	// 	if showTsiObsPnlRow_ADX
-	// 		FunTsiObsPnlCalcDirections		(2,		10,		insTsiObsPnlTF_Second,		tsiObsPnl_ADX,			20)
+		if showTsiObsPnlRow_OSC
+			FunTsiObsPnlCalcDirections		(2,		5,		insTsiObsPnlTF_Second,		tsiObsPnl_OSC,			40)
+		if showTsiObsPnlRow_tSLOW
+			FunTsiObsPnlCalcDirections		(2,		6,		insTsiObsPnlTF_Second,		tsiObsPnl_TSI_slow,		40)
+		if showTsiObsPnlRow_tFAST
+			FunTsiObsPnlCalcDirections		(2,		7,		insTsiObsPnlTF_Second,		tsiObsPnl_Tsi_fast,		35)
+		if showTsiObsPnlRow_RSI
+			FunTsiObsPnlCalcDirections		(2,		8,		insTsiObsPnlTF_Second,		tsiObsPnl_RSI,			30)
+		if showTsiObsPnlRow_MFI
+			FunTsiObsPnlCalcDirections		(2,		9,		insTsiObsPnlTF_Second,		tsiObsPnl_MFI,			25)
+		if showTsiObsPnlRow_ADX
+			FunTsiObsPnlCalcDirections		(2,		10,		insTsiObsPnlTF_Second,		tsiObsPnl_ADX,			20)
 
 	// if showTsiObsPnlColu_Mayor
 	// 	FunTsiObsPnlCalcCellHead			(3,		0,		'Mayor')
-	// 	// FunTsiObsPnlCalculateCellValue		(3,		1,		vTsiObsPnlTFNow)
-	// 	// if showTsiObsPnlRow_TREND
-	// 		// FunTsiObsPnlCalculateCellSgn	(3,		2,		insTsiObsPnlTF_Third,		tsiObsPnl_ZeroLag)
-	// 	// if showTsiObsPnlRow_VIDYA
-	// 		// FunTsiObsPnlCalculateCellSgn	(3,		3,		insTsiObsPnlTF_Third,		tsiObsPnl_Vidya)
+		// FunTsiObsPnlCalculateCellValue		(3,		1,		vTsiObsPnlTFNow)
+		// if showTsiObsPnlRow_TREND
+			// FunTsiObsPnlCalculateCellSgn	(3,		2,		insTsiObsPnlTF_Third,		tsiObsPnl_ZeroLag)
+		// if showTsiObsPnlRow_VIDYA
+			// FunTsiObsPnlCalculateCellSgn	(3,		3,		insTsiObsPnlTF_Third,		tsiObsPnl_Vidya)
 	// 	if showTsiObsPnlRow_DELTA
 	// 		FunTsiObsPnlCalcDirections		(3,		4,		insTsiObsPnlTF_Third,		tsiObsPnl_DELTA,		40)
-	// 	if showTsiObsPnlRow_OSC
-	// 		FunTsiObsPnlCalcDirections		(3,		5,		insTsiObsPnlTF_Third,		tsiObsPnl_OSC,			40)
-	// 	if showTsiObsPnlRow_tSLOW
-	// 		FunTsiObsPnlCalcDirections		(3,		6,		insTsiObsPnlTF_Third,		tsiObsPnl_TSI_slow,		40)
-	// 	if showTsiObsPnlRow_tFAST
-	// 		FunTsiObsPnlCalcDirections		(3,		7,		insTsiObsPnlTF_Third,		tsiObsPnl_Tsi_fast,		35)
-	// 	if showTsiObsPnlRow_RSI
-	// 		FunTsiObsPnlCalcDirections		(3,		8,		insTsiObsPnlTF_Third,		tsiObsPnl_RSI,			30)
-	// 	if showTsiObsPnlRow_MFI
-	// 		FunTsiObsPnlCalcDirections		(3,		9,		insTsiObsPnlTF_Third,		tsiObsPnl_MFI,			25)
-	// 	if showTsiObsPnlRow_ADX
-	// 		FunTsiObsPnlCalcDirections		(3,		10,		insTsiObsPnlTF_Third,		tsiObsPnl_ADX,			20)
+		if showTsiObsPnlRow_OSC
+			FunTsiObsPnlCalcDirections		(3,		5,		insTsiObsPnlTF_Third,		tsiObsPnl_OSC,			40)
+		if showTsiObsPnlRow_tSLOW
+			FunTsiObsPnlCalcDirections		(3,		6,		insTsiObsPnlTF_Third,		tsiObsPnl_TSI_slow,		40)
+		if showTsiObsPnlRow_tFAST
+			FunTsiObsPnlCalcDirections		(3,		7,		insTsiObsPnlTF_Third,		tsiObsPnl_Tsi_fast,		35)
+		if showTsiObsPnlRow_RSI
+			FunTsiObsPnlCalcDirections		(3,		8,		insTsiObsPnlTF_Third,		tsiObsPnl_RSI,			30)
+		if showTsiObsPnlRow_MFI
+			FunTsiObsPnlCalcDirections		(3,		9,		insTsiObsPnlTF_Third,		tsiObsPnl_MFI,			25)
+		if showTsiObsPnlRow_ADX
+			FunTsiObsPnlCalcDirections		(3,		10,		insTsiObsPnlTF_Third,		tsiObsPnl_ADX,			20)
 
 
 /// ─── Table Multi indicators

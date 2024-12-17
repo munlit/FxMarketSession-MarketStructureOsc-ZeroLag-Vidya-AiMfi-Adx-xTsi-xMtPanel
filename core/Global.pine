@@ -543,6 +543,31 @@ FunxTsiMuCalculateTendencyTSI() =>
 	[_trend_tsi, _trend_ema]
 
 
+/// ─── Function Timeframe x 3
+FunTsiObsPnlCalcTimeFrames() =>
+	_tf_first							= timeframe.period
+	_number								= str.tonumber(_tf_first)
+	_mayor								= 60
+	_minor								= 15
+
+	_tf_second							= _number		>=	_mayor	?
+										  _number		+	_mayor	:
+										  _number		+	_minor
+
+	_tf_third							= _tf_second	>=	_mayor	?
+										  _tf_second	+	_mayor	:
+										  _tf_second	+	_minor
+
+	_result_first						= _tf_first
+	_result_second						= str.tostring(_tf_second)
+	_result_third						= str.tostring(_tf_third)
+
+	[_result_first, _result_second, _result_third]
+
+/// ─── Instance Cells Timeframes
+[insTsiObsPnlTF_First, insTsiObsPnlTF_Second, insTsiObsPnlTF_Third]	= FunTsiObsPnlCalcTimeFrames()
+
+
 /// ───────────────────────
 /// ─── Instances
 /// ───────────────────────

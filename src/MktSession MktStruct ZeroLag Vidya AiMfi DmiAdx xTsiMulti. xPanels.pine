@@ -679,7 +679,6 @@ vFxMkSs_NoneColor						= _co_gbl_black
 
 
 /// ─── Timezone
-// optFxMkSs_TimeZone						= input.string	(defval = 'New York',	title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
 optFxMkSs_TimeZone						= input.string	(defval = 'New York',	title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
 		  options						= 				['New York', 'Chicago', 'NYSE', 'Londres', 'Tokyo', 'Sydney', 'Argentina'])
 showFxMkSs_History						= input.string	(defval = vFxMkSs_Yes,	title = 'Historico',										group = fxMrkSsGroupGral,			options = [vFxMkSs_Yes, vFxMkSs_No]) == vFxMkSs_Yes
@@ -697,9 +696,9 @@ vFxMkSs_SessLnExtend					= input.string	(vFxMkSs_No,			title = 'Extender',						
 
 /// Killzones London
 showFxMkSs_KillLonOpen					= input.bool	(true,					title = 'KillZone Open',									group = fxMrkSsGroupLon,			inline = 'KillLonOpen')
-vFxMkSs_KillLonTimeOpen					= input.session	('0400-0500',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonOpen')
+vFxMkSs_KillLonTimeOpen					= input.session	('0330-0445',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonOpen')
 showFxMkSs_KillLonRally					= input.bool	(true,					title = 'KillZone Rally',									group = fxMrkSsGroupLon,			inline = 'KillLonRally')
-vFxMkSs_KillLonTimeRally				= input.session	('0600-0645',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonRally')
+vFxMkSs_KillLonTimeRally				= input.session	('0515-0615',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonRally')
 showFxMkSs_KillLonClose					= input.bool	(true,					title = 'KillZone Close',									group = fxMrkSsGroupLon,			inline = 'KillLonClose')
 vFxMkSs_KillLonTimeClose				= input.session	('1115-1200',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonClose')
 
@@ -715,9 +714,9 @@ vFxMkSs_SessNyExtend					= input.string	(vFxMkSs_No,			title = 'Extender',						
 showFxMkSs_KillNwYOpen					= input.bool	(true,					title = 'KillZone Open',									group = fxMrkSsGroupNewY,			inline = 'KillNwYOpen')
 vFxMkSs_KillNwYTimeOpen					= input.session	('0730-0845',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYOpen')
 showFxMkSs_KillNwYRally					= input.bool	(true,					title = 'KillZone Rally',									group = fxMrkSsGroupNewY,			inline = 'KillNwYRally')
-vFxMkSs_KillNwYTimeRally				= input.session	('1000-1045',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYRally')
+vFxMkSs_KillNwYTimeRally				= input.session	('0930-1045',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYRally')
 showFxMkSs_KillNwYClose					= input.bool	(true,					title = 'KillZone Close',									group = fxMrkSsGroupNewY,			inline = 'KillNwYClose')
-vFxMkSs_KillNwYTimeClose				= input.session	('1230-1315',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYClose')
+vFxMkSs_KillNwYTimeClose				= input.session	('1230-1345',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYClose')
 
 /// ─── Tokyo
 showFxMkSs_SessTk						= input.bool	(true,					title = 'Tokyo   ',											group = fxMrkSsGroupTyo,			inline = 'session3_1') and vFxMkSs_Show
@@ -739,8 +738,8 @@ vFxMkSs_SessSdExtend					= input.string	(vFxMkSs_No,			title = 'Extender',						
 optFxMkSs_LineStyle						= input.string	('····',				title = 'Box style', 										group = fxMrkSsGroupLine,
 		  options						= 				['⎯⎯⎯⎯', '----', '····'])
 vFxMkSs_BorderWidth						= input.int		(1,						title = 'Ancho de Linea',	minval = 0,						group = fxMrkSsGroupLine)
-vFxMkSs_BgOpacity						= input.int		(90,					title = 'Transp fondo',	minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
-vFxMkSs_LineOpacity						= input.int		(30,					title = 'Transp contorno',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+vFxMkSs_BgOpacity						= input.int		(90,					title = 'Transp fondo',	minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'backg color')
+vFxMkSs_LineOpacity						= input.int		(20,					title = 'Transp contorno',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'border color')
 
 /// ─── Labels
 showFxMkSs_Labels						= input.bool	(true,					title = 'Información',										group = fxMrkSsGroupTag,			inline = 'label_show') and vFxMkSs_Show
@@ -771,7 +770,7 @@ optFxMkSs_LineKillzone					= '⎯⎯⎯⎯'
 /// ＦＵＮＣＴＩＯＮＳ ――――――――――――――――――――――
 
 
-/// ─── function visual areas
+/// ─── function visual temp mayor
 FunFxMkSs_AreasIfTimeframe(_cond) =>
 	switch _cond
 		'2 Horas'						=> 120	
@@ -910,44 +909,44 @@ FunFxMkSs_DrawBox(_show, _session, _color, _label, _extend, _lookback) =>
 	[_session, _open, _high, _low]
 
 /// ─── Killzones
-FunFxMkSs_RenderKillZones(_on, _color) =>
+FunFxMkSs_RenderKillZones(_show, _on, _color) =>
+	if _show
+		var int Bar						= 0
+		var float High					= 0.0 
+		var float Low					= 0.0
+		var box BoX						= na
+		var label LabeL					= na 
 
-	var int Bar							= 0
-	var float High						= 0.0 
-	var float Low						= 0.0
-	var box BoX							= na
-	var label LabeL						= na 
+		if  (_on[1] == 0 and _on == 1)
+			Bar							:= bar_index
+			High						:= high
+			Low							:= low
 
-	if  (_on[1] == 0 and _on == 1)
-		Bar								:= bar_index
-		High							:= high
-		Low								:= low
+		else if (_on[1] == 1 and _on == 1)
+			High						:= math.max(high , High) 
+			Low							:= math.min(low , Low)
 
-	else if (_on[1] == 1 and _on == 1)
-		High							:= math.max(high , High) 
-		Low								:= math.min(low , Low)
+		else if _on == 0
+			High						:= 0.0 
+			Low							:= 0.0
+			Bar							:= 0
 
-	else if _on == 0
-		High							:= 0.0 
-		Low								:= 0.0
-		Bar								:= 0
+		if _on > _on[1]
+			BoX							:= box.new(bar_index, High, bar_index, Low,
+				  bgcolor				= color.new(_color, 70),
+				  border_color			= color.new(_color, 90),
+				  border_width			= 1,
+				  border_style			= FunGlobalLineStyle(optFxMkSs_LineKillzone),
+				  force_overlay			= true)
 
-	if _on > _on[1]
-		BoX								:= box.new(bar_index, High, bar_index, Low,
-		  bgcolor						= color.new(_color, 80),
-		  border_color					= color.new(_color, 90),
-		  border_width					= 1,
-		  border_style					= FunGlobalLineStyle(optFxMkSs_LineKillzone),
-		  force_overlay					= true)
+		if _on and _on == _on[1]
+			box.set_top(BoX, High)
+			box.set_bottom(BoX, Low)
+			box.set_right(BoX, bar_index)
+			label.set_x(LabeL,math.round(math.avg(Bar,bar_index)))
+			label.set_y(LabeL, High)
 
-	if _on and _on == _on[1]
-		box.set_top(BoX, High)
-		box.set_bottom(BoX, Low)
-		box.set_right(BoX, bar_index)
-		label.set_x(LabeL,math.round(math.avg(Bar,bar_index)))
-		label.set_y(LabeL, High)
-
-	[High , Low ]
+		[High , Low]
 
 
 /// ＩＮＳＴＡＮＣＳ ――――――――――――――――――――
@@ -956,65 +955,62 @@ FunFxMkSs_RenderKillZones(_on, _color) =>
 /// ─── Timeframe
 iTimeMkSs_TimeFCond						= FunFxMkSs_AreasIfTimeframe(strGlobalAreasTimeFrame)
 bool	timeMkSs_TimeFrameIf			= str.tonumber(timeframe.period)		<=	iTimeMkSs_TimeFCond
-// timeMkSs_TimeFrameIf					= str.tonumber(timeframe.period)	<	60	?	timeframe.period	: na
 
-string	ms_timeZone						= (FunGlobalTimeZone(optFxMkSs_TimeZone) == vFxMkSs_No or FunGlobalTimeZone(optFxMkSs_TimeZone) == '') ? na : FunGlobalTimeZone(optFxMkSs_TimeZone)
+string	MkSs_timeZone					= (FunGlobalTimeZone(optFxMkSs_TimeZone) == vFxMkSs_No or FunGlobalTimeZone(optFxMkSs_TimeZone) == '') ? na : FunGlobalTimeZone(optFxMkSs_TimeZone)
 
 /// ─── Timeframe London
-int		timeMkSs_SessLon				= time(timeframe.period,	vFxMkSs_SessLnTimeZ,		ms_timeZone)
-
-timeMkSs_KillLonOpen					= time(timeframe.period,	vFxMkSs_KillLonTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
-timeMkSs_KillLonRally					= time(timeframe.period,	vFxMkSs_KillLonTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
-timeMkSs_KillLonClose					= time(timeframe.period,	vFxMkSs_KillLonTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+int		timeMkSs_SessLon				= time(timeframe.period,	vFxMkSs_SessLnTimeZ,	MkSs_timeZone)
 
 /// ─── Timeframe New York
-int timeMkSs_SessNewY					= time(timeframe.period,	vFxMkSs_SessNyTimeZ,		ms_timeZone)
-
-timeMkSs_KillNwYOpen					= time(timeframe.period,	vFxMkSs_KillNwYTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))
-timeMkSs_KillNwYRally					= time(timeframe.period,	vFxMkSs_KillNwYTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))
-timeMkSs_KillNwYClose					= time(timeframe.period,	vFxMkSs_KillNwYTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))
+int timeMkSs_SessNewY					= time(timeframe.period,	vFxMkSs_SessNyTimeZ,	MkSs_timeZone)
 
 /// ─── Timeframe Tokyo
-int timeMkSs_SessTyk					= time(timeframe.period,	vFxMkSs_SessTkTimeZ,		ms_timeZone)
+int timeMkSs_SessTyk					= time(timeframe.period,	vFxMkSs_SessTkTimeZ,	MkSs_timeZone)
 
 /// ─── Timeframe Sydney
-int timeMkSs_SessSyd					= time(timeframe.period,	vFxMkSs_SessSdTimeZ,		ms_timeZone)
+int timeMkSs_SessSyd					= time(timeframe.period,	vFxMkSs_SessSdTimeZ,	MkSs_timeZone)
+
+/// ─── killzones london
+
+timeMkSs_KillLonOpen					= math.sign(nz(time(timeframe.period,		vFxMkSs_KillLonTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
+timeMkSs_KillLonRally					= math.sign(nz(time(timeframe.period,		vFxMkSs_KillLonTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
+timeMkSs_KillLonClose					= math.sign(nz(time(timeframe.period,		vFxMkSs_KillLonTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
+
+/// ─── killzones new york
+timeMkSs_KillNwYOpen					= math.sign(nz(time(timeframe.period,		vFxMkSs_KillNwYTimeOpen,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
+timeMkSs_KillNwYRally					= math.sign(nz(time(timeframe.period,		vFxMkSs_KillNwYTimeRally,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
+timeMkSs_KillNwYClose					= math.sign(nz(time(timeframe.period,		vFxMkSs_KillNwYTimeClose,	FunGlobalTimeZone(optFxMkSs_TimeZone))))
 
 
 /// ＰＬＯＴ ――――――――――――――――――――――――――――――
 
 
 /// ─── Session London
-[DRAWMkSsSessLon,		DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessLon,	DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]		= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and timeMkSs_TimeFrameIf and showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
 
 /// ─── Session New York
-[DRAWMkSsSessNewY,		DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessNewY,	DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]		= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and timeMkSs_TimeFrameIf and showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
 
 /// ─── Session Tokyo
-[DRAWMkSsSessTyk,		DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessTyk,	DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]		= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and timeMkSs_TimeFrameIf and showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
 
 /// ─── Session Sydney
-[DRAWMkSsSessSyd,		DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]				= FunFxMkSs_DrawBox(timeMkSs_TimeFrameIf and display_FxMkSs__Sessions and showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
+[DRAWMkSsSessSyd,	DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]		= FunFxMkSs_DrawBox(display_FxMkSs__Sessions and timeMkSs_TimeFrameIf and showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
+
 
 /// ─── KillZones London
-if showFxMkSs_KillLonOpen and display_FxMkSs__Sessions
-	[DwMkSs_KillLon_Open, DwMkSs_KillLon_Op]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonOpen,	vFxMkSs_KillLonColor)
+[DwMkSs_KillLon_Open,	DwMkSs_KillLon_Op]		= FunFxMkSs_RenderKillZones(display_FxMkSs__Sessions	and	timeMkSs_TimeFrameIf	and showFxMkSs_SessLon	and	showFxMkSs_KillLonOpen,		timeMkSs_KillLonOpen,	vFxMkSs_KillLonColor)
 
-if showFxMkSs_KillLonRally and display_FxMkSs__Sessions
-	[DwMkSs_KillLon_Rally, DwMkSs_KillLon_Rl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonRally,	vFxMkSs_KillLonColor)
+[DwMkSs_KillLon_Rally,	DwMkSs_KillLon_Rl]		= FunFxMkSs_RenderKillZones(display_FxMkSs__Sessions	and	timeMkSs_TimeFrameIf	and showFxMkSs_SessLon	and	showFxMkSs_KillLonRally,	timeMkSs_KillLonRally,	vFxMkSs_KillLonColor)
 
-if showFxMkSs_KillLonClose and display_FxMkSs__Sessions
-	[DwMkSs_KillLon_Close, DwMkSs_KillLon_Cl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillLonClose,	vFxMkSs_KillLonColor)
+[DwMkSs_KillLon_Close,	DwMkSs_KillLon_Cl]		= FunFxMkSs_RenderKillZones(display_FxMkSs__Sessions	and	timeMkSs_TimeFrameIf	and showFxMkSs_SessLon	and	showFxMkSs_KillLonClose,	timeMkSs_KillLonClose,	vFxMkSs_KillLonColor)
 
 /// ─── KillZones New York
-if showFxMkSs_KillNwYOpen and display_FxMkSs__Sessions
-	[DwMkSs_KillNwY_Open, DwMkSs_KillNwY_Op]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYOpen,	vFxMkSs_KillNwYColor)
+[DwMkSs_KillNwY_Open,	DwMkSs_KillNwY_Op]		= FunFxMkSs_RenderKillZones(display_FxMkSs__Sessions	and	timeMkSs_TimeFrameIf	and showFxMkSs_SessNy	and	showFxMkSs_KillNwYOpen,		timeMkSs_KillNwYOpen,	vFxMkSs_KillNwYColor)
 
-if showFxMkSs_KillNwYRally and display_FxMkSs__Sessions
-	[DwMkSs_KillNwY_Rally, DwMkSs_KillNwY_Rl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYRally,	vFxMkSs_KillNwYColor)
+[DwMkSs_KillNwY_Rally,	DwMkSs_KillNwY_Rl]		= FunFxMkSs_RenderKillZones(display_FxMkSs__Sessions	and	timeMkSs_TimeFrameIf	and showFxMkSs_SessNy	and	showFxMkSs_KillNwYRally,	timeMkSs_KillNwYRally,	vFxMkSs_KillNwYColor)
 
-if showFxMkSs_KillNwYClose and display_FxMkSs__Sessions
-	[DwMkSs_KillNwY_Close, DwMkSs_KillNwY_Cl]		= FunFxMkSs_RenderKillZones(timeMkSs_KillNwYClose,	vFxMkSs_KillNwYColor)
+[DwMkSs_KillNwY_Close,	DwMkSs_KillNwY_Cl]		= FunFxMkSs_RenderKillZones(display_FxMkSs__Sessions	and	timeMkSs_TimeFrameIf	and showFxMkSs_SessNy	and	showFxMkSs_KillNwYClose,	timeMkSs_KillNwYClose,	vFxMkSs_KillNwYColor)
 
 
 /// ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■

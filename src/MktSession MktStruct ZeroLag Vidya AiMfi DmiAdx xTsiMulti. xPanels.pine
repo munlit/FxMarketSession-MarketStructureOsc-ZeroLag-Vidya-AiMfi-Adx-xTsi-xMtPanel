@@ -1478,19 +1478,19 @@ xAdxDiHi_ADX							= ta.sma(xAdxDiHi_DX,						adxDiHi_Length)
 xAdxDiHi_Didi							= adxDiHi_Th		+ (xAdxDiHi_DIPlus		- xAdxDiHi_DIMinus)
 
 xAdxDiHi_CR								= 
-										  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	10	:
-										  xAdxDiHi_Didi		>=	adxDiHi_Th + 30		?	24	:
-										  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	38	:
-										  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	52	:
-										  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	66	:
-										  80
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	10	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 30		?	24	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	38	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	52	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	66	:
+					  80
 xAdxDiHi_CG								= 
-										  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	10	:
-										  xAdxDiHi_Didi		<=	adxDiHi_Th - 30		?	24	:
-										  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	38	:
-										  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	52	:
-										  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	66	:
-										  80
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	10	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 30		?	24	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	38	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	52	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	66	:
+					  80
 
 
 /// ＰＬＯＴ ―――――――――――――――――――――――――――
@@ -1501,7 +1501,7 @@ adxDiHiPlotIf							= strGlobalMultiHistogram  == 'Adx' or strGlobalMultiHistogr
 plot(adxDiHiPlotIf == 'True' and display_DmiAdx_AdxHisto	? xAdxDiHi_Didi	: na,
 	  style								= plot.style_area,
 	//   style								= plot.style_columns,
-	  linewidth							= 4,
+	  linewidth							= 2,
 	  color								= xAdxDiHi_Didi			>= adxDiHi_Th	?
 		  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
 		  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
@@ -1875,6 +1875,54 @@ FunMltObsPnlCalcTrendDelta(_col, _row, _ticker) =>
 		  text_color					= color.new(co_MltObsPnl_TextDark,	15)
 		  )
 
+/// ─── Function cell mfi / osc trends
+FunMltObsPnlCalcTrendMfiOsc(_col, _row, _ticker) =>
+	_distance							= 25
+
+	_mid								= MltObsPnl_Middle
+	_div								= 5
+
+	//	overbought/oversold
+	_overbought							=  _mid			+	_distance
+	_oversold							=  _mid			-	_distance
+
+	_fract_bougth						= math.round		(_overbought	-	(_overbought	/	_div))
+	_fract_sold							= math.ceil			(_oversold		+	(_overbought	/	_div))
+
+	/// ─── signal buy/sell
+	_if_buy								= _ticker	>	_ticker[2]	and	_ticker[1]	>	_ticker[3]	and _ticker	>=	_mid
+	_if_sell							= _ticker	<	_ticker[2]	and	_ticker[1]	<	_ticker[3]	and _ticker	<=	_mid
+
+	_if_structure						=
+						  _if_buy		and		_ticker		>=	_fract_bougth	?
+						  '🟢'													:
+						  _if_sell		and		_ticker		<=	_fract_sold		?
+						  '🔴'													:
+						  '    '
+
+	_cell_color							=
+		  _if_buy						?
+		  co_MltObsPnl_Buy				:
+		  _if_sell						?
+		  co_MltObsPnl_Sell				:
+		  co_MltObsPnl_Neutral
+
+	_cell_opacity						=
+		  _ticker	>=	_overbought		or
+		  _ticker	<=	_oversold		?
+		  20							:
+		  _ticker	>=	_fract_bougth	or
+		  _ticker	<=	_fract_sold		?
+		  40							:
+		  60
+
+	_cell_text							= str.tostring(_ticker, '#.0')	+ ' '	+ _if_structure
+
+	table.cell							(vTsiPnlTableTrend, _col, _row, _cell_text,
+		  bgcolor						= color.new(_cell_color,	_cell_opacity),
+  		  text_size						= FunGlobalTextSize(stMltObsPnl_TextSize),
+		  text_color					= co_MltObsPnl_TextDark)
+
 /// ─── Function cell adx trends
 FunMltObsPnlCalcTrendAdx(_col, _row, _ticker) =>
 	_number								= _ticker
@@ -1900,9 +1948,6 @@ FunMltObsPnlCalcTrendAdx(_col, _row, _ticker) =>
 
 /// ─── Function table cells Signal
 FunMltObsPnlCalcDirections(_col, _row, _index, _distance) =>
-	// timeframe
-	_timeframe							= timeframe.period
-
 	_mid								= MltObsPnl_Middle
 	_div								= 5
 
@@ -1920,9 +1965,9 @@ FunMltObsPnlCalcDirections(_col, _row, _index, _distance) =>
 	_if_structure						= _if_buy		?	'🟢'			:	_if_sell		?	'🔴'	:	'    '
 
 	_cell_color							=
-		  _index	>=	_fract_bougth	?
+		  _if_buy	and _oversold		?
 		  co_MltObsPnl_Buy				:
-		  _index	<=	_fract_sold		?
+		  _if_sell	and	_overbought		?
 		  co_MltObsPnl_Sell				:
 		  co_MltObsPnl_Neutral
 
@@ -1958,9 +2003,6 @@ var vTsiPnlTableMtlIndicator			= table.new(
 
 /// ─── Function table multi indicador
 FunMltObsPnlCalcMultiIndic(_col, _row, _title, _ticker, _distance) =>
-	// timeframe
-	_timeframe							= timeframe.period
-
 	/// ─── signal buy/sell
 	_if_buy								= _ticker		>	_ticker[2]		and	_ticker[1]		>	_ticker[3]
 	_if_sell							= _ticker		<	_ticker[2]		and	_ticker[1]		<	_ticker[3]
@@ -2077,25 +2119,25 @@ FunMltObsPnlCalcTimeTicker() =>
 
 /// ─── Table Trend indicators
 if display_MltObsPnlMultiTFIndicPanel
-	// FunMltObsPnlCalcCellHead				(0,		0,			'Promedio')
+	// FunMltObsPnlCalcCellHead				(0,		0,			'Trend Score')
 	if show_MltObsPnlRow_TREND
-		FunMltObsPnlCalcCellHead			(0,		1,			'Trend')
+		FunMltObsPnlCalcCellHead			(0,		1,			'Trend ')
 	if show_MltObsPnlRow_VIDYA
-		FunMltObsPnlCalcCellHead			(0,		2,			'Dya')
-	if show_MltObsPnlRow_OSC
-		FunMltObsPnlCalcCellHead			(0,		3,			'Osc')
+		FunMltObsPnlCalcCellHead			(0,		2,			'Dya   ')
 	if show_MltObsPnlRow_tSLOW
-		FunMltObsPnlCalcCellHead			(0,		4,			'Tsi')
+		FunMltObsPnlCalcCellHead			(0,		3,			'Tsi   ')
 	if show_MltObsPnlRow_tFAST
-		FunMltObsPnlCalcCellHead			(0,		5,			'xFast')
+		FunMltObsPnlCalcCellHead			(0,		4,			'xFast ')
 	if show_MltObsPnlRow_RSI
-		FunMltObsPnlCalcCellHead			(0,		6,			'Rsi')
+		FunMltObsPnlCalcCellHead			(0,		5,			'Rsi   ')
+	if show_MltObsPnlRow_OSC
+		FunMltObsPnlCalcCellHead			(0,		6,			'Osc   ')
 	if show_MltObsPnlRow_MFI
-		FunMltObsPnlCalcCellHead			(0,		7,			'Mfi')
+		FunMltObsPnlCalcCellHead			(0,		7,			'Mfi   ')
 	if show_MltObsPnlRow_ADX
-		FunMltObsPnlCalcCellHead			(0,		8,			'Adx')
+		FunMltObsPnlCalcCellHead			(0,		8,			'Adx   ')
 	if show_MltObsPnlRow_DELTA
-		FunMltObsPnlCalcCellHead			(0,		9,			'Delta')
+		FunMltObsPnlCalcCellHead			(0,		9,			'Delta ')
 
 	if show_MltObsPnlColumn_Now
 		// FunMltObsPnlCalcXTendency			(1,		0,		vMltObsPnlTFNow)
@@ -2103,16 +2145,16 @@ if display_MltObsPnlMultiTFIndicPanel
 			FunMltObsPnlCalcTrends			(1,		1,			MltObsPnl_ZeroLag)
 		if show_MltObsPnlRow_VIDYA
 			FunMltObsPnlCalcTrends			(1,		2,			MltObsPnl_Vidya)
-		if show_MltObsPnlRow_OSC
-			FunMltObsPnlCalcDirections		(1,		3,			MltObsPnl_OSC,				40)
 		if show_MltObsPnlRow_tSLOW
-			FunMltObsPnlCalcDirections		(1,		4,			MltObsPnl_TSI_slow,			40)
+			FunMltObsPnlCalcDirections		(1,		3,			MltObsPnl_TSI_slow,			40)
 		if show_MltObsPnlRow_tFAST
-			FunMltObsPnlCalcDirections		(1,		5,			MltObsPnl_Tsi_fast,			35)
+			FunMltObsPnlCalcDirections		(1,		4,			MltObsPnl_Tsi_fast,			35)
 		if show_MltObsPnlRow_RSI
-			FunMltObsPnlCalcDirections		(1,		6,			MltObsPnl_RSI,				30)
+			FunMltObsPnlCalcDirections		(1,		5,			MltObsPnl_RSI,				30)
+		if show_MltObsPnlRow_OSC
+			FunMltObsPnlCalcTrendMfiOsc		(1,		6,			MltObsPnl_OSC)
 		if show_MltObsPnlRow_MFI
-			FunMltObsPnlCalcDirections		(1,		7,			MltObsPnl_MFI,				25)
+			FunMltObsPnlCalcTrendMfiOsc		(1,		7,			MltObsPnl_MFI)
 		if show_MltObsPnlRow_ADX
 			FunMltObsPnlCalcTrendAdx		(1,		8,			MltObsPnl_ADX)
 		if show_MltObsPnlRow_DELTA

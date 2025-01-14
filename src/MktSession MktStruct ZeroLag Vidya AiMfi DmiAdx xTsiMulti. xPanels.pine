@@ -1478,19 +1478,19 @@ xAdxDiHi_ADX							= ta.sma(xAdxDiHi_DX,						adxDiHi_Length)
 xAdxDiHi_Didi							= adxDiHi_Th		+ (xAdxDiHi_DIPlus		- xAdxDiHi_DIMinus)
 
 xAdxDiHi_CR								= 
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	8	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	10	:
 					  xAdxDiHi_Didi		>=	adxDiHi_Th + 30		?	20	:
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	32	:
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	44	:
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	56	:
-					  68
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	30	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	40	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	50	:
+					  60
 xAdxDiHi_CG								= 
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	8	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	10	:
 					  xAdxDiHi_Didi		<=	adxDiHi_Th - 30		?	20	:
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	32	:
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	44	:
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	56	:
-					  68
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	30	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	40	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	50	:
+					  60
 
 
 /// ＰＬＯＴ ―――――――――――――――――――――――――――
@@ -1500,11 +1500,10 @@ adxDiHiPlotIf							= strGlobalMultiHistogram  == 'Adx' or strGlobalMultiHistogr
 
 plot(adxDiHiPlotIf == 'True' and display_DmiAdx_AdxHisto	? xAdxDiHi_Didi	: na,
 	  style								= plot.style_area,
-	//   style								= plot.style_columns,
-	  linewidth							= 2,
-	  color								= xAdxDiHi_Didi			>= adxDiHi_Th	?
-		  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
-		  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
+	  linewidth							= 3,
+	  color								= xAdxDiHi_Didi			>= adxDiHi_Th			?
+										  color.new(colorxAdxDiHi_Buy,	xAdxDiHi_CR)	:
+										  color.new(colorxAdxDiHi_Sell,	xAdxDiHi_CG),
 	  histbase							= adxDiHi_Th,
 	  title								= 'DI')
 

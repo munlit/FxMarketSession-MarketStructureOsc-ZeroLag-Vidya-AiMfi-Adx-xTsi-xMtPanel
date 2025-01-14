@@ -1478,19 +1478,19 @@ xAdxDiHi_ADX							= ta.sma(xAdxDiHi_DX,						adxDiHi_Length)
 xAdxDiHi_Didi							= adxDiHi_Th		+ (xAdxDiHi_DIPlus		- xAdxDiHi_DIMinus)
 
 xAdxDiHi_CR								= 
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	10	:
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 30		?	24	:
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	38	:
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	52	:
-					  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	66	:
-					  80
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 40		?	8	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 30		?	20	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 20		?	32	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 10		?	44	:
+					  xAdxDiHi_Didi		>=	adxDiHi_Th + 5		?	56	:
+					  68
 xAdxDiHi_CG								= 
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	10	:
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 30		?	24	:
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	38	:
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	52	:
-					  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	66	:
-					  80
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 40		?	8	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 30		?	20	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 20		?	32	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 10		?	44	:
+					  xAdxDiHi_Didi		<=	adxDiHi_Th - 5		?	56	:
+					  68
 
 
 /// ＰＬＯＴ ―――――――――――――――――――――――――――
@@ -1513,7 +1513,6 @@ plot(adxDiHiPlotIf == 'True' and display_DmiAdx_AdxHisto	? xAdxDiHi_Didi	: na,
 
 
 /// ╔═══════════════════════════════╗
-/// ║	Tsi & Divergences			║
 /// ║	Tsi Multi Speed				║
 /// ║	@	Allen.					║
 /// ╚═══════════════════════════════╝
@@ -1794,7 +1793,7 @@ MltObsPnl_DELTA							= vVidya_delta_volume					//	Delta Volume
 MltObsPnl_DELTA_f						= vVidya_delta_float					//	Delta float
 MltObsPnl_OSC							= msOSC									//	Market Oscillator
 MltObsPnl_TSI_slow						= ixTsiMuCalcTsiSlow					//	Tsi Slow		Fast/Slow
-MltObsPnl_Tsi_fast						= ixTsiMuCalcTsiFast					//	Tsi Fast		Fast/Slow
+MltObsPnl_TSI_fast						= ixTsiMuCalcTsiFast					//	Tsi Fast		Fast/Slow
 MltObsPnl_Ema							= ixTsiMuCalcEmaSlow					//	Tsi Ema Slow	Fast/Slow
 MltObsPnl_RSI							= ixTsiMu_RSI							//	Rsi
 MltObsPnlMTFRange						= ixTsiMuCalcMultiTfTSIRange			//	Tsi Multitimeframe
@@ -1810,7 +1809,7 @@ MltObsPnl_ADX							= xAdxDiHi_Didi							//	Adx
 /// ─── New table trends
 var vTsiPnlTableTrend					= table.new(
 	  position							= FunGlobalVertical(MltObsPnl_PosiVert) + '_' + FunGlobalHorizontal(MltObsPnl_PosiHoriz),
-	  columns							= 6,
+	  columns							= 3,
 	  rows								= 11,
 	  border_width						= 2,
 	  frame_color						= color.new(co_MltObsPnl_Black,		70),
@@ -2148,7 +2147,7 @@ if display_MltObsPnlMultiTFIndicPanel
 		if show_MltObsPnlRow_tSLOW
 			FunMltObsPnlCalcDirections		(1,		3,			MltObsPnl_TSI_slow,			40)
 		if show_MltObsPnlRow_tFAST
-			FunMltObsPnlCalcDirections		(1,		4,			MltObsPnl_Tsi_fast,			35)
+			FunMltObsPnlCalcDirections		(1,		4,			MltObsPnl_TSI_fast,			35)
 		if show_MltObsPnlRow_RSI
 			FunMltObsPnlCalcDirections		(1,		5,			MltObsPnl_RSI,				30)
 		if show_MltObsPnlRow_OSC
@@ -2171,7 +2170,7 @@ if display_MltObsPnlIndicatPanel
 		FunMltObsPnlCalcMultiIndic			(0,	1,	'TSI',		MltObsPnl_TSI_slow,		40)
 
 	if show_MltObsPnlIndicatMtf
-		FunMltObsPnlCalcMultiIndic			(0,	2,	'Fast',		MltObsPnl_Tsi_fast,		35)
+		FunMltObsPnlCalcMultiIndic			(0,	2,	'Fast',		MltObsPnl_TSI_fast,		35)
 
 	if show_MltObsPnlIndicatRsi
 		FunMltObsPnlCalcMultiIndic			(0,	3,	'RSI',		MltObsPnl_RSI,			30)
